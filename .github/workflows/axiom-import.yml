@@ -55,7 +55,7 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf .axiom-import3 .axiom-import2 .axiom-staging
-          rm -f .github/workflows/axiom-import.yml
+          git checkout HEAD -- .github/workflows/validate.yml .github/workflows/release.yml .github/workflows/axiom-import.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
