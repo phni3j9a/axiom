@@ -50,14 +50,20 @@ jobs:
         run: |
           set -euo pipefail
           cargo generate-lockfile --manifest-path plugins/axiom/dashboard/Cargo.toml
-      - name: Commit reconstructed v0.1.3
+      - name: Prepare reconstructed commit
         shell: bash
         run: |
           set -euo pipefail
           rm -rf .axiom-import3 .axiom-import2 .axiom-staging
-          git checkout HEAD -- .github/workflows/validate.yml .github/workflows/release.yml .github/workflows/axiom-import.yml
+          rm -f .github/workflows/release.yml
+          git checkout HEAD -- .github/workflows/validate.yml .github/workflows/axiom-import.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
+          git status --short
           git commit -m "Fix Axiom dashboard v0.1.3"
+      - name: Push reconstructed commit
+        shell: bash
+        run: |
+          set -euo pipefail
           git push origin HEAD:agent/fix-dashboard-v0.1.3
