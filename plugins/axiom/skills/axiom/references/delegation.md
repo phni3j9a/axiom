@@ -1,73 +1,149 @@
-# Delegation guide
+# Delegation
 
-## Main owns the decisions
+## Purpose
 
-Keep these in the Main session:
+Use delegation to protect Main context and gain useful parallelism, not to maximize agent count.
 
-- user intent and material ambiguity;
-- architecture, interfaces, data model, and responsibility boundaries;
-- decomposition and dependency ordering;
-- whether an observed problem changes the plan;
-- integration of competing approaches;
-- final diff inspection, verification judgment, and acceptance.
+Main retains architecture, intent, trade-offs, integration, and acceptance. Luna receives bounded work whose delegation benefit exceeds coordination cost.
 
-A worker may make local implementation choices inside an already-defined boundary, but it must not silently expand scope or redesign an unresolved interface.
+## Signals that favor delegation
 
-## Luna MAX is the default worker
+A Luna MAX worker often helps when:
 
-Treat Luna MAX as a general-purpose bounded worker, not merely an implementer. Appropriate assignments include:
+- repository exploration would touch many files or produce noisy notes;
+- logs, test output, compiler errors, or generated diagnostics would pollute Main context;
+- a change has a useful ownership boundary;
+- an implementation, test, or investigation can make progress without inventing unresolved architecture;
+- repetitive or mechanical work would consume substantial Main context;
+- independent investigations can run concurrently;
+- Main mainly needs evidence, a file map, or a concise recommendation rather than the raw search process.
 
-- codebase exploration with a concrete question;
-- implementation of a defined slice;
-- test creation and targeted debugging;
-- repetitive or mechanical refactors;
-- dependency tracing;
-- log/test-output analysis;
-- documentation or migration of clearly specified content.
+Luna is inexpensive enough to use proactively, but each spawn still has coordination and integration cost.
 
-Do not choose Terra simply because a task is exploratory, context-heavy, or read-heavy. Axiom's default delegated model is Luna MAX. Use another model only for a concrete task-specific reason or explicit user request.
+## Signals that favor staying in Main
 
-## Delegation threshold
+Main may keep work local when:
 
-Good delegation substitutes for Main work. Bad delegation duplicates it.
+- the edit is obvious and local;
+- the request is primarily explanation rather than repository work;
+- architecture or product intent is still unresolved;
+- the worker would require continuous back-and-forth;
+- delegation would save little context or time;
+- the only reason to spawn is to satisfy a ritual.
 
-Prefer delegation when the packet can be self-contained and the expected context/noise saved in Main is larger than the coordination cost. Prefer Main for a two-line fix, unresolved architecture, or work whose core value is the design judgment itself.
+These are heuristics, not routing rules.
 
-## Parallelism
+## Scale the handoff to the task
 
-Parallelize independent searches freely when results do not depend on one another. Parallelize writes only when ownership is disjoint enough that two workers will not edit the same logical surface.
+Give a worker enough context to act correctly. Prefer a self-contained handoff, but do not force a full schema for a small bounded task.
 
-If write scopes overlap, use one worker, sequential delegation, or isolated worktrees. Never spawn a fleet just because concurrency is available.
+### Minimal handoff
 
-## Worker packet
+Useful for a simple investigation or tightly scoped edit:
 
-Every write-capable delegated task should contain enough information to stand alone:
+```text
+GOAL
+- Find why refresh tokens are rejected after rotation.
 
-### OBJECTIVE
-What outcome is required and why.
+SCOPE
+- Inspect auth/token modules and related tests.
+- READ-ONLY for this investigation.
 
-### OWNERSHIP
-Exact files/modules or logical scope the worker owns. State what it must not edit when relevant.
+RETURN
+- Root-cause evidence with file/symbol references.
+- Recommended next step.
+```
 
-### INTERFACES
-Contracts that must remain stable: APIs, types, schemas, behavior, call sites, or integration assumptions.
+### Rich handoff
 
-### CONSTRAINTS
-Design decisions already made, forbidden shortcuts, dependencies, compatibility requirements, and non-goals.
+Add structure as complexity, risk, or write scope grows:
 
-### VERIFICATION
-Commands/checks to run and concrete completion criteria.
+```text
+OBJECTIVE
+- Concrete outcome.
 
-Also request a compact return containing:
+WHY / CONTEXT
+- Decisions and facts needed to do the work.
 
-- files changed;
-- implementation summary;
-- verification run and result;
-- risks/assumptions;
-- anything Main must decide.
+FILES / OWNERSHIP
+- Likely areas to inspect.
+- Intended write boundary or READ-ONLY expectation.
+- Pre-existing changes that must be preserved.
 
-For read-only exploration, simplify the packet but still state the question, scope, constraints, and expected output.
+INTERFACES / INVARIANTS
+- APIs, types, schemas, commands, or behavior that should remain compatible.
 
-## Worker correction
+CONSTRAINTS / NON-GOALS
+- Design choices already made by Main.
+- Important repository instructions.
 
-If the worker misunderstood the packet, correct the packet and reuse/follow up only when preserving that worker's context is genuinely useful. If independence is more valuable, spawn a fresh Luna. Do not create an automatic repair loop.
+ACCEPTANCE
+- Observable conditions that define success.
+
+VERIFICATION
+- Targeted checks or evidence that would be useful.
+
+RETURN
+- Concise result, changed files when applicable, verification evidence, and unresolved risks.
+```
+
+Use only the fields that improve correctness for the current task.
+
+## Worker guidance
+
+Useful defaults for a worker:
+
+- stay aligned with the assigned objective and intended ownership;
+- inspect relevant repository instructions before editing;
+- preserve unrelated and pre-existing changes;
+- avoid destructive Git/history operations;
+- surface substantive architecture or product ambiguity back to Main rather than silently redefining intent;
+- report verification actually performed, not verification merely intended;
+- return concise evidence rather than raw transcripts.
+
+In a shared working tree, Main-owned commits are usually simpler. In an isolated worktree or clearly bounded branch, Main may deliberately delegate commit creation when it improves integration.
+
+Further subdelegation is not a goal by itself. Let the active agent use it only when the runtime supports it and it produces clear net value without obscuring Main's authority.
+
+## Direct-spawn default
+
+For Codex v0.147, prefer:
+
+```text
+model = "gpt-5.6-luna"
+reasoning_effort = "max"
+fork_turns = "none"
+```
+
+A small recent-turn fork can be reasonable when it preserves essential context more reliably than rewriting that context into the message.
+
+See [codex-0.147-subagents.md](codex-0.147-subagents.md) for the exact surface and fail-closed behavior.
+
+## Parallel delegation
+
+Parallelize when expected speed/context benefit exceeds integration cost.
+
+Especially good candidates:
+
+- read-only searches of separate subsystems;
+- tests or analyses of separate packages;
+- implementation in disjoint modules with stable interfaces;
+- competing hypotheses that can be investigated independently.
+
+When writes overlap, Main should explicitly account for conflict and integration cost. Serialization or isolated worktrees are often safer; overlapping writes are not categorically forbidden if Main has a concrete integration strategy.
+
+## Result compression
+
+Workers should return evidence and conclusions, not transcripts.
+
+A compact result might look like:
+
+```text
+RESULT: COMPLETE
+SUMMARY: Added cache invalidation on update and delete.
+CHANGED: src/cache.ts, tests/cache.test.ts
+VERIFICATION: npm test -- cache.test.ts — pass (18 tests)
+RISKS: distributed invalidation remains outside scope
+```
+
+Main may request more raw evidence when a claim is surprising, disputed, or high impact.

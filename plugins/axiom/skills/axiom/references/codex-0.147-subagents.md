@@ -1,90 +1,137 @@
-# Codex 0.147 direct-spawn contract
+# Codex v0.147 direct-spawn subagents
 
-This reference is version-specific. It teaches the Main agent how to request Luna MAX workers and fresh Sol reviewers without installing custom agent profiles.
+This reference is intentionally version-specific. Re-check it before adapting Axiom to another Codex release.
 
-## Preferred surface: Multi-Agent V2
+## One-time configuration
 
-Codex 0.147 adds support for leaf models in Multi-Agent V2. When the active `spawn_agent` schema exposes `task_name`, `fork_turns`, `model`, and `reasoning_effort`, use this shape.
-
-### Luna MAX worker
-
-```text
-spawn_agent
-  task_name: <short_lowercase_task_name>
-  message: <self-contained worker packet>
-  model: gpt-5.6-luna
-  reasoning_effort: max
-  fork_turns: none
-```
-
-### Fresh Sol reviewer
-
-```text
-spawn_agent
-  task_name: review_<short_task_name>
-  message: <self-contained review packet; explicitly forbid writes>
-  model: gpt-5.6-sol
-  reasoning_effort: xhigh
-  fork_turns: none
-```
-
-`max`/`xhigh` are reasoning-effort choices. They are not service tiers. Do not set `service_tier` merely to obtain MAX/XHIGH reasoning.
-
-V2 defaults `fork_turns` to `all` when omitted, so specify `none` intentionally for isolated Axiom work. Valid values are `none`, `all`, or a positive integer string such as `3`.
-
-Codex 0.147 reports: `fork_context is not supported in MultiAgentV2; use fork_turns instead`. Do not pass the V1-only `fork_context` argument to a V2 spawn call.
-
-## V1 compatibility surface in 0.147
-
-If the actual `spawn_agent` schema is V1 and exposes `fork_context` rather than `fork_turns`, use the explicit model override there instead:
-
-### Luna MAX worker, V1
-
-```text
-spawn_agent
-  message: <self-contained worker packet>
-  model: gpt-5.6-luna
-  reasoning_effort: max
-  fork_context: false
-```
-
-### Fresh Sol reviewer, V1
-
-```text
-spawn_agent
-  message: <self-contained review packet; explicitly forbid writes>
-  model: gpt-5.6-sol
-  reasoning_effort: xhigh
-  fork_context: false
-```
-
-Use the schema that is actually exposed by the running Codex session; never invent fields from the other surface.
-
-## If V2 hides model overrides
-
-In Codex 0.147, the V2 implementation supports explicit `model` and `reasoning_effort`, but the tool schema may hide those fields unless model overrides are exposed. The version's feature configuration includes:
+Merge this into `~/.codex/config.toml`, then fully restart Codex:
 
 ```toml
 [features.multi_agent_v2]
+enabled = true
 expose_spawn_agent_model_overrides = true
+wait_agent_enabled = true
+
+# Axiom prefers long event-driven waits instead of repeated 30-second wakeups.
+default_wait_timeout_ms = 3600000
+max_wait_timeout_ms = 3600000
+
+# Optional while validating routing:
+hide_spawn_agent_metadata = false
 ```
 
-If the fields are not present on the active tool schema:
+Axiom must not edit the user's global config automatically.
 
-1. Do not send undeclared arguments.
-2. Do not assume the child will become Luna automatically.
-3. Do not silently substitute Terra.
-4. Tell the user/runtime operator that model overrides are not exposed in this session and point to the 0.147 setting above.
-5. Continue in Main when practical, or wait for the user to adjust runtime configuration when the requested model split matters.
+In Codex v0.147, the built-in Multi-Agent V2 wait defaults are 30,000 ms and the hard maximum is 3,600,000 ms. Setting the default to 60 minutes prevents omitted `timeout_ms` calls from repeatedly waking Main every 30 seconds. A `wait_agent` call returns early when agent activity or new steering input arrives, so 60 minutes is an upper bound rather than a forced sleep duration.
 
-`hide_spawn_agent_metadata` is a different V2 option; it controls returned spawn metadata and should not be treated as the switch that exposes model/effort arguments.
+## Luna MAX worker
 
-## Waiting and reuse
+Prefer direct spawn:
 
-Do not busy-poll. Let workers run while Main performs non-overlapping work. Use the available wait primitive only when the result blocks the next critical step, with a meaningful timeout rather than repeated short waits.
+```text
+spawn_agent(
+  task_name = "bounded_worker_task",
+  message = "<bounded handoff with enough context to act correctly>",
+  model = "gpt-5.6-luna",
+  reasoning_effort = "max",
+  fork_turns = "none"
+)
+```
 
-Reuse an existing worker only when the follow-up genuinely benefits from its local context. Prefer a fresh reviewer even if the implementer is still available.
+Intent:
 
-## Runtime truth
+- `model` selects Luna;
+- `reasoning_effort` selects MAX;
+- `fork_turns: "none"` preserves a clean context boundary when the handoff is sufficient;
+- `message` contains the context the task actually needs.
 
-Tool schema and returned runtime metadata are more trustworthy than a subagent's prose claim about its model. If the runtime rejects the requested model/effort, report the failure instead of pretending the requested routing succeeded.
+Do not confuse `reasoning_effort: "max"` with `service_tier`. Omit `service_tier` unless the user explicitly requests one.
+
+## Sol XHIGH reviewer: fresh initial spawn, same-session re-review
+
+Prefer direct spawn:
+
+```text
+spawn_agent(
+  task_name = "independent_sol_review",
+  message = "<fresh review context with explicit no-edit contract>",
+  model = "gpt-5.6-sol",
+  reasoning_effort = "xhigh",
+  fork_turns = "none"
+)
+```
+
+Never use Luna as the reviewer. Retain the returned reviewer handle/agent identity. If fixes need re-review, continue with that same reviewer session using the follow-up mechanism exposed by the running Codex tool surface rather than starting a new reviewer from scratch.
+
+If the reviewer session is lost, a new direct-spawn Sol XHIGH reviewer is the recovery path. Rehydrate it with the prior findings, Main adjudication, relevant fixes, current candidate, and verification evidence.
+
+## `fork_turns`
+
+Multi-Agent V2 accepts:
+
+- `"none"` — no conversation fork; Axiom default for clean bounded handoffs;
+- `"all"` — full history;
+- a positive integer string such as `"3"` — most recent turns.
+
+Choose the smallest context that reliably preserves the task. A recent-turn fork can be better than rewriting subtle dialogue into a packet; full history can be appropriate when the larger conversation materially informs the task. Use context isolation deliberately rather than mechanically.
+
+Do not pass `fork_context` to Multi-Agent V2. Use `fork_turns`.
+
+## Fail closed when model overrides are hidden
+
+Before relying on delegated model routing, confirm that the available `spawn_agent` surface includes both:
+
+- `model`
+- `reasoning_effort`
+
+If they are missing, do not silently spawn an unspecified worker that may inherit Main Sol. Continue in Main when practical or report the one-time v0.147 configuration requirement. Do not fall back to Terra merely because Luna routing is unavailable, and never fall back to Luna for independent review.
+
+This preserves the intended cost and role separation.
+
+## Waiting without polling churn
+
+For Axiom's long-running workers, prefer an event-driven wait near the v0.147 maximum rather than repeated short waits:
+
+```text
+wait_agent(timeout_ms = 3600000)
+```
+
+With the recommended `default_wait_timeout_ms = 3600000`, omitting the argument has the same intended default.
+
+The call can return before 60 minutes when agent activity arrives or the user steers the parent. If the running configuration exposes a lower maximum, use the longest permitted wait that fits the task rather than tight polling.
+
+When several independent agents are running, spawn the useful set first and then wait; do not serialize them by waiting immediately after each spawn unless their work is actually dependent.
+
+## Follow-up and continuity
+
+Use follow-up when it continues the same bounded task and retained worker context is useful. Start a fresh worker when independence or a clean context boundary is more valuable.
+
+For review, preserve the same Sol reviewer across re-review passes when available; do not reuse an implementation worker as the independent reviewer.
+
+## Reviewer read-only contract
+
+Direct spawn does not install a custom read-only profile. Put this contract at the top of the review message:
+
+```text
+READ-ONLY REVIEW.
+Do not edit files, commit, format, auto-fix, generate code into the working tree,
+or run commands likely to mutate it. Inspect and report evidence only.
+```
+
+Main should verify the working tree after review before accepting the candidate.
+
+## Troubleshooting Luna spawn after an upgrade
+
+If Codex reports v0.147 but rejects `gpt-5.6-luna` as an unknown child model:
+
+1. fully terminate old Codex/app-server processes;
+2. start a new session;
+3. confirm model override fields are exposed;
+4. retry a minimal Luna spawn;
+5. for diagnosis, bypass an old TUI app-server with:
+
+```bash
+codex --disable tui_app_server -m gpt-5.6-sol
+```
+
+Do not claim routing succeeded based only on the child saying “I am Luna.” Use visible spawn metadata or runtime evidence when available.

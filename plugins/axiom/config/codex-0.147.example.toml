@@ -1,0 +1,19 @@
+# Axiom target: Codex v0.147.x
+#
+# Merge this section into ~/.codex/config.toml, then fully restart Codex.
+# Axiom does not modify user configuration automatically.
+
+[features.multi_agent_v2]
+enabled = true
+expose_spawn_agent_model_overrides = true
+wait_agent_enabled = true
+
+# v0.147 defaults wait_agent to 30 seconds and allows up to 60 minutes.
+# Axiom uses the full 60-minute event-driven wait window to avoid repeated
+# timeout/wakeup cycles while Luna MAX or Sol XHIGH is still working.
+default_wait_timeout_ms = 3600000
+max_wait_timeout_ms = 3600000
+
+# Optional but useful while verifying that requested model/effort was used.
+# Set to true later if you prefer less spawn metadata.
+hide_spawn_agent_metadata = false

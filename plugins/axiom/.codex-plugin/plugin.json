@@ -1,7 +1,7 @@
 {
   "name": "axiom",
-  "version": "0.1.0",
-  "description": "Agentic engineering guidance for Codex: Main-owned decisions, Luna-first delegation, fresh Sol review, context isolation, and pragmatic Git coordination without a fixed workflow.",
+  "version": "0.1.2",
+  "description": "Guidance-first Codex engineering with Main-owned decisions, direct-spawn Luna MAX workers, Sol XHIGH review continuity, context isolation, adaptive convergence, and safe Git coordination.",
   "author": {
     "name": "phni3j9a",
     "url": "https://github.com/phni3j9a"
@@ -12,29 +12,33 @@
     "multi-agent",
     "delegation",
     "context-isolation",
-    "code-review",
+    "luna",
+    "sol",
+    "review",
     "git"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Axiom",
-    "shortDescription": "Adaptive agentic engineering",
-    "longDescription": "Axiom is a lightweight engineering playbook rather than a workflow engine. It teaches a capable Main Sol agent when to delegate bounded work to Luna MAX, how to keep subagent context isolated on Codex 0.147, when to request a fresh direct-spawn Sol review, how to stop review loops with Finding Freeze, and how to coordinate Git without imposing mandatory phases or one-task-one-commit ceremony.",
+    "shortDescription": "Sol/Luna engineering guidance",
+    "longDescription": "Axiom is a guidance-first Codex plugin for non-trivial software engineering. It keeps intent, architecture, integration, and final acceptance in the Main Sol agent; delegates bounded work to direct-spawn Luna MAX workers; starts independent review with a fresh direct-spawn Sol XHIGH reviewer and reuses that reviewer for follow-up; and converges through Main adjudication and stable findings rather than numeric caps. It applies proactively without forcing phases, route declarations, state machines, or custom-agent installation.",
     "developerName": "phni3j9a",
     "category": "Developer Tools",
     "capabilities": [
-      "Adaptive subagent delegation",
+      "Context-efficient delegation",
       "Luna MAX worker routing",
-      "Fresh Sol review guidance",
-      "Context isolation",
-      "Review convergence",
-      "Git coordination"
+      "Independent Sol review",
+      "Review-loop convergence",
+      "Safe Git coordination"
     ],
     "defaultPrompt": [
-      "Apply Axiom to this non-trivial coding task and delegate only where it materially helps.",
-      "Use Axiom to keep the main context clean while implementing this feature.",
-      "Review this implementation using Axiom's fresh-Sol review policy."
+      "Use $axiom:axiom to implement this change with efficient delegation and independent review.",
+      "Use $axiom:axiom to investigate this codebase while keeping Main context concise.",
+      "Use $axiom:axiom to finish and review this non-trivial change safely."
     ],
-    "brandColor": "#4338CA"
+    "brandColor": "#1D4ED8",
+    "brandColorDark": "#60A5FA",
+    "logo": "./assets/axiom-logo.svg",
+    "composerIcon": "./assets/axiom-composer.svg"
   }
 }

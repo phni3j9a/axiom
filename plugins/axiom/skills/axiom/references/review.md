@@ -1,85 +1,162 @@
-# Fresh Sol review and convergence
+# Independent Sol review
 
 ## Reviewer identity
 
-When Axiom calls for independent review, the reviewer is a freshly direct-spawned `gpt-5.6-sol` at `xhigh` reasoning effort. Do not use the Luna implementer as its own independent reviewer and do not route review to Terra.
+When delegated independent review is useful, use:
 
-A direct-spawn reviewer does not have a custom read-only sandbox profile. Therefore enforce **behavioral read-only review** in the prompt and verify repository state in Main before/after review. The reviewer must not edit files, apply patches, commit, install dependencies, or run commands that intentionally mutate the working tree.
+- model: `gpt-5.6-sol`
+- reasoning effort: `xhigh`
+- initial context: fresh, normally `fork_turns: "none"`
+- launch: direct `spawn_agent`
+- role: evidence-based reviewer, not implementer
 
-## When to review
+Do not use Luna as reviewer. Do not install or depend on a custom reviewer agent.
 
-Fresh Sol review is normally worth the cost when any of these are true:
+The reviewer is **fresh at the start of the review cycle**. If fixes are made and re-review is useful, continue with the **same reviewer agent/session** so it retains the original findings, Main adjudication, and review boundary. Do not spawn a new reviewer merely because the candidate changed.
 
-- Luna changed meaningful production behavior;
-- auth, security, privacy, permissions, crypto, or trust boundaries changed;
-- persistence, schema, migration, or destructive data behavior changed;
-- concurrency, async ordering, caching, or lifecycle behavior changed;
-- a public API/interface changed;
-- a refactor has meaningful blast radius;
-- the change is difficult to validate deterministically;
-- Main has material uncertainty after inspecting the diff.
+## When review adds value
 
-Review may be skipped for read-only investigation, docs-only changes, trivial mechanical changes, or tiny low-risk edits directly verified by Main.
+Use risk, uncertainty, and verification quality rather than file count.
 
-## Review packet
+Review value tends to rise when:
 
-Give the fresh Sol reviewer a self-contained packet containing:
+- correctness depends on subtle behavior or edge cases;
+- deterministic tests are incomplete or expensive;
+- regression/blast-radius risk is meaningful;
+- security, auth, persistence, migration, concurrency, cryptography, protocols, or public compatibility are involved;
+- the implementation changes cross-cutting assumptions or architecture;
+- Main wants an independent challenge before accepting the candidate.
 
-- **INTENT** — what the change is supposed to accomplish;
-- **SCOPE** — actual diff/range/files to inspect;
-- **ACCEPTANCE** — behavior that must hold;
-- **VERIFICATION EVIDENCE** — tests/checks already run and their results;
-- **FOCUS** — specific high-risk areas when known;
-- **READ-ONLY RULE** — do not mutate repository or artifacts.
+A mechanically verified or clearly trivial change may not need delegated review. A one-file change can be high risk; a many-file mechanical change can be low risk.
 
-Ask the reviewer to inspect the actual implementation, not just the worker summary.
+## Useful review context
+
+Before initial review, Main should normally provide enough evidence for the reviewer to understand:
+
+- user-visible intent and acceptance criteria;
+- important design decisions and non-goals;
+- the actual candidate diff/change boundary;
+- relevant verification already performed;
+- pre-existing user changes that are outside scope;
+- known limitations or unresolved uncertainty.
+
+This is context guidance, not a required ceremony. Main may omit fields that add no value.
+
+## Initial Review Packet
+
+```text
+READ-ONLY REVIEW.
+Do not edit files, commit, format, auto-fix, generate code into the working
+ tree, or run commands likely to mutate it. Inspect and report evidence only.
+
+INTENT / ACCEPTANCE
+- <goal and relevant acceptance criteria>
+
+DESIGN CONTEXT
+- <important decisions/non-goals only>
+
+CANDIDATE
+- <how to inspect the actual diff/change>
+- <pre-existing changes outside scope if relevant>
+
+VERIFICATION EVIDENCE
+- <checks already run and notable gaps>
+
+FOCUS
+- Correctness, regressions, security/data integrity, requirement gaps,
+  compatibility, and missing verification with material impact.
+
+OUTPUT
+- Report material findings only.
+- Give each finding a stable ID.
+- Cite concrete file/line/symbol/behavior evidence.
+- Explain concrete impact and a bounded remediation direction.
+- Omit style-only, preference-only, speculative, and low-value nit findings.
+- Do not redesign beyond the accepted intent unless the current design cannot satisfy it.
+```
 
 ## Reviewer output
 
-Prefer a compact verdict:
+A useful output is:
 
 ```text
-VERDICT: SHIP | FIX_FIRST | RETHINK
-
 FINDINGS:
-- F1 | critical|major | file:line | issue | impact | evidence | fix intent
-- F2 | ...
+- AX-001 Short title
+  Evidence: exact file/line/behavior
+  Impact: concrete failure or risk
+  Remediation direction: smallest useful correction
+
+RESIDUAL_RISK:
+- concise remaining uncertainty, if useful
+
+VERIFICATION_GAPS:
+- checks that still matter, if useful
 ```
 
-Limit Round 1 to the most important actionable findings, normally no more than five. Ignore pure style/preferences unless they hide a correctness, security, maintenance, or regression risk.
+If there are no material findings:
 
-`RETHINK` means the current design/approach is materially wrong; return architecture ownership to Main rather than asking the reviewer to redesign and implement it.
+```text
+FINDINGS: none
+```
+
+Do not require the reviewer to issue `SHIP`, `FIX_FIRST`, `RETHINK`, severity enums, or other release verdicts. Main owns acceptance and scope.
 
 ## Main adjudication
 
-Main judges every Round-1 finding:
+Reviewer findings are proposals, not commands.
 
-- **ACCEPT** — valid and required before completion;
-- **DEFER** — valid but outside the current acceptance boundary or not worth immediate change;
-- **REJECT** — incorrect, irrelevant, already covered, or not supported by evidence.
+Main assigns each material finding as useful:
 
-Only accepted findings are sent for correction. Reviewer findings are advice, not authority.
+- `ACCEPT` — valid and worth addressing in the current task;
+- `DEFER` — valid but intentionally outside current scope, with residual risk understood;
+- `REJECT` — unsupported, incorrect, preference-driven, or inconsistent with accepted intent;
+- `ESCALATE` — resolving it requires user input or a substantive design/product decision.
 
-## Finding Freeze
+Do not forward reviewer output blindly to an implementer. Translate accepted findings into bounded fix requirements that preserve Main's intended design.
 
-After Main adjudicates Round 1, freeze the finding set.
+Main also decides whether another review pass is useful. Reviewer output does not force another pass by itself.
 
-If accepted findings require code changes, the implementer (usually Luna) applies only those corrections plus necessary directly-caused adjustments. Main reruns verification and inspects the resulting diff.
+## Finding Freeze and reviewer continuity
 
-Round 2 is a **verification review**, not a fresh hunt for more improvements. Ask fresh Sol to check:
+The initial review establishes stable finding IDs and a review boundary; it does not establish a fixed number of findings or rounds.
 
-1. whether each accepted frozen finding is actually resolved;
-2. whether those fixes introduced a **critical or major regression directly caused by the fix**.
+After accepted fixes, send a follow-up to the **same reviewer agent/session** when Main wants re-review. Include Main's adjudication and the evidence needed to inspect the updated candidate.
 
-Do not add new general findings in Round 2. Do not reopen rejected/deferred items. If an unrelated possible improvement is noticed, omit it unless it is critical enough that shipping would be unsafe.
+Example:
 
-Two review rounds are the default ceiling. If a required finding remains unresolved after Round 2, Main decides the next engineering action or asks the user when a product/design decision is required; do not enter an automatic review-fix loop.
+```text
+RE-REVIEW WITH CONTINUITY.
 
-## Mutation guard for direct-spawn reviewers
+Main adjudication:
+- AX-001: ACCEPT — <required outcome>
+- AX-002: REJECT — <brief rationale>
+- AX-003: DEFER — <brief rationale>
 
-Because the reviewer is not backed by a custom read-only agent profile:
+Check the accepted findings against the updated candidate and consider whether
+those fixes introduced or revealed any new material defect. Respect Main's
+REJECT/DEFER decisions unless new concrete evidence materially changes them.
+Do not restart style/preference review or rediscover already-adjudicated points.
+```
 
-- Main should note the pre-review repository state (`git status --short` and relevant diff identity when useful).
-- The reviewer prompt must explicitly forbid writes.
-- Main checks state again after review.
-- Any unexpected reviewer mutation invalidates the verdict until Main understands and resolves that mutation.
+Finding Freeze means:
+
+- previously reported findings keep stable IDs;
+- Main's adjudication controls task scope;
+- re-review retains the original reviewer context instead of resetting it;
+- accepted fixes remain the center of attention;
+- genuinely new material defects may still be reported when supported by new evidence or caused/revealed by the fix;
+- Main decides when further review has diminishing value and when the candidate is sufficiently resolved.
+
+There is **no arbitrary finding-count limit and no arbitrary review-round limit**. Convergence comes from reviewer continuity, stable IDs, Main adjudication, and Main's judgment about remaining risk—not from numeric caps.
+
+If reviewer and Main remain in substantive disagreement, Main decides whether to accept the risk, replan, escalate to the user, or request more evidence. The reviewer is not an autonomous loop controller.
+
+## Reviewer session loss
+
+If the original reviewer session is unavailable, do not silently substitute Luna. If independent review is still useful, direct-spawn a replacement Sol XHIGH reviewer and supply the prior findings, Main adjudication, relevant fixes, current candidate, and verification evidence needed to recover context.
+
+Treat replacement as recovery, not the normal re-review pattern.
+
+## Final acceptance
+
+Main, not Reviewer, decides completion after considering the final candidate, verification evidence, accepted findings, pre-existing user work, and any residual risk.

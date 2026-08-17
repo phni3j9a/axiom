@@ -1,64 +1,50 @@
 #!/usr/bin/env python3
-"""Create deterministic-ish source and plugin ZIP archives using stdlib only."""
-
 from __future__ import annotations
 
 import argparse
 import json
 import shutil
+import subprocess
+import tempfile
+import zipfile
 from pathlib import Path
-from zipfile import ZIP_DEFLATED, ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
 PLUGIN = ROOT / "plugins" / "axiom"
 
-EXCLUDED_DIRS = {".git", "__pycache__", "dist"}
-EXCLUDED_NAMES = {".DS_Store"}
 
-
-def iter_files(base: Path):
-    for path in sorted(base.rglob("*")):
-        if not path.is_file():
-            continue
-        rel = path.relative_to(base)
-        if any(part in EXCLUDED_DIRS for part in rel.parts):
-            continue
-        if path.name in EXCLUDED_NAMES or path.suffix == ".pyc":
-            continue
-        yield path, rel
-
-
-def write_zip(source: Path, destination: Path, prefix: str) -> None:
-    with ZipFile(destination, "w", ZIP_DEFLATED) as zf:
-        for path, rel in iter_files(source):
-            zf.write(path, Path(prefix) / rel)
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--output-dir", default=str(ROOT / "dist"))
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Package the Axiom Codex plugin.")
+    parser.add_argument("--output", type=Path, default=ROOT / "dist")
     args = parser.parse_args()
 
-    manifest = json.loads((PLUGIN / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8"))
+    subprocess.run(
+        ["python3", str(ROOT / "tools" / "validate_plugin.py")],
+        check=True,
+    )
+
+    manifest = json.loads(
+        (PLUGIN / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8")
+    )
     version = manifest["version"]
+    args.output.mkdir(parents=True, exist_ok=True)
+    archive = args.output / f"axiom-v{version}-plugin.zip"
 
-    out = Path(args.output_dir).expanduser().resolve()
-    out.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory() as tmp:
+        stage = Path(tmp) / "axiom"
+        shutil.copytree(PLUGIN, stage)
+        with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+            for path in sorted(stage.rglob("*")):
+                if path.is_file():
+                    zf.write(path, path.relative_to(stage.parent))
 
-    full_zip = out / f"axiom-v{version}-source.zip"
-    plugin_zip = out / f"axiom-v{version}-plugin.zip"
+    with zipfile.ZipFile(archive) as zf:
+        bad = zf.testzip()
+        if bad:
+            raise RuntimeError(f"Corrupt archive member: {bad}")
 
-    for p in (full_zip, plugin_zip):
-        if p.exists():
-            p.unlink()
-
-    write_zip(ROOT, full_zip, f"axiom-v{version}-source")
-    write_zip(PLUGIN, plugin_zip, "axiom")
-
-    print(full_zip)
-    print(plugin_zip)
-    return 0
+    print(archive)
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "axiom",
+  "version": "0.1.2",
+  "description": "Guidance-first Codex engineering with Main-owned decisions, direct-spawn Luna MAX workers, Sol XHIGH review continuity, context isolation, adaptive convergence, and safe Git coordination.",
+  "author": {
+    "name": "phni3j9a"
+  },
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "multi-agent",
+    "delegation",
+    "context-isolation",
+    "luna",
+    "sol",
+    "review",
+    "git"
+  ]
+}

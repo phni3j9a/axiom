@@ -1,28 +1,16 @@
-# Axiom plugin
+# Axiom v0.1.2
 
-Axiom is a lightweight engineering playbook for Codex. It does not impose a fixed software-development workflow.
+Axiom is a guidance-first Codex plugin for non-trivial software engineering.
 
-## Contract
+> Sol thinks. Luna works. Sol reviews.
 
-- Main owns requirements, architecture, decomposition, integration, reviewer adjudication, and final acceptance.
-- Delegated bounded work defaults to direct-spawned `gpt-5.6-luna` with `reasoning_effort: max`.
-- Independent review, when warranted, uses a fresh direct-spawned `gpt-5.6-sol` with `reasoning_effort: xhigh`.
-- No custom subagent profiles, hooks, runtime state machine, mandatory phases, or mandatory one-task-one-commit rule.
-- Review uses Finding Freeze to prevent open-ended review/fix loops.
+- Main Sol owns intent, architecture, integration, and acceptance.
+- Direct-spawn Luna MAX performs bounded exploration and implementation.
+- An initially fresh direct-spawn Sol XHIGH performs independent review when useful; the same reviewer is reused for re-review.
+- Main adjudication + stable Finding IDs + Finding Freeze provide convergence without arbitrary count/round caps.
+- Guidance is separated into hard constraints, strong defaults, and Main-judged heuristics.
+- No fixed workflow, no Terra default, and no custom agent installation.
+- `allow_implicit_invocation: true` makes Axiom available proactively.
+- Codex v0.147 `wait_agent` defaults to the 60-minute maximum in the recommended config to avoid 30-second polling churn.
 
-The primary instructions live in `skills/axiom/SKILL.md`; version-specific Codex 0.147 details live under `skills/axiom/references/`.
-
-The `skills/axiom/agents/openai.yaml` file is skill UI/invocation metadata, not a custom subagent definition.
-
-## Codex 0.147 model-routing prerequisite
-
-When Multi-Agent V2 does not expose `model` and `reasoning_effort` on `spawn_agent`, enable the version's model-override surface and restart the session:
-
-```toml
-[features.multi_agent_v2]
-expose_spawn_agent_model_overrides = true
-```
-
-## License
-
-MIT
+See the repository root `README.md` for installation and configuration.

@@ -1,6 +1,9 @@
 interface:
   display_name: "Axiom"
-  short_description: "Adaptive agentic engineering"
-  default_prompt: "Apply Axiom's engineering guidance to this task. Keep simple work simple and delegate only when it materially helps."
+  short_description: "Proactive Sol/Luna engineering guidance"
+  default_prompt: "Use $axiom:axiom to complete this software task with efficient delegation and independent review."
+
 policy:
+  products:
+    - CODEX
   allow_implicit_invocation: true

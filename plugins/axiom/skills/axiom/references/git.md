@@ -1,43 +1,69 @@
 # Git coordination
 
-## Commit principle
+## Preserve the user's working tree
 
-Do not enforce one task = one commit. Prefer commits that are coherent, independently understandable, and useful to review or revert.
+Before editing or delegating writes, inspect enough Git state to distinguish task work from pre-existing user work. Commonly useful commands include:
 
-A small feature may reasonably be one commit even if several worker subtasks contributed. A larger change may deserve separate commits for a migration, implementation, and cleanup when those boundaries make the history safer or clearer.
+```bash
+git status --short
+git branch --show-current
+```
 
-Do not create commits unless the user/project workflow expects the agent to do so.
+Inspect staged/unstaged diffs when they matter to the task.
 
-## Dirty working tree
+Hard safety rules:
 
-Before delegating writes, Main should understand pre-existing user changes well enough not to overwrite them. Workers must preserve unrelated edits and avoid broad cleanup outside their ownership.
+- do not reset, clean, checkout, restore, or otherwise discard pre-existing user changes;
+- do not rewrite history without applicable authorization;
+- do not stash user changes merely to make the tree look clean;
+- do not claim pre-existing changes as worker output.
 
-Never reset, clean, checkout away, or otherwise discard existing changes merely to make delegation easier unless the user explicitly authorizes it.
+## Commit ownership
+
+In a shared working tree, **prefer** Main-owned integration and commits because Main sees the combined candidate and user intent.
+
+Worker commits can still be useful when Main deliberately chooses them—for example, in an isolated worktree/branch with a clean semantic boundary. Commit ownership is therefore a coordination choice, not a hard Axiom rule.
+
+Do not force `one task = one commit`.
+
+Prefer semantic commit boundaries that make the change understandable and verifiable. Several worker tasks may belong in one coherent commit; one worker task may justify multiple commits when there are genuinely independent boundaries.
 
 ## Parallel writes
 
-Parallel write delegation is appropriate only when logical ownership is disjoint.
+Prefer disjoint ownership for parallel writes. When scopes overlap, explicitly weigh:
 
-Safe patterns include:
+- expected speedup;
+- conflict probability;
+- shared interfaces or generated files;
+- lockfile/schema/migration ordering;
+- cost of worktree setup and integration.
 
-- separate packages/modules with no shared generated files;
-- independent test fixtures plus implementation areas that do not collide;
-- separate Git worktrees for genuinely independent branches of work.
+Serialization or separate worktrees are often safer when overlap is high. Same-file parallel edits are usually a poor tradeoff, but Axiom does not impose a blanket prohibition when Main has a concrete integration strategy.
 
-Unsafe patterns include:
+## Review boundary
 
-- multiple workers editing the same central config/index/schema;
-- one worker refactoring an interface while another implements against the old shape;
-- parallel dependency or lockfile changes without explicit coordination.
+Review the candidate that Main actually intends to accept, not merely the most recent worker patch.
 
-When ownership becomes ambiguous, serialize the writes.
+When the tree contains pre-existing user changes:
 
-## Worktrees
+- establish a baseline when practical;
+- tell reviewer which paths/hunks belong to the task when that distinction matters;
+- avoid exposing unrelated sensitive diffs unnecessarily;
+- verify that accepted fixes did not overwrite user work.
 
-Use worktrees when true parallel implementation would otherwise create merge/index contention and the integration value justifies the overhead. Worktrees are a tool, not a mandatory Axiom phase.
+## Final integration checks
 
-Main remains responsible for integration and for resolving semantic conflicts even when Git can merge text automatically.
+Use the Git evidence appropriate to the repository and task. Commonly useful checks include:
 
-## Review identity
+```bash
+git status --short
+git diff --check
+git diff
+git diff --cached
+```
 
-A reviewer should inspect the exact current diff it is being asked to judge. If the implementation changes after Round 1, Round 2 reviews the updated diff only for frozen accepted findings and directly-caused major regressions, as described in `review.md`.
+Not every command is mandatory on every task. Main should inspect enough state to confirm that the accepted candidate contains no accidental changes, unresolved conflicts, or unsafe additions and that commit state matches the user's request.
+
+## Destructive operations
+
+Destructive or history-changing operations require explicit justification and any applicable user approval. Axiom never treats delegation as permission to bypass Git safety.
