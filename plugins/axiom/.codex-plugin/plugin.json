@@ -1,0 +1,40 @@
+{
+  "name": "axiom",
+  "version": "0.1.0",
+  "description": "Agentic engineering guidance for Codex: Main-owned decisions, Luna-first delegation, fresh Sol review, context isolation, and pragmatic Git coordination without a fixed workflow.",
+  "author": {
+    "name": "phni3j9a",
+    "url": "https://github.com/phni3j9a"
+  },
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "multi-agent",
+    "delegation",
+    "context-isolation",
+    "code-review",
+    "git"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Axiom",
+    "shortDescription": "Adaptive agentic engineering",
+    "longDescription": "Axiom is a lightweight engineering playbook rather than a workflow engine. It teaches a capable Main Sol agent when to delegate bounded work to Luna MAX, how to keep subagent context isolated on Codex 0.147, when to request a fresh direct-spawn Sol review, how to stop review loops with Finding Freeze, and how to coordinate Git without imposing mandatory phases or one-task-one-commit ceremony.",
+    "developerName": "phni3j9a",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Adaptive subagent delegation",
+      "Luna MAX worker routing",
+      "Fresh Sol review guidance",
+      "Context isolation",
+      "Review convergence",
+      "Git coordination"
+    ],
+    "defaultPrompt": [
+      "Apply Axiom to this non-trivial coding task and delegate only where it materially helps.",
+      "Use Axiom to keep the main context clean while implementing this feature.",
+      "Review this implementation using Axiom's fresh-Sol review policy."
+    ],
+    "brandColor": "#4338CA"
+  }
+}

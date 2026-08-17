@@ -1,0 +1,6 @@
+interface:
+  display_name: "Axiom"
+  short_description: "Adaptive agentic engineering"
+  default_prompt: "Apply Axiom's engineering guidance to this task. Keep simple work simple and delegate only when it materially helps."
+policy:
+  allow_implicit_invocation: true
