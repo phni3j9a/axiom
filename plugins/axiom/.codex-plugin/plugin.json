@@ -1,7 +1,7 @@
 {
   "name": "axiom",
-  "version": "0.1.2",
-  "description": "Guidance-first Codex engineering with Main-owned decisions, direct-spawn Luna MAX workers, Sol XHIGH review continuity, context isolation, adaptive convergence, and safe Git coordination.",
+  "version": "0.1.3",
+  "description": "Guidance-first Codex engineering with proactive parallel Luna MAX workers, fresh Sol XHIGH review, context isolation, safe Git coordination, and an optional local observability dashboard.",
   "author": {
     "name": "phni3j9a",
     "url": "https://github.com/phni3j9a"
@@ -15,26 +15,34 @@
     "luna",
     "sol",
     "review",
-    "git"
+    "git",
+    "parallelism",
+    "observability",
+    "dashboard",
+    "rollout-trace"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Axiom",
     "shortDescription": "Sol/Luna engineering guidance",
-    "longDescription": "Axiom is a guidance-first Codex plugin for non-trivial software engineering. It keeps intent, architecture, integration, and final acceptance in the Main Sol agent; delegates bounded work to direct-spawn Luna MAX workers; starts independent review with a fresh direct-spawn Sol XHIGH reviewer and reuses that reviewer for follow-up; and converges through Main adjudication and stable findings rather than numeric caps. It applies proactively without forcing phases, route declarations, state machines, or custom-agent installation.",
+    "longDescription": "Axiom is a guidance-first Codex plugin for non-trivial software engineering. Main Sol owns intent, architecture, integration, review adjudication, and final acceptance; useful independent bounded work fans out to parallel direct-spawn Luna MAX workers; meaningful changes receive fresh direct-spawn Sol XHIGH review with same-reviewer continuity. Axiom v0.1.3 also bundles an optional local read-only Dashboard that observes Codex Rollout Trace, agent parallelism, review evidence, token distribution, Git state, and Axiom principle compliance without turning Axiom into a workflow engine or control plane.",
     "developerName": "phni3j9a",
     "category": "Developer Tools",
     "capabilities": [
       "Context-efficient delegation",
+      "Parallel Luna MAX execution",
       "Luna MAX worker routing",
       "Independent Sol review",
       "Review-loop convergence",
-      "Safe Git coordination"
+      "Safe Git coordination",
+      "Local rollout observability",
+      "Agent graph and parallel timeline",
+      "Axiom principle compliance view"
     ],
     "defaultPrompt": [
       "Use $axiom:axiom to implement this change with efficient delegation and independent review.",
       "Use $axiom:axiom to investigate this codebase while keeping Main context concise.",
-      "Use $axiom:axiom to finish and review this non-trivial change safely."
+      "Use $axiom:axiom-dashboard to open the local read-only Axiom Dashboard for this repository."
     ],
     "brandColor": "#1D4ED8",
     "brandColorDark": "#60A5FA",

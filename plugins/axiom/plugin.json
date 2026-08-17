@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "axiom",
-  "version": "0.1.2",
-  "description": "Guidance-first Codex engineering with Main-owned decisions, direct-spawn Luna MAX workers, Sol XHIGH review continuity, context isolation, adaptive convergence, and safe Git coordination.",
+  "version": "0.1.3",
+  "description": "Guidance-first Codex engineering with proactive parallel Luna MAX workers, fresh Sol XHIGH review, context isolation, safe Git coordination, and an optional local observability dashboard.",
   "author": {
     "name": "phni3j9a"
   },
@@ -15,6 +15,10 @@
     "luna",
     "sol",
     "review",
-    "git"
+    "git",
+    "parallelism",
+    "observability",
+    "dashboard",
+    "rollout-trace"
   ]
 }

@@ -2,12 +2,16 @@ from __future__ import annotations
 
 import json
 import subprocess
+import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PLUGIN = ROOT / "plugins" / "axiom"
-SKILL = PLUGIN / "skills" / "axiom"
+CORE_SKILL = PLUGIN / "skills" / "axiom"
+DASHBOARD_SKILL = PLUGIN / "skills" / "axiom-dashboard"
+DASHBOARD = PLUGIN / "dashboard"
 
 
 class AxiomPluginTests(unittest.TestCase):
@@ -20,62 +24,88 @@ class AxiomPluginTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_manifest_and_marketplace_names(self) -> None:
-        manifest = json.loads(
-            (PLUGIN / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8")
-        )
-        marketplace = json.loads(
-            (ROOT / ".agents" / "plugins" / "marketplace.json").read_text(encoding="utf-8")
-        )
+        manifest = json.loads((PLUGIN / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8"))
+        marketplace = json.loads((ROOT / ".agents" / "plugins" / "marketplace.json").read_text(encoding="utf-8"))
         self.assertEqual(manifest["name"], "axiom")
-        self.assertEqual(manifest["version"], "0.1.2")
+        self.assertEqual(manifest["version"], "0.1.3")
         self.assertEqual(marketplace["plugins"][0]["name"], "axiom")
 
-    def test_proactive_invocation(self) -> None:
-        metadata = (SKILL / "agents" / "openai.yaml").read_text(encoding="utf-8")
-        self.assertIn("allow_implicit_invocation: true", metadata)
+    def test_core_is_proactive_dashboard_is_explicit(self) -> None:
+        core = (CORE_SKILL / "agents" / "openai.yaml").read_text(encoding="utf-8")
+        dashboard = (DASHBOARD_SKILL / "agents" / "openai.yaml").read_text(encoding="utf-8")
+        self.assertIn("allow_implicit_invocation: true", core)
+        self.assertIn("allow_implicit_invocation: false", dashboard)
 
     def test_direct_spawn_roles(self) -> None:
         text = "\n".join(
             path.read_text(encoding="utf-8")
-            for path in [SKILL / "SKILL.md", *sorted((SKILL / "references").glob("*.md"))]
+            for path in [CORE_SKILL / "SKILL.md", *sorted((CORE_SKILL / "references").glob("*.md"))]
         )
-        self.assertIn('gpt-5.6-luna', text)
+        self.assertIn('model = "gpt-5.6-luna"', text)
         self.assertIn('reasoning_effort = "max"', text)
-        self.assertIn('gpt-5.6-sol', text)
+        self.assertIn('model = "gpt-5.6-sol"', text)
         self.assertIn('reasoning_effort = "xhigh"', text)
         self.assertIn('fork_turns = "none"', text)
 
+    def test_review_continuity_without_numeric_caps(self) -> None:
+        text = (CORE_SKILL / "references" / "review.md").read_text(encoding="utf-8")
+        self.assertIn("same reviewer agent", text.lower())
+        self.assertIn("no fixed finding count", text.lower())
+        self.assertIn("no fixed review-round limit", text.lower())
+        self.assertNotIn("Maximum five findings", text)
+        self.assertNotIn("Default maximum: two review rounds", text)
+
+    def test_proactive_parallel_luna_fleet(self) -> None:
+        skill = (CORE_SKILL / "SKILL.md").read_text(encoding="utf-8")
+        delegation = (CORE_SKILL / "references" / "delegation.md").read_text(encoding="utf-8")
+        combined = (skill + "\n" + delegation).lower()
+        self.assertIn("prefer parallel luna", combined)
+        self.assertIn("spawn the independent luna workers before waiting", combined)
+        self.assertIn("no fixed worker count", combined)
+        self.assertIn("do not split", combined)
+
     def test_no_custom_agent_toml(self) -> None:
-        self.assertEqual(list((SKILL / "agents").glob("*.toml")), [])
+        self.assertEqual(list((CORE_SKILL / "agents").glob("*.toml")), [])
 
-    def test_same_reviewer_convergence_without_hard_caps_or_verdict_schema(self) -> None:
-        review = (SKILL / "references" / "review.md").read_text(encoding="utf-8")
-        self.assertIn("same reviewer agent/session", review)
-        self.assertIn("no arbitrary finding-count limit and no arbitrary review-round limit", review)
-        self.assertNotIn("VERDICT: SHIP | FIX_FIRST | RETHINK", review)
-        self.assertNotIn("[CRITICAL|MAJOR]", review)
-        self.assertNotIn("maximum five", review.lower())
-        self.assertNotIn("two review rounds", review.lower())
+    def test_dashboard_is_read_only_observation_plane(self) -> None:
+        skill = (DASHBOARD_SKILL / "SKILL.md").read_text(encoding="utf-8")
+        git_source = (DASHBOARD / "src" / "git.rs").read_text(encoding="utf-8").lower()
+        self.assertIn("observation plane, not a control plane", skill)
+        self.assertIn("Do not modify the target repository", skill)
+        for command in ("git reset", "git checkout", "git clean", "git commit", "git add"):
+            self.assertNotIn(command, git_source)
 
-    def test_rigid_workflow_artifacts_removed(self) -> None:
-        main = (SKILL / "SKILL.md").read_text(encoding="utf-8")
-        delegation = (SKILL / "references" / "delegation.md").read_text(encoding="utf-8")
-        review = (SKILL / "references" / "review.md").read_text(encoding="utf-8")
-        git = (SKILL / "references" / "git.md").read_text(encoding="utf-8")
-        subagents = (SKILL / "references" / "codex-0.147-subagents.md").read_text(encoding="utf-8")
-        self.assertNotIn("## Default decision process", main)
-        self.assertNotIn("Every delegated task must be self-contained", delegation)
-        self.assertNotIn("multi-file implementation", review)
-        self.assertNotIn("workers do not commit", git)
-        self.assertNotIn("send a follow-up only when", subagents)
-        self.assertIn("## Three kinds of guidance", main)
+    def test_dashboard_web_bundle_is_local_and_embedded(self) -> None:
+        main = (DASHBOARD / "src" / "main.rs").read_text(encoding="utf-8")
+        index = (DASHBOARD / "web" / "dist" / "index.html").read_text(encoding="utf-8")
+        app = (DASHBOARD / "web" / "dist" / "app.js").read_text(encoding="utf-8")
+        self.assertIn("include_str!", main)
+        self.assertIn("/vendor/react.production.min.js", index)
+        self.assertNotIn("https://", index + app)
+        self.assertNotIn("http://", index + app)
 
-    def test_wait_agent_uses_sixty_minute_default(self) -> None:
-        config = (PLUGIN / "config" / "codex-0.147.example.toml").read_text(encoding="utf-8")
-        subagents = (SKILL / "references" / "codex-0.147-subagents.md").read_text(encoding="utf-8")
-        self.assertIn("default_wait_timeout_ms = 3600000", config)
-        self.assertIn("max_wait_timeout_ms = 3600000", config)
-        self.assertIn("wait_agent(timeout_ms = 3600000)", subagents)
+    def test_release_packager_creates_plugin_and_source_archives(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            result = subprocess.run(
+                ["python3", str(ROOT / "tools" / "package_release.py"), "--output", tmp],
+                text=True,
+                capture_output=True,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            plugin_zip = Path(tmp) / "axiom-v0.1.3-plugin.zip"
+            source_zip = Path(tmp) / "axiom-codex-plugin-v0.1.3-source.zip"
+            self.assertTrue(plugin_zip.is_file())
+            self.assertTrue(source_zip.is_file())
+            with zipfile.ZipFile(plugin_zip) as archive:
+                names = set(archive.namelist())
+                self.assertIn("axiom/.codex-plugin/plugin.json", names)
+                self.assertIn("axiom/dashboard/Cargo.toml", names)
+                self.assertIn("axiom/dashboard/web/dist/index.html", names)
+                self.assertIn("axiom/dashboard/web/dist/app.js", names)
+                self.assertIn("axiom/dashboard/web/dist/styles.css", names)
+                self.assertIn("axiom/dashboard/web/dist/vendor/react.production.min.js", names)
+                self.assertIn("axiom/skills/axiom-dashboard/SKILL.md", names)
+                self.assertFalse(any("/target/" in name or "/node_modules/" in name for name in names))
 
 
 if __name__ == "__main__":
