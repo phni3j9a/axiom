@@ -1,6 +1,6 @@
 ---
 name: axiom
-description: Apply proactively to non-trivial software engineering work—feature implementation, bug fixes, refactoring, debugging, testing, codebase investigation, and code review—when delegation, context isolation, independent review, or Git coordination can improve delivery. Keep intent, architecture, integration, and acceptance in the Main Sol agent; prefer direct-spawn Luna MAX for bounded work and fresh direct-spawn Sol XHIGH for meaningful review. Axiom is usually unnecessary for trivial edits or purely conversational requests.
+description: Apply proactively to non-trivial software engineering work—feature implementation, bug fixes, refactoring, debugging, testing, codebase investigation, and code review—when delegation, context isolation, independent review, or Git coordination can improve delivery. Keep intent, architecture, integration, and acceptance in the Main Sol agent; prefer direct-spawn Luna MAX for bounded work and fresh direct-spawn Sol XHIGH for meaningful review. Skip only trivial edits or purely conversational requests.
 ---
 
 # Axiom
@@ -15,69 +15,33 @@ When this skill applies, the request authorizes appropriate subagent delegation 
 
 This does not override sandbox, approval, security, or user constraints.
 
-## Three kinds of guidance
-
-Interpret Axiom instructions according to their role:
-
-### Hard constraints
-
-These define Axiom's safety and role separation:
-
-- Main retains final authority over intent, architecture, integration, finding adjudication, and acceptance.
-- Delegated workers use Luna MAX by default; do not route to Terra merely from a role label such as “exploration.”
-- Delegated independent review uses Sol XHIGH, never Luna.
-- The first review session is fresh; re-review continues with the same reviewer when available.
-- Reviewer findings go through Main adjudication before fixes are assigned.
-- Preserve pre-existing user work and do not perform destructive Git/history operations without applicable authorization.
-- Do not silently claim model routing or verification that the runtime did not actually provide.
-
-### Strong defaults
-
-Follow these in ordinary cases, but Main may deviate for a concrete task-specific reason:
-
-- Prefer direct-spawn `gpt-5.6-luna` with `reasoning_effort: "max"` for bounded delegated work.
-- Prefer a concise handoff with `fork_turns: "none"`; include recent turns when doing so is safer or cheaper than reconstructing context.
-- Prefer Main-owned integration and commits in a shared working tree.
-- Prefer long `wait_agent` waits rather than short polling loops.
-- Prefer independent Sol review when risk, uncertainty, blast radius, or weak deterministic verification makes a second perspective valuable.
-
-### Heuristics
-
-Let Main decide these adaptively rather than following fixed thresholds:
-
-- whether to delegate at all;
-- how many workers to use;
-- how much structure a handoff needs;
-- whether work should run sequentially or in parallel;
-- whether a change benefits from Sol review;
-- how many findings matter;
-- how many re-review passes are useful;
-- when the review has converged;
-- whether a worker commit or worktree is useful.
-
 ## Operating axioms
 
 1. **Main owns meaning.** Keep user intent, architecture, substantive design, decomposition, integration, finding adjudication, and final acceptance in Main.
-2. **Delegate bounded work.** Offload repository exploration, implementation, tests, debugging, log analysis, and mechanical refactors when the context or execution benefit exceeds coordination cost.
+2. **Delegate bounded work.** Offload repository exploration, implementation, tests, debugging, log analysis, and mechanical refactors when they can be expressed with a clear objective, scope, constraints, and verification.
 3. **Luna first.** On Codex v0.147, directly spawn `gpt-5.6-luna` with `reasoning_effort: "max"` for ordinary delegated work. Do not select Terra merely because work is exploratory or read-heavy.
-4. **Sol reviews.** When independent review is useful, directly spawn one fresh `gpt-5.6-sol` with `reasoning_effort: "xhigh"`. Re-review by continuing with that same reviewer session. Never substitute Luna as the reviewer.
-5. **Isolate context deliberately.** `fork_turns: "none"` is the default when a concise handoff captures what matters; inherit a small amount of dialogue when that better preserves essential context.
-6. **Parallelize for net value.** Prefer independent ownership, but let Main weigh overlap, worktree cost, integration risk, and expected speedup rather than applying a blanket file-count rule.
+4. **Sol reviews.** When independent review is warranted, directly spawn a fresh `gpt-5.6-sol` with `reasoning_effort: "xhigh"`. Never substitute Luna as the reviewer.
+5. **Fresh context by default.** Prefer a self-contained Task Packet and `fork_turns: "none"`. Share conversation turns only when the dialogue itself is indispensable input.
+6. **Prefer parallel Luna fleets for independent work.** When two or more useful bounded tasks are independent, launch Luna MAX workers concurrently unless coordination cost, dependency order, or write-conflict risk outweighs the benefit. Choose the natural fan-out from the task; never use a fixed agent count. Parallel writes require disjoint ownership and stable interfaces; otherwise serialize or isolate with worktrees.
 7. **Verify the actual tree.** Inspect the resulting diff and run relevant deterministic checks. Worker self-reports are evidence, not acceptance.
-8. **Freeze findings without freezing judgment.** Main adjudicates findings; the same reviewer follows accepted fixes without resetting the review boundary. Use no arbitrary finding-count or round-count cap.
+8. **Keep review continuity.** Spawn a fresh Sol for the initial review, then reuse the same reviewer agent for re-review. Main adjudicates every finding and decides when the review is complete; do not impose arbitrary finding or round limits.
 9. **Preserve user work.** Detect pre-existing changes, never discard or rewrite them, and do not attribute them to an Axiom worker.
 10. **Keep simple work simple.** A direct Main edit is correct when delegation or review would cost more than the context or quality benefit.
 
-## Decision lenses
+## Default decision process
 
-There is no required order. Revisit these questions as the task evolves:
+Do not narrate this process unless it helps the user.
 
-- **Authority:** Which decisions must remain in Main because they affect user intent, architecture, or acceptance?
-- **Delegation:** Which bounded work would benefit from Luna MAX because it is noisy, mechanical, parallelizable, or context-heavy?
-- **Context:** What is the minimum context each worker needs to act correctly, and is `fork_turns: "none"` appropriate here?
-- **Verification:** What evidence would make the result trustworthy—tests, builds, type checks, reproductions, or diff inspection?
-- **Review:** Would a fresh Sol perspective materially reduce risk or uncertainty for this candidate?
-- **Integration:** What Git/worktree arrangement minimizes collision and protects pre-existing work?
+1. Clarify the goal and acceptance boundary from available context.
+2. Inspect repository instructions and current Git state.
+3. Decide which judgment must remain in Main.
+4. Split only genuinely bounded work.
+5. When multiple useful bounded tasks are independent, launch their Luna MAX workers before waiting on any one of them; otherwise delegate only work that benefits from isolation.
+6. Integrate results in Main and inspect the actual changed tree.
+7. Run targeted verification, then broader verification when justified.
+8. For meaningful changes, request an initial fresh Sol XHIGH review and keep that reviewer available.
+9. Adjudicate findings, apply only accepted fixes, and send the updated candidate back to the same reviewer when re-review is useful.
+10. Continue only while Main accepts unresolved material findings; then report the completed result, tests, and residual risks.
 
 ## Model policy
 
@@ -90,33 +54,44 @@ There is no required order. Revisit these questions as the task evolves:
 
 If explicit spawn model overrides are unavailable, do not silently create an inherited Main-Sol worker. Continue in Main or report the one-time v0.147 configuration requirement. If review is needed but a fresh Sol cannot be explicitly spawned, Main Sol performs the review itself rather than delegating review to Luna.
 
-## Review judgment
+## Parallel execution default
 
-Review is risk-based rather than file-count-based. Consider a fresh Sol review when the change is non-trivial, uncertain, hard to verify deterministically, or has meaningful regression/blast-radius risk.
+Treat safe parallelism as the default optimization, not an exceptional mode.
 
-Signals that increase review value include security/authentication, persistence or migrations, concurrency, cryptography/protocol behavior, public compatibility, subtle lifecycle behavior, or architectural/cross-cutting changes. These are signals for Main judgment, not a mandatory checklist.
+- If two or more **useful** bounded tasks are already independent, prefer concurrent Luna MAX workers over serial spawn/wait/spawn execution.
+- Launch the independent Luna workers before waiting on any one of them; do not serialize merely out of habit.
+- Do not split work artificially just to increase agent count. One coherent task should remain one worker when extra boundaries add coordination cost.
+- Read-only investigations are the easiest parallel lane and should be fanned out proactively when they cover independent subsystems or hypotheses.
+- Parallel implementation is appropriate only with disjoint write scopes and stable interfaces. If writes overlap, serialize or use isolated worktrees.
+- Main Sol chooses the natural degree of parallelism from dependencies, ownership, and useful work. Axiom defines no fixed fleet size or concurrency target.
 
-A clearly trivial or mechanically verified change may not need delegated review.
+## Review threshold
 
-## Read focused references as useful
+A fresh Sol review is strongly preferred for any meaningful behavioral implementation, multi-file change, complex bug fix, or substantial refactor.
 
-- Delegation and handoff patterns: [delegation.md](references/delegation.md)
-- Codex v0.147 spawn/wait details: [codex-0.147-subagents.md](references/codex-0.147-subagents.md)
-- Independent review and convergence: [review.md](references/review.md)
-- Long-task context preservation: [context-management.md](references/context-management.md)
-- Parallel writes, commits, and integration: [git.md](references/git.md)
+Treat review as expected for security, authentication, authorization, persistence, migration, concurrency, cryptography, public APIs, cross-platform behavior, or broad blast radius.
 
-Load only the references that materially help the current task.
+Main verification may be enough for a clearly trivial, non-behavioral edit.
+
+## Read the focused references
+
+- Before delegating: [delegation.md](references/delegation.md)
+- Before a v0.147 spawn or when routing fails: [codex-0.147-subagents.md](references/codex-0.147-subagents.md)
+- Before independent review or a fix loop: [review.md](references/review.md)
+- When the task is long or compaction risk is material: [context-management.md](references/context-management.md)
+- Before parallel writes, commits, rebases, or final integration: [git.md](references/git.md)
+
+Read only the references relevant to the current task.
 
 ## Completion standard
 
 Do not finish merely because a worker returned success.
 
-Finish when Main is satisfied that:
+Finish when:
 
-- the user-visible intent is satisfied;
-- the actual candidate matches the intended design;
-- relevant verification is adequate and accurately reported;
-- accepted review findings are resolved to Main's satisfaction;
-- pre-existing user changes remain intact; and
-- residual risks and unverified assumptions are explicit.
+- the user-visible intent is satisfied
+- the actual diff matches the intended design
+- relevant tests or checks pass, or their absence is clearly reported
+- accepted review findings are resolved
+- pre-existing user changes remain intact
+- residual risks and unverified assumptions are explicit
