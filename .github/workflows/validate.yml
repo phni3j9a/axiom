@@ -18,7 +18,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - run: python3 tools/validate_plugin.py
+      - name: Validate plugin
+        shell: bash
+        run: |
+          set +e
+          python3 tools/validate_plugin.py 2>&1 | tee /tmp/axiom-validator.log
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            while IFS= read -r line; do
+              echo "::error::$line"
+            done < /tmp/axiom-validator.log
+          fi
+          exit "$status"
       - run: python3 -m unittest discover -s tests -v
       - run: npm install --no-save typescript@5.8.3
         working-directory: plugins/axiom/dashboard/web
