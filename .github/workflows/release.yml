@@ -1,0 +1,83 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  dashboard-binaries:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux-x86_64
+            binary: axiom-dashboard
+          - runner: macos-15
+            platform: darwin-aarch64
+            binary: axiom-dashboard
+          - runner: macos-15-intel
+            platform: darwin-x86_64
+            binary: axiom-dashboard
+          - runner: windows-latest
+            platform: windows-x86_64
+            binary: axiom-dashboard.exe
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo build --release --manifest-path plugins/axiom/dashboard/Cargo.toml
+      - name: Stage binary (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p "release-binaries/${{ matrix.platform }}"
+          cp "plugins/axiom/dashboard/target/release/${{ matrix.binary }}" "release-binaries/${{ matrix.platform }}/${{ matrix.binary }}"
+          chmod +x "release-binaries/${{ matrix.platform }}/${{ matrix.binary }}"
+      - name: Stage binary (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force "release-binaries/${{ matrix.platform }}" | Out-Null
+          Copy-Item "plugins/axiom/dashboard/target/release/${{ matrix.binary }}" "release-binaries/${{ matrix.platform }}/${{ matrix.binary }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-${{ matrix.platform }}
+          path: release-binaries/${{ matrix.platform }}
+
+  package:
+    needs: dashboard-binaries
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: dashboard-*
+          path: release-binaries
+      - name: Normalize downloaded artifact layout
+        shell: bash
+        run: |
+          find release-binaries -maxdepth 3 -type f -print
+          for artifact in release-binaries/dashboard-*; do
+            [ -d "$artifact" ] || continue
+            platform="${artifact##*dashboard-}"
+            mkdir -p "release-binaries/$platform"
+            find "$artifact" -maxdepth 2 -type f -exec cp {} "release-binaries/$platform/" \;
+          done
+      - run: python3 tools/package_release.py --output dist --dashboard-binaries release-binaries --require-dashboard-binaries
+      - uses: actions/upload-artifact@v4
+        with:
+          name: axiom-release
+          path: dist/*.zip
+      - uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: dist/*.zip

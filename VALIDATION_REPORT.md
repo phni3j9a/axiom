@@ -1,50 +1,103 @@
-# Validation Report
+# Axiom v0.1.3 Validation Report
 
-Generated: 2026-08-17 02:39 UTC  
-Axiom version: 0.1.2  
+Generated: 2026-08-17 15:17 JST  
+Axiom version: 0.1.3  
+Dashboard version: 0.1.0  
 Target Codex: v0.147.x
 
-## Structural validator
+## Completed checks
+
+### Plugin structural validator
 
 ```text
-Axiom validation PASSED (96 checks)
+Axiom validation PASSED (158 checks)
 ```
 
-## Unit tests
+The validator covers manifests, marketplace metadata, Skill policy, direct-spawn routing guidance, review continuity, Dashboard isolation, read-only boundaries, embedded web assets, launchers, release workflows, and archive rules.
+
+### Python unit tests
 
 ```text
-test_direct_spawn_roles (test_plugin.AxiomPluginTests.test_direct_spawn_roles) ... ok
-test_manifest_and_marketplace_names (test_plugin.AxiomPluginTests.test_manifest_and_marketplace_names) ... ok
-test_no_custom_agent_toml (test_plugin.AxiomPluginTests.test_no_custom_agent_toml) ... ok
-test_proactive_invocation (test_plugin.AxiomPluginTests.test_proactive_invocation) ... ok
-test_rigid_workflow_artifacts_removed (test_plugin.AxiomPluginTests.test_rigid_workflow_artifacts_removed) ... ok
-test_same_reviewer_convergence_without_hard_caps_or_verdict_schema (test_plugin.AxiomPluginTests.test_same_reviewer_convergence_without_hard_caps_or_verdict_schema) ... ok
-test_validator (test_plugin.AxiomPluginTests.test_validator) ... ok
-test_wait_agent_uses_sixty_minute_default (test_plugin.AxiomPluginTests.test_wait_agent_uses_sixty_minute_default) ... ok
-
-----------------------------------------------------------------------
-Ran 8 tests in 0.540s
-
+Ran 10 tests
 OK
 ```
 
-## Confirmed design constraints
+Covered behaviors include:
 
-- One proactively invokable `axiom` skill
-- `allow_implicit_invocation: true`
-- guidance separated into hard constraints, strong defaults, and heuristics
-- direct-spawn Luna MAX worker guidance
-- initially fresh direct-spawn Sol XHIGH reviewer guidance
-- same Sol reviewer session reused for re-review
-- Main adjudicates reviewer findings and controls convergence
-- no fixed reviewer verdict/severity schema
-- no arbitrary maximum finding count or review-round count
-- no mandatory Task Packet schema or default step sequence
-- worker commit, parallel-write, context-fork, and follow-up rules expressed as adaptive defaults/heuristics where appropriate
-- no Terra default route
-- no custom agent TOML
-- `wait_agent` recommended/configured at the v0.147 60-minute maximum (`3600000` ms)
-- no mandatory workflow phases or runtime state
-- local marketplace entry included
+- proactive Axiom Core and explicit-only Dashboard invocation
+- Luna MAX worker routing and dependency-driven parallelism
+- fresh Sol XHIGH review and same-reviewer re-review continuity
+- absence of custom agent TOML and fixed review caps
+- Dashboard observation-plane/read-only constraints
+- local embedded web bundle
+- Plugin and source archive generation
 
-This is repository-local structural and policy validation. It is not a live authenticated model-routing probe.
+### Frontend checks
+
+```text
+TypeScript no-emit check: PASS
+TypeScript build: PASS
+Generated app.js syntax check: PASS
+Deterministic committed bundle: PASS
+```
+
+`web/dist/app.js` remained byte-identical after rebuilding from `web/src/app.ts`.
+
+### Static and packaging checks
+
+```text
+Python bytecode compilation: PASS
+JSON parsing: PASS
+YAML parsing: PASS
+POSIX launcher shell syntax: PASS
+ZIP integrity: PASS
+```
+
+### Axiom Core compatibility
+
+The following v0.1.2 Core files are byte-identical in v0.1.3:
+
+- `skills/axiom/SKILL.md`
+- `skills/axiom/agents/openai.yaml`
+- `skills/axiom/references/delegation.md`
+- `skills/axiom/references/review.md`
+- `skills/axiom/references/git.md`
+- `skills/axiom/references/context-management.md`
+- `skills/axiom/references/codex-0.147-subagents.md`
+
+This confirms that v0.1.3 adds the optional Dashboard without changing the agreed v0.1.2 Core behavior.
+
+## Rust validation status
+
+The current execution environment does not contain `cargo`, `rustc`, or `rustfmt`, and external binary installation is restricted. Consequently, the Rust crate could not be compiled or executed locally in this environment.
+
+The repository includes GitHub Actions that run the following with a stable Rust toolchain:
+
+```text
+cargo check --all-targets
+cargo clippy --all-targets
+cargo test
+cargo build --release
+```
+
+The release workflow builds and packages native Dashboard binaries for:
+
+- Linux x86_64
+- macOS Apple Silicon
+- macOS Intel
+- Windows x86_64
+
+The release packager refuses `--require-dashboard-binaries` packaging unless all four required binaries are present.
+
+## Distribution note
+
+The locally generated Plugin ZIP in this delivery contains the complete Axiom Core, Dashboard source, committed web UI, and platform launchers, but no prebuilt native Dashboard executable because Rust compilation was unavailable here.
+
+- Axiom Core installs and operates normally.
+- Dashboard launchers use a matching bundled binary when present.
+- In this source-capable package, the launchers fall back to `cargo run --release` when Cargo is installed.
+- The included GitHub release workflow creates the intended self-contained Plugin ZIP with native binaries overlaid.
+
+## Result
+
+All checks available in this environment passed. Native Rust compilation remains delegated to the included CI workflow and is the only unexecuted validation category.

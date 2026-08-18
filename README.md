@@ -4,7 +4,7 @@ Axiomは、Codexへ固定ワークフローを強制するPluginではありま�
 
 > **Sol thinks. Luna works. Sol reviews.**
 
-Mainの賢さを活かしながら、探索・実装・テスト・デバッグなどのbounded workをLuna MAXへ積極的に委譲し、意味のある変更はfreshなSol XHIGHで独立レビューします。Mainのコンテキストを守り、レビューを収束させ、Git上のユーザー変更を安全に扱うための判断原則を、必要な開発タスクで自動的に適用します。
+Mainの賢さを活かしながら、探索・実装・テスト・デバッグなどのbounded workをLuna MAXへ積極的に委譲し、独立した仕事が複数ある場合はLuna MAXを並列に走らせます。意味のある変更はfreshなSol XHIGHで独立レビューします。Mainのコンテキストを守り、レビューを収束させ、Git上のユーザー変更を安全に扱うための判断原則を、必要な開発タスクで自動的に適用します。
 
 ## Axiomの立ち位置
 
@@ -75,10 +75,6 @@ enabled = true
 expose_spawn_agent_model_overrides = true
 wait_agent_enabled = true
 
-# v0.147の30秒defaultを60分へ延長。agent activityがあれば早く復帰します。
-default_wait_timeout_ms = 3600000
-max_wait_timeout_ms = 3600000
-
 # routing確認時に便利。通常運用ではtrueへ戻しても構いません。
 hide_spawn_agent_metadata = false
 ```
@@ -100,74 +96,106 @@ codex --enable plugins plugin add axiom@axiom-local --json
 
 ### 単体Plugin ZIPを使う場合
 
-`axiom-v0.1.2-plugin.zip`は、`.codex-plugin/plugin.json`と`skills/`を含む配布用Plugin packageです。ローカルMarketplace repositoryとして使う場合はsource archiveのほうが便利です。
+`axiom-v0.1.3-plugin.zip`は、`.codex-plugin/plugin.json`と`skills/`を含む配布用Plugin packageです。ローカルMarketplace repositoryとして使う場合はsource archiveのほうが便利です。
 
-## 判断の仕方
+## 基本動作
 
-Axiomは固定手順を持ちません。Main Solは作業中に次の観点を必要に応じて見直します。
+非自明な開発依頼を受けると、Mainはおおむね次のように判断します。ただし固定phaseではありません。
 
-- 重要な意味・設計・受理判断はMainに残すべきか
-- どのbounded workをLuna MAXへ逃がすとcontext/速度/コスト面で得か
-- `fork_turns: "none"`で十分か、少量のrecent turnsを渡した方が安全か
-- どのverification evidenceが必要か
-- risk / uncertainty / blast radiusを考えるとfresh Sol reviewが有益か
-- shared tree / worktree / commit ownershipをどうすると統合コストが低いか
-
-この判断に固定順序はありません。小さな変更ならMainだけで完結して構いません。
+```text
+User request
+   │
+   ▼
+Main Sol XHIGH
+   ├─ 意図・設計・境界を保持
+   ├─ bounded workをLuna MAXへdirect spawn
+   ├─ actual diffとverificationを統合
+   ├─ meaningful changeならfresh Sol XHIGH review
+   ├─ FindingをACCEPT / DEFER / REJECT
+   └─ accepted fixだけを反映して終了
+```
 
 ### Luna MAX worker
 
-conceptual direct spawn:
+概念上のdirect spawn:
 
 ```text
 spawn_agent(
   task_name = "implement_bounded_change",
-  message = "<必要十分なbounded handoff>",
+  message = "<self-contained Task Packet>",
   model = "gpt-5.6-luna",
   reasoning_effort = "max",
   fork_turns = "none"
 )
 ```
 
-`fork_turns: "none"`はstrong defaultです。直近の会話を少量引き継ぐ方が意図を安全に保てる場合は、Mainがrecent-turn forkを選べます。
+## Luna fleetと並列実行
+
+Axiom v0.1.3でも、**安全な並列化を積極的なデフォルト**にしました。
+
+2つ以上の有用なbounded workが互いに独立しているなら、調整コスト・依存順序・write conflictのリスクが利益を上回らない限り、Luna MAXを逐次実行するより**同時にdirect spawnして並列実行**することを優先します。
+
+```text
+Main Sol XHIGH
+   ├─ Luna MAX A ─ subsystem A investigation
+   ├─ Luna MAX B ─ subsystem B investigation
+   ├─ Luna MAX C ─ test-gap analysis
+   └─ Luna MAX D ─ disjoint implementation
+             │
+             └─ Mainが統合・判断
+```
+
+ただし、固定で3体・5体を起動するルールはありません。Main Solがtask graphから自然な並列度を決めます。
+
+- 独立したread-only調査は積極的にfan-out
+- 独立したwrite taskもownershipとinterfaceが分離できれば並列化
+- 同じファイルや共有schemaを触る場合は逐次化またはworktree分離
+- 1つのまとまった仕事をagent数を増やすためだけに細切れにしない
+- 独立性が最初から分かっているのに`spawn A → wait → spawn B`と不要に直列化しない
+
+狙いはagent数の最大化ではなく、**useful independenceの最大活用**です。
 
 ### Sol XHIGH reviewer
-
-初回だけfresh reviewerをdirect spawnします。
 
 ```text
 spawn_agent(
   task_name = "review_meaningful_change",
-  message = "<fresh review context; no edits>",
+  message = "<fresh review packet; no edits>",
   model = "gpt-5.6-sol",
   reasoning_effort = "xhigh",
   fork_turns = "none"
 )
 ```
 
-再レビューが有益なら同じReviewer sessionへfollow-upします。`MAX` / `XHIGH`は`reasoning_effort`であり、`service_tier`とは別です。
+`MAX` / `XHIGH`は`reasoning_effort`です。`service_tier`とは別物であり、Axiomは通常`service_tier`を指定しません。
 
-### wait_agent
+## Review continuity and convergence
 
-v0.147は`wait_agent`のdefault timeoutが30秒、hard maximumが60分です。Axiomでは短いpollingを避けるため、config defaultを60分にし、必要なら明示的にも次を使います。
+最初のレビューはfreshなSol XHIGHをdirect spawnします。LunaをReviewerには使いません。
+
+その後の再レビューでは、新しいReviewerを立て直さず、**同じReviewer agentを継続利用**します。MainはReviewerをreview cycleが終わるまで保持し、修正後のcandidate、検証結果、Findingごとの裁定を同じagentへfollow-upします。
 
 ```text
-wait_agent(timeout_ms = 3600000)
+Initial fresh Sol review
+        ↓
+Main: ACCEPT / DEFER / REJECT / ESCALATE
+        ↓
+accepted findingsを修正・検証
+        ↓
+same Sol reviewerへfollow-up
+        ↓
+Mainが再度裁定し、必要な間だけ継続
 ```
 
-これは「必ず60分待つ」という意味ではありません。agent activityや新しいsteering inputが入れば早く復帰します。そのため、Luna MAXの長い実装中にMainが30秒ごとに不要なtimeout復帰を繰り返すのを避けられます。
+Finding数やreview round数には固定上限を設けません。収束性は次で確保します。
 
-## Review convergence
+- Finding IDとMainの裁定を同じReviewer contextで維持する
+- `REJECT`または`DEFER`したFindingを、新しい根拠なしに蒸し返さない
+- 再レビューはaccepted findingの解消とupdated candidateのmaterial riskを中心にする
+- style、好み、無関係なrefactorをblocking findingへ昇格させない
+- reviewを続けるか、終了するか、設計へ戻るかはMainが判断する
 
-Reviewerを呼ぶ場合、初回はfresh Sol XHIGHです。以後のre-reviewは、利用可能なら**同じReviewer session**を継続します。LunaをReviewerには使いません。
-
-Reviewerはstyleや好みではなく、具体的なimpactを持つmaterial findingをstable ID付きで返します。`SHIP / FIX_FIRST / RETHINK`や`CRITICAL / MAJOR`といった固定判定は要求しません。最終判断はMainが持ちます。
-
-Mainは各findingを`ACCEPT / DEFER / REJECT / ESCALATE`として裁定し、accepted findingだけを現在のdesign boundaryに沿ったfix requirementへ変換します。再レビュー時は同じReviewerが以前のfinding IDとMain裁定を保持したまま更新candidateを確認します。
-
-Finding件数やreview round数には固定上限を置きません。収束性は、**same-reviewer continuity + stable finding IDs + Main adjudication + Finding Freeze + Mainによる終了判断**で確保します。新しいmaterial findingは、新しい具体的証拠やfixによって発生・顕在化した問題なら追加できます。
-
-Reviewの有無もファイル数では決めません。risk、uncertainty、blast radius、deterministic verificationの強さをMainが総合して判断します。
+終了条件は、**Mainが受理した未解決のmaterial findingがなくなること**です。固定回数で打ち切るのではなく、Mainの裁定により収束させます。
 
 ## Direct spawn reviewerのread-only性
 
@@ -181,6 +209,60 @@ custom agentを使わないため、Reviewerのsandboxを専用TOMLでhard read-
 
 つまりread-onlyは**behavioral contract**です。この制約と導入容易性のトレードオフは意図的です。最終diff確認と受理はMainが担当します。
 
+## Axiom Dashboard（v0.1.3）
+
+Axiom v0.1.3には、任意利用のローカルDashboardを同梱しています。
+
+> **配布は一体、実行責務は分離。**
+
+Core Skillは引き続きguidance-firstです。DashboardはCodex Rollout TraceとGitを読み取って観測用read modelを構築するだけで、agentのspawn、停止、メッセージ送信、Finding裁定、リポジトリ変更を行いません。hook、常駐daemon、外部telemetryも追加しません。
+
+主な表示内容:
+
+- Main / Worker / ReviewerのAgent Graph
+- Luna workerの並列Timeline、peak concurrency、overlap
+- model、reasoning effort、`fork_turns`、duration、token、compaction
+- Sol Reviewer、review round、verdict、`AX-*` Finding
+- Main / Worker / Reviewerのtoken分離
+- branch、変更ファイル、diff統計などのread-only Git情報
+- Worker routing、Review continuity、Context isolation、ParallelismなどのAxiom principle checks
+
+Dashboard Skillは通常の開発依頼では自動選択されません。明示的に呼び出します。
+
+```text
+$axiom:axiom-dashboard
+
+このリポジトリのAxiom Dashboardを開いてください。
+```
+
+### Traceを有効化
+
+Rollout TraceはCodex起動前に環境変数を設定します。
+
+```bash
+export CODEX_ROLLOUT_TRACE_ROOT="$HOME/.codex/axiom-traces"
+mkdir -p "$CODEX_ROLLOUT_TRACE_ROOT"
+codex
+```
+
+PowerShell:
+
+```powershell
+$env:CODEX_ROLLOUT_TRACE_ROOT = "$HOME/.codex/axiom-traces"
+New-Item -ItemType Directory -Force $env:CODEX_ROLLOUT_TRACE_ROOT | Out-Null
+codex
+```
+
+その後、別terminalまたはDashboard Skillから起動します。
+
+```bash
+plugins/axiom/dashboard/launch/axiom-dashboard.sh serve --repo "$PWD" --open
+```
+
+配布版は対応platformの単一Rust binaryを使用します。source archiveではCargoがある場合にlauncherが`cargo run --release`へfallbackします。Dashboardは既定で`127.0.0.1`だけにbindし、外部通信を行いません。Rollout Traceにはprompt、response、tool data、terminal output、filesystem pathが含まれ得るため、trace rootは機密データとして扱ってください。
+
+詳細は[`plugins/axiom/dashboard/README.md`](plugins/axiom/dashboard/README.md)を参照してください。
+
 ## Repository構成
 
 ```text
@@ -191,10 +273,14 @@ axiom-codex-plugin/
 │   ├── plugin.json
 │   ├── assets/
 │   ├── config/
-│   └── skills/axiom/
-│       ├── SKILL.md
-│       ├── agents/openai.yaml
-│       └── references/
+│   ├── skills/
+│   │   ├── axiom/                 # proactive engineering guidance
+│   │   └── axiom-dashboard/       # explicit dashboard launcher
+│   └── dashboard/
+│       ├── src/                    # Rust collector/API
+│       ├── web/                    # embedded React UI
+│       ├── launch/                 # platform-aware launchers
+│       └── bin/                    # release binaries by platform
 ├── docs/
 ├── tests/
 └── tools/
@@ -205,13 +291,17 @@ axiom-codex-plugin/
 ```bash
 python3 tools/validate_plugin.py
 python3 -m unittest discover -s tests -v
+tsc -p plugins/axiom/dashboard/web/tsconfig.json --noEmit
+cargo test --manifest-path plugins/axiom/dashboard/Cargo.toml
 ```
 
-配布ZIPの生成:
+配布物の生成:
 
 ```bash
 python3 tools/package_release.py --output dist
 ```
+
+これにより、Plugin packageとsource archiveを生成します。release workflowではplatform別にbuildしたDashboard binaryを`dashboard/bin/`へoverlayして、自己完結したPlugin ZIPを作成します。
 
 ## 設計資料
 

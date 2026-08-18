@@ -147,7 +147,7 @@ Finding Freeze means:
 - genuinely new material defects may still be reported when supported by new evidence or caused/revealed by the fix;
 - Main decides when further review has diminishing value and when the candidate is sufficiently resolved.
 
-There is **no arbitrary finding-count limit and no arbitrary review-round limit**. Convergence comes from reviewer continuity, stable IDs, Main adjudication, and Main's judgment about remaining risk—not from numeric caps.
+There is no fixed finding count and no fixed review-round limit. Convergence comes from reviewer continuity, stable IDs, Main adjudication, and Main's judgment about remaining risk—not from numeric caps.
 
 If reviewer and Main remain in substantive disagreement, Main decides whether to accept the risk, replan, escalate to the user, or request more evidence. The reviewer is not an autonomous loop controller.
 
