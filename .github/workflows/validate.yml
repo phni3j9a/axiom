@@ -4,74 +4,24 @@ on:
   push:
   pull_request:
 
-permissions:
-  contents: write
-
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Align token fallback regression expectation
-        if: github.event_name == 'pull_request'
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          path = Path('plugins/axiom/dashboard/src/trace.rs')
-          text = path.read_text()
-          old = 'assert_eq!(usage.total_tokens, 17);'
-          new = 'assert_eq!(usage.total_tokens, 14);'
-          if old in text:
-              path.write_text(text.replace(old, new, 1))
-          PY
-          if ! git diff --quiet -- plugins/axiom/dashboard/src/trace.rs; then
-            git config user.name github-actions[bot]
-            git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-            git add plugins/axiom/dashboard/src/trace.rs
-            git commit -m 'Align token usage regression with output accounting'
-            git push origin "HEAD:${{ github.head_ref }}"
-          fi
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - run: python3 tools/validate_plugin.py
+      - run: python3 -m unittest discover -s tests -v
       - run: npm install --no-save typescript@5.8.3
         working-directory: plugins/axiom/dashboard/web
-      - name: Materialize dashboard web assets
-        shell: bash
-        run: |
-          set -euo pipefail
-          WEB=plugins/axiom/dashboard/web
-          npm run build --prefix "$WEB"
-          mkdir -p "$WEB/dist/vendor"
-          curl -fsSL https://unpkg.com/react@18.3.1/umd/react.production.min.js -o "$WEB/dist/vendor/react.production.min.js"
-          curl -fsSL https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js -o "$WEB/dist/vendor/react-dom.production.min.js"
-          curl -fsSL https://unpkg.com/react@18.3.1/LICENSE -o "$WEB/dist/vendor/REACT-LICENSE.txt"
-      - name: Commit generated dashboard assets on PR branches
-        if: github.event_name == 'pull_request'
-        shell: bash
-        run: |
-          set -euo pipefail
-          git add -f plugins/axiom/dashboard/web/dist
-          if ! git diff --cached --quiet; then
-            git config user.name github-actions[bot]
-            git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-            git commit -m 'Materialize dashboard web assets'
-            git push origin "HEAD:${{ github.head_ref }}"
-          fi
-      - name: Validate plugin
-        shell: bash
-        run: python3 tools/validate_plugin.py
-      - run: python3 -m unittest discover -s tests -v
       - run: npm run check
         working-directory: plugins/axiom/dashboard/web
       - run: npm run build
