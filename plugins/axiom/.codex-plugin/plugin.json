@@ -1,7 +1,7 @@
 {
   "name": "axiom",
-  "version": "0.1.3",
-  "description": "Guidance-first Codex engineering with proactive parallel Luna MAX workers, fresh Sol XHIGH review, context isolation, safe Git coordination, and an optional local observability dashboard.",
+  "version": "0.1.4",
+  "description": "Guidance-first Codex engineering with almost-free proactive parallel Luna MAX workers, fresh Sol XHIGH review, context isolation, safe Git coordination, and an optional local observability dashboard.",
   "author": {
     "name": "phni3j9a",
     "url": "https://github.com/phni3j9a"
@@ -25,7 +25,7 @@
   "interface": {
     "displayName": "Axiom",
     "shortDescription": "Sol/Luna engineering guidance",
-    "longDescription": "Axiom is a guidance-first Codex plugin for non-trivial software engineering. Main Sol owns intent, architecture, integration, review adjudication, and final acceptance; useful independent bounded work fans out to parallel direct-spawn Luna MAX workers; meaningful changes receive fresh direct-spawn Sol XHIGH review with same-reviewer continuity. Axiom v0.1.3 also bundles an optional local read-only Dashboard that observes Codex Rollout Trace, agent parallelism, review evidence, token distribution, Git state, and Axiom principle compliance without turning Axiom into a workflow engine or control plane.",
+    "longDescription": "Axiom is a guidance-first Codex plugin for non-trivial software engineering. Main Sol owns intent, architecture, integration, review adjudication, and final acceptance; under Axiom v0.1.4 model economics, Luna MAX worker usage is treated as almost free so useful bounded delegation and parallel fan-out are not suppressed to conserve model usage; meaningful changes receive fresh direct-spawn Sol XHIGH review with same-reviewer continuity. The optional local read-only Dashboard observes Codex Rollout Trace, agent parallelism, review evidence, token distribution, Git state, and Axiom principle compliance without turning Axiom into a workflow engine or control plane.",
     "developerName": "phni3j9a",
     "category": "Developer Tools",
     "capabilities": [

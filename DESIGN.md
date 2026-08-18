@@ -1,6 +1,6 @@
 # Axiom Design
 
-Version: 0.1.3  
+Version: 0.1.4  
 Target: Codex v0.147.x  
 Status: Dashboard-enabled implementation
 
@@ -23,10 +23,16 @@ The Main Sol model remains the authority for:
 
 Bounded cognitive labor is externalized to Luna MAX. Independent review is externalized to a fresh Sol XHIGH only when the change is meaningful.
 
+Axiom v0.1.4 makes its worker economics explicit: under the current Codex/model economics targeted by this version, ordinary Luna MAX worker usage is treated as **almost free** for orchestration decisions. This deliberately makes Main context preservation more important than minimizing Luna usage.
+
+> **Main context is expensive; Luna compute is almost free.**
+
+This is a versioned assumption. If model economics change materially, the policy should be updated rather than treated as timeless.
+
 ## 3. Core axioms
 
 1. **Main owns meaning.** Do not delegate final architecture, product intent, or acceptance.
-2. **Delegate bounded work.** Use workers for work that has a clear objective, scope, constraints, and verification.
+2. **Delegate bounded work proactively.** Use workers for work that has a clear objective, scope, constraints, and verification; do not keep such work in Main merely to save Luna usage.
 3. **Luna first.** Use direct-spawn Luna MAX for ordinary delegated work, including exploration.
 4. **Sol reviews.** If independent review is warranted, use a fresh direct-spawn Sol XHIGH.
 5. **Fresh context by default.** Prefer self-contained packets with `fork_turns: "none"`.
@@ -34,7 +40,7 @@ Bounded cognitive labor is externalized to Luna MAX. Independent review is exter
 7. **Verify the actual tree.** Worker claims never replace inspection, tests, or diff review.
 8. **Preserve review continuity.** Spawn a fresh Sol for the initial review, then reuse that same reviewer for re-review while Main owns every finding decision.
 9. **Preserve user work.** Never discard, overwrite, or misattribute pre-existing changes.
-10. **Keep simple work simple.** Delegation and review are tools, not mandatory phases.
+10. **Keep simple work simple.** Delegation and review are tools, not mandatory phases. Coordination/integration overhead can justify staying in Main; Luna token cost alone cannot.
 
 ## 4. Why no Terra default
 
@@ -44,7 +50,9 @@ Main Sol handles substantive ambiguity instead of delegating that ambiguity to a
 
 ## 5. Parallel Luna fleet policy
 
-Luna MAX is cheap enough that Axiom lowers the threshold for useful fan-out. If Main can identify two or more bounded tasks whose results do not depend on each other, parallel execution is the preferred default rather than serial spawn/wait cycles.
+Luna MAX is cheap enough that Axiom lowers the threshold for useful fan-out. In v0.1.4, that assumption is stronger and explicit: ordinary Luna worker compute is treated as almost free, so Luna usage itself is not a meaningful reason to serialize or retain bounded work in Main.
+
+If Main can identify two or more bounded tasks whose results do not depend on each other, parallel execution is the preferred default rather than serial spawn/wait cycles.
 
 The policy is deliberately dependency-driven rather than numeric:
 
@@ -54,6 +62,8 @@ The policy is deliberately dependency-driven rather than numeric:
 - read-only investigations may fan out aggressively
 - write tasks may fan out when ownership is disjoint and interfaces are stable
 - overlapping writes are serialized or isolated with worktrees
+
+The practical constraints are coordination, latency, dependency ordering, write conflicts, integration, and verification—not Luna token conservation.
 
 Main Sol owns the task graph and integration. Axiom does not introduce a permanent intermediary orchestrator.
 
@@ -102,6 +112,7 @@ Axiom is not:
 - a substitute for deterministic tests
 - a fixed-size agent fleet
 - a promise that more agents always improve results
+
 ## 10. Dashboard architecture
 
 Axiom Dashboard is bundled in the same Plugin package for simple installation and release management, but it is not part of Axiom Core's decision path.
@@ -150,4 +161,3 @@ Rollout traces can contain sensitive prompts, responses, tool inputs and outputs
 - performs no telemetry or external network calls
 - never uploads traces
 - leaves retention and deletion under local user control
-

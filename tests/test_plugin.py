@@ -27,7 +27,7 @@ class AxiomPluginTests(unittest.TestCase):
         manifest = json.loads((PLUGIN / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8"))
         marketplace = json.loads((ROOT / ".agents" / "plugins" / "marketplace.json").read_text(encoding="utf-8"))
         self.assertEqual(manifest["name"], "axiom")
-        self.assertEqual(manifest["version"], "0.1.3")
+        self.assertEqual(manifest["version"], "0.1.4")
         self.assertEqual(marketplace["plugins"][0]["name"], "axiom")
 
     def test_core_is_proactive_dashboard_is_explicit(self) -> None:
@@ -64,6 +64,17 @@ class AxiomPluginTests(unittest.TestCase):
         self.assertIn("no fixed worker count", combined)
         self.assertIn("do not split", combined)
 
+    def test_luna_worker_economics_are_explicit(self) -> None:
+        skill = (CORE_SKILL / "SKILL.md").read_text(encoding="utf-8")
+        delegation = (CORE_SKILL / "references" / "delegation.md").read_text(encoding="utf-8")
+        combined = (skill + "\n" + delegation).lower()
+        self.assertIn("luna compute is almost free", combined)
+        self.assertIn("main context is expensive", combined)
+        self.assertIn("do not avoid a useful luna spawn", combined)
+        self.assertIn("do not keep such work in main merely to save luna usage", combined)
+        self.assertIn("coordination", combined)
+        self.assertIn("integration", combined)
+
     def test_no_custom_agent_toml(self) -> None:
         self.assertEqual(list((CORE_SKILL / "agents").glob("*.toml")), [])
 
@@ -92,8 +103,8 @@ class AxiomPluginTests(unittest.TestCase):
                 capture_output=True,
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            plugin_zip = Path(tmp) / "axiom-v0.1.3-plugin.zip"
-            source_zip = Path(tmp) / "axiom-codex-plugin-v0.1.3-source.zip"
+            plugin_zip = Path(tmp) / "axiom-v0.1.4-plugin.zip"
+            source_zip = Path(tmp) / "axiom-codex-plugin-v0.1.4-source.zip"
             self.assertTrue(plugin_zip.is_file())
             self.assertTrue(source_zip.is_file())
             with zipfile.ZipFile(plugin_zip) as archive:

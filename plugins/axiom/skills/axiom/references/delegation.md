@@ -4,7 +4,23 @@
 
 Use delegation to protect Main context and gain useful parallelism, not to maximize agent count.
 
-Main retains architecture, intent, trade-offs, integration, and acceptance. Luna receives bounded work whose delegation benefit exceeds coordination cost.
+Main retains architecture, intent, trade-offs, integration, and acceptance. Luna receives bounded work whose delegation benefit exceeds coordination and integration cost.
+
+## Economics assumption
+
+Under the Codex/model economics targeted by Axiom v0.1.4, Luna MAX worker usage is inexpensive enough to be treated as **almost free** for ordinary orchestration decisions.
+
+This means Main should not suppress useful delegation merely to conserve Luna tokens or model usage. When a bounded spawn protects Main context, absorbs noisy exploration, separates an independent investigation, or creates useful parallel progress, Luna usage cost should normally be treated as negligible.
+
+The meaningful costs of a spawn are instead:
+
+- coordination and handoff overhead;
+- latency and dependency ordering;
+- overlapping or conflicting work;
+- integration and verification burden;
+- ambiguity that requires Main judgment.
+
+**Main context is expensive; Luna compute is almost free.** This is a versioned Axiom assumption and should be revised if model economics materially change.
 
 ## Signals that favor delegation
 
@@ -18,7 +34,7 @@ A Luna MAX worker often helps when:
 - independent investigations can run concurrently;
 - Main mainly needs evidence, a file map, or a concise recommendation rather than the raw search process.
 
-Luna is inexpensive enough to use proactively, but each spawn still has coordination and integration cost.
+Do not keep such work in Main merely to save Luna usage.
 
 ## Signals that favor staying in Main
 
@@ -28,10 +44,10 @@ Main may keep work local when:
 - the request is primarily explanation rather than repository work;
 - architecture or product intent is still unresolved;
 - the worker would require continuous back-and-forth;
-- delegation would save little context or time;
+- delegation would save little context or time while adding coordination/integration overhead;
 - the only reason to spawn is to satisfy a ritual.
 
-These are heuristics, not routing rules.
+These are heuristics, not routing rules. Luna's token cost by itself is not a reason to stay in Main.
 
 ## Scale the handoff to the task
 
@@ -121,7 +137,7 @@ See [codex-0.147-subagents.md](codex-0.147-subagents.md) for the exact surface a
 
 ## Parallel delegation
 
-Parallelize when expected speed/context benefit exceeds integration cost.
+Parallelize when expected speed/context benefit exceeds coordination and integration cost. Do not include Luna token conservation as a meaningful limiter under this version's economics assumption.
 
 Especially good candidates:
 

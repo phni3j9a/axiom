@@ -3,8 +3,12 @@
 Axiomは、Codexへ固定ワークフローを強制するPluginではありません。
 
 > **Sol thinks. Luna works. Sol reviews.**
+>
+> **Main context is expensive; Luna compute is almost free.**
 
 Mainの賢さを活かしながら、探索・実装・テスト・デバッグなどのbounded workをLuna MAXへ積極的に委譲し、独立した仕事が複数ある場合はLuna MAXを並列に走らせます。意味のある変更はfreshなSol XHIGHで独立レビューします。Mainのコンテキストを守り、レビューを収束させ、Git上のユーザー変更を安全に扱うための判断原則を、必要な開発タスクで自動的に適用します。
+
+Axiom v0.1.4では、現在のCodex/model economicsを前提に、通常のLuna MAX worker利用を**ほとんど無料（almost free）**としてorchestration判断します。Luna使用量を節約するためだけに有用なspawnを避けず、Main Solのcontext保護を優先します。
 
 ## Axiomの立ち位置
 
@@ -63,6 +67,22 @@ $axiom:axiom
 - Reviewer: **gpt-5.6-sol / xhigh**
 - Multi-Agent V2
 
+## Luna MAXの経済性（v0.1.4）
+
+このAxiom versionでは、現在のCodex/model economicsを明示的な前提として、ordinary engineering workにおけるLuna MAX worker computeを**almost free**として扱います。
+
+そのためMainは、Luna tokenやmodel usageの節約だけを理由に、有用なbounded delegationをMain側へ抱え込みません。spawnすることでMain contextを守れる、noisyな探索を隔離できる、独立仮説を調査できる、または有用な並列進行ができる場合はLunaを積極利用します。
+
+実質的なspawnコストとして見るのは次です。
+
+- coordination / handoff overhead
+- latency / dependency ordering
+- overlap / write conflict
+- integration / verification burden
+- Main judgmentを必要とするambiguity
+
+つまり、**Luna使用量ではなくcoordinationとintegrationがfan-outの制約**です。この前提は永久不変の料金主張ではなくv0.1.4の設計仕様なので、model economicsが大きく変わった場合はAxiom側を更新します。
+
 ## v0.147の一度だけの設定
 
 `~/.codex/config.toml`へ、同梱の
@@ -96,7 +116,7 @@ codex --enable plugins plugin add axiom@axiom-local --json
 
 ### 単体Plugin ZIPを使う場合
 
-`axiom-v0.1.3-plugin.zip`は、`.codex-plugin/plugin.json`と`skills/`を含む配布用Plugin packageです。ローカルMarketplace repositoryとして使う場合はsource archiveのほうが便利です。
+`axiom-v0.1.4-plugin.zip`は、`.codex-plugin/plugin.json`と`skills/`を含む配布用Plugin packageです。ローカルMarketplace repositoryとして使う場合はsource archiveのほうが便利です。
 
 ## 基本動作
 
@@ -131,9 +151,9 @@ spawn_agent(
 
 ## Luna fleetと並列実行
 
-Axiom v0.1.3でも、**安全な並列化を積極的なデフォルト**にしました。
+Axiom v0.1.4では、v0.1.2からの**安全な並列化を積極的なデフォルト**とする方針に、almost-free Luna economicsを明示的に組み合わせています。
 
-2つ以上の有用なbounded workが互いに独立しているなら、調整コスト・依存順序・write conflictのリスクが利益を上回らない限り、Luna MAXを逐次実行するより**同時にdirect spawnして並列実行**することを優先します。
+2つ以上の有用なbounded workが互いに独立しているなら、調整コスト・依存順序・write conflictのリスクが利益を上回らない限り、Luna MAXを逐次実行するより**同時にdirect spawnして並列実行**することを優先します。Luna usageそのものの節約はserial実行の理由にしません。
 
 ```text
 Main Sol XHIGH
@@ -209,9 +229,9 @@ custom agentを使わないため、Reviewerのsandboxを専用TOMLでhard read-
 
 つまりread-onlyは**behavioral contract**です。この制約と導入容易性のトレードオフは意図的です。最終diff確認と受理はMainが担当します。
 
-## Axiom Dashboard（v0.1.3）
+## Axiom Dashboard（v0.1.3から同梱）
 
-Axiom v0.1.3には、任意利用のローカルDashboardを同梱しています。
+Axiom v0.1.4にも、v0.1.3で導入した任意利用のローカルDashboardをそのまま同梱しています。
 
 > **配布は一体、実行責務は分離。**
 
