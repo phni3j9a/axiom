@@ -8,7 +8,7 @@ Axiomは、Codexへ固定ワークフローを強制するPluginではありま�
 
 Mainの賢さを活かしながら、探索・実装・テスト・デバッグなどのbounded workをLuna MAXへ積極的に委譲し、独立した仕事が複数ある場合はLuna MAXを並列に走らせます。意味のある変更はfreshなSol XHIGHで独立レビューします。Mainのコンテキストを守り、レビューを収束させ、Git上のユーザー変更を安全に扱うための判断原則を、必要な開発タスクで自動的に適用します。
 
-Axiom v0.1.4では、現在のCodex/model economicsを前提に、通常のLuna MAX worker利用を**ほとんど無料（almost free）**としてorchestration判断します。Luna使用量を節約するためだけに有用なspawnを避けず、Main Solのcontext保護を優先します。
+Axiom v0.1.5では、v0.1.4で明文化したCodex/model economicsの原則を維持し、通常のLuna MAX worker利用を**ほとんど無料（almost free）**としてorchestration判断します。Luna使用量を節約するためだけに有用なspawnを避けず、Main Solのcontext保護を優先します。
 
 ## Axiomの立ち位置
 
@@ -67,9 +67,9 @@ $axiom:axiom
 - Reviewer: **gpt-5.6-sol / xhigh**
 - Multi-Agent V2
 
-## Luna MAXの経済性（v0.1.4）
+## Luna MAXの経済性（v0.1.4から継続）
 
-このAxiom versionでは、現在のCodex/model economicsを明示的な前提として、ordinary engineering workにおけるLuna MAX worker computeを**almost free**として扱います。
+Axiom v0.1.5では、現在のCodex/model economicsを明示的な前提として、ordinary engineering workにおけるLuna MAX worker computeを**almost free**として扱います。
 
 そのためMainは、Luna tokenやmodel usageの節約だけを理由に、有用なbounded delegationをMain側へ抱え込みません。spawnすることでMain contextを守れる、noisyな探索を隔離できる、独立仮説を調査できる、または有用な並列進行ができる場合はLunaを積極利用します。
 
@@ -81,7 +81,7 @@ $axiom:axiom
 - integration / verification burden
 - Main judgmentを必要とするambiguity
 
-つまり、**Luna使用量ではなくcoordinationとintegrationがfan-outの制約**です。この前提は永久不変の料金主張ではなくv0.1.4の設計仕様なので、model economicsが大きく変わった場合はAxiom側を更新します。
+つまり、**Luna使用量ではなくcoordinationとintegrationがfan-outの制約**です。この前提は永久不変の料金主張ではなくv0.1.4で明文化され、v0.1.5でも維持している設計仕様なので、model economicsが大きく変わった場合はAxiom側を更新します。
 
 ## v0.147の一度だけの設定
 
@@ -116,7 +116,7 @@ codex --enable plugins plugin add axiom@axiom-local --json
 
 ### 単体Plugin ZIPを使う場合
 
-`axiom-v0.1.4-plugin.zip`は、`.codex-plugin/plugin.json`と`skills/`を含む配布用Plugin packageです。ローカルMarketplace repositoryとして使う場合はsource archiveのほうが便利です。
+`axiom-v0.1.5-plugin.zip`は、`.codex-plugin/plugin.json`と`skills/`を含む配布用Plugin packageです。ローカルMarketplace repositoryとして使う場合はsource archiveのほうが便利です。
 
 ## 基本動作
 
@@ -151,7 +151,7 @@ spawn_agent(
 
 ## Luna fleetと並列実行
 
-Axiom v0.1.4では、v0.1.2からの**安全な並列化を積極的なデフォルト**とする方針に、almost-free Luna economicsを明示的に組み合わせています。
+Axiom v0.1.5では、v0.1.2からの**安全な並列化を積極的なデフォルト**とする方針と、v0.1.4で明文化したalmost-free Luna economicsを維持しています。
 
 2つ以上の有用なbounded workが互いに独立しているなら、調整コスト・依存順序・write conflictのリスクが利益を上回らない限り、Luna MAXを逐次実行するより**同時にdirect spawnして並列実行**することを優先します。Luna usageそのものの節約はserial実行の理由にしません。
 
@@ -229,60 +229,6 @@ custom agentを使わないため、Reviewerのsandboxを専用TOMLでhard read-
 
 つまりread-onlyは**behavioral contract**です。この制約と導入容易性のトレードオフは意図的です。最終diff確認と受理はMainが担当します。
 
-## Axiom Dashboard（v0.1.3から同梱）
-
-Axiom v0.1.4にも、v0.1.3で導入した任意利用のローカルDashboardをそのまま同梱しています。
-
-> **配布は一体、実行責務は分離。**
-
-Core Skillは引き続きguidance-firstです。DashboardはCodex Rollout TraceとGitを読み取って観測用read modelを構築するだけで、agentのspawn、停止、メッセージ送信、Finding裁定、リポジトリ変更を行いません。hook、常駐daemon、外部telemetryも追加しません。
-
-主な表示内容:
-
-- Main / Worker / ReviewerのAgent Graph
-- Luna workerの並列Timeline、peak concurrency、overlap
-- model、reasoning effort、`fork_turns`、duration、token、compaction
-- Sol Reviewer、review round、verdict、`AX-*` Finding
-- Main / Worker / Reviewerのtoken分離
-- branch、変更ファイル、diff統計などのread-only Git情報
-- Worker routing、Review continuity、Context isolation、ParallelismなどのAxiom principle checks
-
-Dashboard Skillは通常の開発依頼では自動選択されません。明示的に呼び出します。
-
-```text
-$axiom:axiom-dashboard
-
-このリポジトリのAxiom Dashboardを開いてください。
-```
-
-### Traceを有効化
-
-Rollout TraceはCodex起動前に環境変数を設定します。
-
-```bash
-export CODEX_ROLLOUT_TRACE_ROOT="$HOME/.codex/axiom-traces"
-mkdir -p "$CODEX_ROLLOUT_TRACE_ROOT"
-codex
-```
-
-PowerShell:
-
-```powershell
-$env:CODEX_ROLLOUT_TRACE_ROOT = "$HOME/.codex/axiom-traces"
-New-Item -ItemType Directory -Force $env:CODEX_ROLLOUT_TRACE_ROOT | Out-Null
-codex
-```
-
-その後、別terminalまたはDashboard Skillから起動します。
-
-```bash
-plugins/axiom/dashboard/launch/axiom-dashboard.sh serve --repo "$PWD" --open
-```
-
-配布版は対応platformの単一Rust binaryを使用します。source archiveではCargoがある場合にlauncherが`cargo run --release`へfallbackします。Dashboardは既定で`127.0.0.1`だけにbindし、外部通信を行いません。Rollout Traceにはprompt、response、tool data、terminal output、filesystem pathが含まれ得るため、trace rootは機密データとして扱ってください。
-
-詳細は[`plugins/axiom/dashboard/README.md`](plugins/axiom/dashboard/README.md)を参照してください。
-
 ## Repository構成
 
 ```text
@@ -293,14 +239,8 @@ axiom-codex-plugin/
 │   ├── plugin.json
 │   ├── assets/
 │   ├── config/
-│   ├── skills/
-│   │   ├── axiom/                 # proactive engineering guidance
-│   │   └── axiom-dashboard/       # explicit dashboard launcher
-│   └── dashboard/
-│       ├── src/                    # Rust collector/API
-│       ├── web/                    # embedded React UI
-│       ├── launch/                 # platform-aware launchers
-│       └── bin/                    # release binaries by platform
+│   └── skills/
+│       └── axiom/                 # proactive engineering guidance
 ├── docs/
 ├── tests/
 └── tools/
@@ -311,8 +251,6 @@ axiom-codex-plugin/
 ```bash
 python3 tools/validate_plugin.py
 python3 -m unittest discover -s tests -v
-tsc -p plugins/axiom/dashboard/web/tsconfig.json --noEmit
-cargo test --manifest-path plugins/axiom/dashboard/Cargo.toml
 ```
 
 配布物の生成:
@@ -321,7 +259,7 @@ cargo test --manifest-path plugins/axiom/dashboard/Cargo.toml
 python3 tools/package_release.py --output dist
 ```
 
-これにより、Plugin packageとsource archiveを生成します。release workflowではplatform別にbuildしたDashboard binaryを`dashboard/bin/`へoverlayして、自己完結したPlugin ZIPを作成します。
+これにより、Core Plugin packageとsource archiveを生成します。
 
 ## 設計資料
 

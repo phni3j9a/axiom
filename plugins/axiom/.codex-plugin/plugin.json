@@ -1,7 +1,7 @@
 {
   "name": "axiom",
-  "version": "0.1.4",
-  "description": "Guidance-first Codex engineering with almost-free proactive parallel Luna MAX workers, fresh Sol XHIGH review, context isolation, safe Git coordination, and an optional local observability dashboard.",
+  "version": "0.1.5",
+  "description": "Guidance-first Codex engineering with almost-free proactive parallel Luna MAX workers, fresh Sol XHIGH review, context isolation, and safe Git coordination.",
   "author": {
     "name": "phni3j9a",
     "url": "https://github.com/phni3j9a"
@@ -16,16 +16,13 @@
     "sol",
     "review",
     "git",
-    "parallelism",
-    "observability",
-    "dashboard",
-    "rollout-trace"
+    "parallelism"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Axiom",
     "shortDescription": "Sol/Luna engineering guidance",
-    "longDescription": "Axiom is a guidance-first Codex plugin for non-trivial software engineering. Main Sol owns intent, architecture, integration, review adjudication, and final acceptance; under Axiom v0.1.4 model economics, Luna MAX worker usage is treated as almost free so useful bounded delegation and parallel fan-out are not suppressed to conserve model usage; meaningful changes receive fresh direct-spawn Sol XHIGH review with same-reviewer continuity. The optional local read-only Dashboard observes Codex Rollout Trace, agent parallelism, review evidence, token distribution, Git state, and Axiom principle compliance without turning Axiom into a workflow engine or control plane.",
+    "longDescription": "Axiom is a guidance-first Codex plugin for non-trivial software engineering. Main Sol owns intent, architecture, decomposition, integration, review adjudication, and final acceptance. Luna MAX worker usage is treated as almost free, so useful bounded delegation and parallel fan-out are not suppressed merely to conserve model usage. Meaningful changes receive fresh direct-spawn Sol XHIGH review with same-reviewer continuity, while context isolation and safe Git coordination protect the main thread and existing user work.",
     "developerName": "phni3j9a",
     "category": "Developer Tools",
     "capabilities": [
@@ -34,15 +31,11 @@
       "Luna MAX worker routing",
       "Independent Sol review",
       "Review-loop convergence",
-      "Safe Git coordination",
-      "Local rollout observability",
-      "Agent graph and parallel timeline",
-      "Axiom principle compliance view"
+      "Safe Git coordination"
     ],
     "defaultPrompt": [
       "Use $axiom:axiom to implement this change with efficient delegation and independent review.",
-      "Use $axiom:axiom to investigate this codebase while keeping Main context concise.",
-      "Use $axiom:axiom-dashboard to open the local read-only Axiom Dashboard for this repository."
+      "Use $axiom:axiom to investigate this codebase while keeping Main context concise."
     ],
     "brandColor": "#1D4ED8",
     "brandColorDark": "#60A5FA",

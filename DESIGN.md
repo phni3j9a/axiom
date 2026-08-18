@@ -1,8 +1,8 @@
 # Axiom Design
 
-Version: 0.1.4  
-Target: Codex v0.147.x  
-Status: Dashboard-enabled implementation
+Version: 0.1.5
+Target: Codex v0.147.x
+Status: Core-only guidance-first implementation
 
 ## 1. Problem
 
@@ -23,7 +23,7 @@ The Main Sol model remains the authority for:
 
 Bounded cognitive labor is externalized to Luna MAX. Independent review is externalized to a fresh Sol XHIGH only when the change is meaningful.
 
-Axiom v0.1.4 makes its worker economics explicit: under the current Codex/model economics targeted by this version, ordinary Luna MAX worker usage is treated as **almost free** for orchestration decisions. This deliberately makes Main context preservation more important than minimizing Luna usage.
+Axiom v0.1.5 preserves the worker economics made explicit in v0.1.4: under the current Codex/model economics targeted by this version, ordinary Luna MAX worker usage is treated as **almost free** for orchestration decisions. This deliberately makes Main context preservation more important than minimizing Luna usage.
 
 > **Main context is expensive; Luna compute is almost free.**
 
@@ -50,7 +50,7 @@ Main Sol handles substantive ambiguity instead of delegating that ambiguity to a
 
 ## 5. Parallel Luna fleet policy
 
-Luna MAX is cheap enough that Axiom lowers the threshold for useful fan-out. In v0.1.4, that assumption is stronger and explicit: ordinary Luna worker compute is treated as almost free, so Luna usage itself is not a meaningful reason to serialize or retain bounded work in Main.
+Luna MAX is cheap enough that Axiom lowers the threshold for useful fan-out. The explicit v0.1.4 assumption remains unchanged in v0.1.5: ordinary Luna worker compute is treated as almost free, so Luna usage itself is not a meaningful reason to serialize or retain bounded work in Main.
 
 If Main can identify two or more bounded tasks whose results do not depend on each other, parallel execution is the preferred default rather than serial spawn/wait cycles.
 
@@ -112,52 +112,3 @@ Axiom is not:
 - a substitute for deterministic tests
 - a fixed-size agent fleet
 - a promise that more agents always improve results
-
-## 10. Dashboard architecture
-
-Axiom Dashboard is bundled in the same Plugin package for simple installation and release management, but it is not part of Axiom Core's decision path.
-
-```text
-Axiom Plugin package
-├─ Core Skill                 proactive, guidance-first
-└─ Optional Dashboard
-   ├─ explicit-only Skill
-   ├─ Rust collector/API
-   └─ embedded web UI
-             ↑ read only
-        Codex Rollout Trace + Git
-```
-
-The separation rule is **unified distribution, separate runtime responsibility**:
-
-- Core never depends on Dashboard availability.
-- Dashboard absence or failure never changes agent routing.
-- Dashboard is started only by explicit request.
-- No hook or daemon is installed.
-- Dashboard derives an observation read model; it never becomes Axiom execution state.
-- Dashboard cannot spawn, stop, message, approve, reject, or otherwise control agents.
-- Repository access is limited to read-only Git commands.
-
-The backend is Rust with Tokio and Axum. It discovers Rollout Trace bundles, parses append-only raw events incrementally at refresh time, optionally enriches from an already-present `state.json`, and serves a React/TypeScript interface embedded in the executable. Runtime distribution is a platform-specific single binary. Source packages retain a Cargo fallback for development.
-
-## 11. Dashboard data-confidence policy
-
-Trace schemas and payload completeness can vary. The Dashboard follows evidence-first semantics:
-
-- display observed model, effort, `fork_turns`, token, and review data when present
-- display `unknown` when evidence is missing
-- do not infer that missing telemetry means a policy failure
-- do not claim counterfactual token savings
-- separate observed write-capable tool activity from proof that a file was modified
-- treat compliance checks as explainable indicators, not enforcement decisions
-
-## 12. Dashboard privacy and network boundary
-
-Rollout traces can contain sensitive prompts, responses, tool inputs and outputs, terminal data, and local paths. The Dashboard therefore:
-
-- binds to loopback by default
-- refuses non-loopback binding without an explicit flag
-- has no authentication and must not be exposed casually
-- performs no telemetry or external network calls
-- never uploads traces
-- leaves retention and deletion under local user control

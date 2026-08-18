@@ -3,7 +3,3 @@ __pycache__/
 .pytest_cache/
 dist/
 .DS_Store
-plugins/axiom/dashboard/target/
-plugins/axiom/dashboard/web/node_modules/
-plugins/axiom/dashboard/bin/*/axiom-dashboard
-plugins/axiom/dashboard/bin/*/axiom-dashboard.exe
