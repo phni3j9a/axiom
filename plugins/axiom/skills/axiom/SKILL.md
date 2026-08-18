@@ -15,10 +15,20 @@ When this skill applies, the request authorizes appropriate subagent delegation 
 
 This does not override sandbox, approval, security, or user constraints.
 
+## Luna economics
+
+Under the current Codex/model economics assumed by Axiom v0.1.4, Luna MAX is so inexpensive that ordinary worker usage can be treated as **almost free** for orchestration decisions.
+
+**Main context is expensive; Luna compute is almost free.** Protect Main Sol context aggressively when bounded work can be delegated cleanly.
+
+Do not avoid a useful Luna spawn merely to conserve Luna tokens or model usage. When delegation can protect Main context, isolate noisy work, investigate independently, or make useful parallel progress, prefer spawning Luna. The practical costs that should limit delegation are coordination, latency, overlapping work, dependency order, and integration complexity—not Luna MAX usage itself.
+
+This is an explicit economics assumption of this Axiom version, not a timeless claim about model pricing. If Codex/model economics change materially, update this policy.
+
 ## Operating axioms
 
 1. **Main owns meaning.** Keep user intent, architecture, substantive design, decomposition, integration, finding adjudication, and final acceptance in Main.
-2. **Delegate bounded work.** Offload repository exploration, implementation, tests, debugging, log analysis, and mechanical refactors when they can be expressed with a clear objective, scope, constraints, and verification.
+2. **Delegate bounded work proactively.** Offload repository exploration, implementation, tests, debugging, log analysis, and mechanical refactors when they can be expressed with a clear objective, scope, constraints, and verification. Do not keep bounded work in Main merely to save Luna usage.
 3. **Luna first.** On Codex v0.147, directly spawn `gpt-5.6-luna` with `reasoning_effort: "max"` for ordinary delegated work. Do not select Terra merely because work is exploratory or read-heavy.
 4. **Sol reviews.** When independent review is warranted, directly spawn a fresh `gpt-5.6-sol` with `reasoning_effort: "xhigh"`. Never substitute Luna as the reviewer.
 5. **Fresh context by default.** Prefer a self-contained Task Packet and `fork_turns: "none"`. Share conversation turns only when the dialogue itself is indispensable input.
@@ -26,7 +36,7 @@ This does not override sandbox, approval, security, or user constraints.
 7. **Verify the actual tree.** Inspect the resulting diff and run relevant deterministic checks. Worker self-reports are evidence, not acceptance.
 8. **Keep review continuity.** Spawn a fresh Sol for the initial review, then reuse the same reviewer agent for re-review. Main adjudicates every finding and decides when the review is complete. There is no fixed finding count and no fixed review-round limit.
 9. **Preserve user work.** Detect pre-existing changes, never discard or rewrite them, and do not attribute them to an Axiom worker.
-10. **Keep simple work simple.** A direct Main edit is correct when delegation or review would cost more than the context or quality benefit.
+10. **Keep simple work simple.** A direct Main edit is correct when coordination and integration overhead would exceed the context or quality benefit. Luna's token cost alone is not a reason to stay in Main.
 
 ## Default decision process
 
@@ -35,8 +45,8 @@ Do not narrate this process unless it helps the user.
 1. Clarify the goal and acceptance boundary from available context.
 2. Inspect repository instructions and current Git state.
 3. Decide which judgment must remain in Main.
-4. Split only genuinely bounded work.
-5. When multiple useful bounded tasks are independent, spawn the independent Luna workers before waiting on any one of them; otherwise delegate only work that benefits from isolation.
+4. Split genuinely bounded work whenever doing so protects Main context or creates useful independent progress; do not optimize for minimizing Luna usage.
+5. When multiple useful bounded tasks are independent, spawn the independent Luna workers before waiting on any one of them; otherwise delegate work that benefits from isolation.
 6. Integrate results in Main and inspect the actual changed tree.
 7. Run targeted verification, then broader verification when justified.
 8. For meaningful changes, request an initial fresh Sol XHIGH review and keep that reviewer available.
@@ -56,14 +66,14 @@ If explicit spawn model overrides are unavailable, do not silently create an inh
 
 ## Parallel execution default
 
-Treat safe parallelism as the default optimization, not an exceptional mode.
+Treat safe parallelism as the default optimization, not an exceptional mode. Luna usage itself is almost free under this version's economics assumption, so size the fleet around useful independent work and integration constraints rather than token conservation.
 
 - If two or more **useful** bounded tasks are already independent, prefer concurrent Luna MAX workers over serial spawn/wait/spawn execution.
 - Spawn the independent Luna workers before waiting on any one of them; do not serialize merely out of habit.
 - Do not split work artificially just to increase agent count. One coherent task should remain one worker when extra boundaries add coordination cost.
 - Read-only investigations are the easiest parallel lane and should be fanned out proactively when they cover independent subsystems or hypotheses.
 - Parallel implementation is appropriate only with disjoint write scopes and stable interfaces. If writes overlap, serialize or use isolated worktrees.
-- Main Sol chooses the natural degree of parallelism from dependencies, ownership, and useful work. There is no fixed worker count; Axiom defines no fixed fleet size or concurrency target.
+- Main Sol chooses the natural degree of parallelism from dependencies, ownership, useful work, latency, and integration cost. There is no fixed worker count; Axiom defines no fixed fleet size or concurrency target.
 
 ## Review threshold
 
