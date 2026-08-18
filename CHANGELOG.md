@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.5 — 2026-08-19
+
+- Removed the optional Axiom Dashboard introduced in v0.1.3.
+- Removed the Rust/Axum backend, React/TypeScript frontend, platform launchers, and explicit Dashboard Skill.
+- Removed Dashboard-specific Rust/Node CI and multi-platform binary release jobs.
+- Simplified Plugin packaging to a Core-only distribution.
+- Removed Dashboard/observability metadata, setup instructions, runtime documentation, and the stale validation report.
+- Preserved Axiom Core delegation, parallel Luna, same-reviewer continuity, Git safety, direct-spawn policy, and the v0.1.4 Luna economics principle unchanged.
+
 ## 0.1.4 — 2026-08-18
 
 - Made the current Luna MAX economics assumption explicit: for ordinary Axiom orchestration decisions, Luna worker compute is treated as almost free.

@@ -8,7 +8,7 @@ Main retains architecture, intent, trade-offs, integration, and acceptance. Luna
 
 ## Economics assumption
 
-Under the Codex/model economics targeted by Axiom v0.1.4, Luna MAX worker usage is inexpensive enough to be treated as **almost free** for ordinary orchestration decisions.
+Under the Codex/model economics targeted by Axiom v0.1.5, Luna MAX worker usage is inexpensive enough to be treated as **almost free** for ordinary orchestration decisions. This is the unchanged economics principle introduced in v0.1.4.
 
 This means Main should not suppress useful delegation merely to conserve Luna tokens or model usage. When a bounded spawn protects Main context, absorbs noisy exploration, separates an independent investigation, or creates useful parallel progress, Luna usage cost should normally be treated as negligible.
 
