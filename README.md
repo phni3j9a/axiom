@@ -40,8 +40,6 @@ WorkerとReviewerはいずれもCodex v0.147の`spawn_agent`から**direct spawn
 
 ```yaml
 policy:
-  products:
-    - CODEX
   allow_implicit_invocation: true
 ```
 

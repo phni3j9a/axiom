@@ -174,8 +174,8 @@ def check_skill(skill: Path, name: str, implicit: bool) -> str:
         f"{name} implicit invocation is explicitly {expected}",
     )
     check(
-        re.search(r"products:\s*\n\s*-\s*CODEX", openai_yaml) is not None,
-        f"{name} is scoped to CODEX",
+        re.search(r"^\s*products:\s*$", openai_yaml, re.MULTILINE) is None,
+        f"{name} omits unsupported policy.products",
     )
     return skill_text
 

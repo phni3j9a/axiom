@@ -38,7 +38,6 @@
       "Use $axiom:axiom to investigate this codebase while keeping Main context concise."
     ],
     "brandColor": "#1D4ED8",
-    "brandColorDark": "#60A5FA",
     "logo": "./assets/axiom-logo.svg",
     "composerIcon": "./assets/axiom-composer.svg"
   }

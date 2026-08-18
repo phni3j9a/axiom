@@ -4,6 +4,4 @@ interface:
   default_prompt: "Use $axiom:axiom to complete this software task with efficient delegation and independent review."
 
 policy:
-  products:
-    - CODEX
   allow_implicit_invocation: true
