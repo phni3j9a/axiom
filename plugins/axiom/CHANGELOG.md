@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.4 — 2026-08-18
+
+- Made the current Luna MAX economics assumption explicit: for ordinary Axiom orchestration decisions, Luna worker compute is treated as almost free.
+- Added the principle **“Main context is expensive; Luna compute is almost free.”**
+- Instructed Main not to suppress useful bounded delegation merely to conserve Luna tokens or model usage.
+- Shifted the practical spawn-cost model toward coordination, latency, dependency ordering, overlap/write conflicts, integration, and verification burden.
+- Strengthened proactive delegation and parallel fan-out while retaining natural task boundaries, no fixed worker count, and safeguards against artificial fragmentation.
+- Preserved the v0.1.3 Dashboard and existing Sol reviewer continuity policies unchanged.
+- Added validation/tests to prevent accidental removal of the almost-free Luna economics policy.
+
 ## 0.1.3 — 2026-08-17
 
 - Bundled Axiom Dashboard v0.1.0 inside the existing Plugin package while keeping Axiom Core and Dashboard runtime responsibilities separate.
