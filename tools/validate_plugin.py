@@ -15,7 +15,7 @@ CORE_SKILL = PLUGIN / "skills" / "axiom"
 DASHBOARD_SKILL = PLUGIN / "skills" / "axiom-dashboard"
 DASHBOARD = PLUGIN / "dashboard"
 WEB = DASHBOARD / "web"
-EXPECTED_VERSION = "0.1.3"
+EXPECTED_VERSION = "0.1.4"
 
 errors: list[str] = []
 checks: list[str] = []
@@ -174,6 +174,9 @@ check(
     "guidance avoids accidental serial worker execution",
 )
 check("no fixed worker count" in core_combined.lower(), "guidance uses dependency-driven fleet sizing")
+check("main context is expensive; luna compute is almost free" in core_combined.lower(), "guidance states the v0.1.4 Luna economics principle")
+check("do not avoid a useful luna spawn" in core_combined.lower(), "guidance does not conserve Luna usage at Main-context expense")
+check("luna's token cost by itself is not a reason to stay in main" in core_combined.lower(), "delegation economics are explicit")
 check("Maximum five findings" not in core_combined, "legacy maximum-five-findings rule is absent")
 check("Default maximum: two review rounds" not in core_combined, "legacy two-round limit is absent")
 check(not list((CORE_SKILL / "agents").glob("*.toml")), "no custom agent TOML is bundled")
@@ -267,4 +270,3 @@ if errors:
     sys.exit(1)
 
 print(f"Axiom validation PASSED ({len(checks)} checks)")
-
