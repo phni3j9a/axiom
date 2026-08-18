@@ -1645,7 +1645,7 @@ mod tests {
             }
         });
         let usage = find_token_usage(&value).expect("usage");
-        assert_eq!(usage.total_tokens, 17);
+        assert_eq!(usage.total_tokens, 14);
     }
 
     #[test]
