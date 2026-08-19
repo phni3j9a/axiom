@@ -1,6 +1,6 @@
 {
   "name": "axiom",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Guidance-first Codex engineering with almost-free proactive parallel Luna MAX workers, fresh Sol XHIGH review, context isolation, and safe Git coordination.",
   "author": {
     "name": "phni3j9a",
@@ -38,7 +38,6 @@
       "Use $axiom:axiom to investigate this codebase while keeping Main context concise."
     ],
     "brandColor": "#1D4ED8",
-    "brandColorDark": "#60A5FA",
     "logo": "./assets/axiom-logo.svg",
     "composerIcon": "./assets/axiom-composer.svg"
   }

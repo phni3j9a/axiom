@@ -8,9 +8,9 @@ Axiomは、Codexへ固定ワークフローを強制するPluginではありま�
 
 Mainの賢さを活かしながら、探索・実装・テスト・デバッグなどのbounded workをLuna MAXへ積極的に委譲し、独立した仕事が複数ある場合はLuna MAXを並列に走らせます。意味のある変更はfreshなSol XHIGHで独立レビューします。Mainのコンテキストを守り、レビューを収束させ、Git上のユーザー変更を安全に扱うための判断原則を、必要な開発タスクで自動的に適用します。
 
-Axiom v0.1.5では、v0.1.4で明文化したCodex/model economicsの原則を維持し、通常のLuna MAX worker利用を**ほとんど無料（almost free）**としてorchestration判断します。Luna使用量を節約するためだけに有用なspawnを避けず、Main Solのcontext保護を優先します。
+Axiom v0.1.6では、v0.1.4で明文化したCodex/model economicsの原則を維持し、通常のLuna MAX worker利用を**ほとんど無料（almost free）**としてorchestration判断します。Luna使用量を節約するためだけに有用なspawnを避けず、Main Solのcontext保護を優先します。
 
-v0.1.5は**Core-only構成**です。v0.1.3で追加されたoptional Dashboardは削除され、Rust/Axum backend、React/TypeScript frontend、Dashboard Skill、platform launcher、Dashboard用binary release処理は現在のPlugin packageには含まれません。Axiom Coreのdelegation、parallel Luna、review continuity、Git safety、direct-spawn policyはそのまま維持されています。
+v0.1.6は**Core-only構成**です。v0.1.3で追加されたoptional Dashboardは削除され、Rust/Axum backend、React/TypeScript frontend、Dashboard Skill、platform launcher、Dashboard用binary release処理は現在のPlugin packageには含まれません。Axiom Coreのdelegation、parallel Luna、review continuity、Git safety、direct-spawn policyはそのまま維持されています。
 
 ## Axiomの立ち位置
 
@@ -43,8 +43,6 @@ WorkerとReviewerはいずれもCodex v0.147の`spawn_agent`から**direct spawn
 
 ```yaml
 policy:
-  products:
-    - CODEX
   allow_implicit_invocation: true
 ```
 
@@ -72,7 +70,7 @@ $axiom:axiom
 
 ## Luna MAXの経済性（v0.1.4から継続）
 
-Axiom v0.1.5では、現在のCodex/model economicsを明示的な前提として、ordinary engineering workにおけるLuna MAX worker computeを**almost free**として扱います。
+Axiom v0.1.6では、現在のCodex/model economicsを明示的な前提として、ordinary engineering workにおけるLuna MAX worker computeを**almost free**として扱います。
 
 そのためMainは、Luna tokenやmodel usageの節約だけを理由に、有用なbounded delegationをMain側へ抱え込みません。spawnすることでMain contextを守れる、noisyな探索を隔離できる、独立仮説を調査できる、または有用な並列進行ができる場合はLunaを積極利用します。
 
@@ -84,7 +82,7 @@ Axiom v0.1.5では、現在のCodex/model economicsを明示的な前提とし�
 - integration / verification burden
 - Main judgmentを必要とするambiguity
 
-つまり、**Luna使用量ではなくcoordinationとintegrationがfan-outの制約**です。この前提は永久不変の料金主張ではなくv0.1.4で明文化され、v0.1.5でも維持している設計仕様なので、model economicsが大きく変わった場合はAxiom側を更新します。
+つまり、**Luna使用量ではなくcoordinationとintegrationがfan-outの制約**です。この前提は永久不変の料金主張ではなくv0.1.4で明文化され、v0.1.6でも維持している設計仕様なので、model economicsが大きく変わった場合はAxiom側を更新します。
 
 ## v0.147の一度だけの設定
 
@@ -101,16 +99,17 @@ wait_agent_enabled = true
 # 30秒ごとの不要なMain復帰を避け、長時間workerをevent-drivenで待つ。
 default_wait_timeout_ms = 3600000
 max_wait_timeout_ms = 3600000
-
-# routing確認時に便利。通常運用ではtrueへ戻しても構いません。
-hide_spawn_agent_metadata = false
 ```
+
+v0.1.5から更新する場合は、既存設定の`hide_spawn_agent_metadata = false`を削除してください。Codex CLI 0.147.0では、この設定が残っていると最初のモデル応答前に予約済み`collaboration.spawn_agent`のschema mismatchでHTTP 400になります。
 
 設定後はCodexを完全に再起動してください。
 
 Axiomはユーザー設定を自動変更しません。`spawn_agent`に`model`と`reasoning_effort`が見えない場合、親Solを黙って継承するworkerは作らず、Mainで継続するか一度だけ設定不足を報告します。
 
 Codex v0.147では`wait_agent`の既定waitが30秒で、最大は60分です。Axiomは`default_wait_timeout_ms = 3600000`と`max_wait_timeout_ms = 3600000`を推奨し、長時間のLuna MAX / Sol XHIGH実行中にMainが短周期で何度もtimeout復帰するのを避けます。これは60分間必ずsleepする設定ではなく、agent activityやsteering inputがあれば早く復帰するevent-driven waitの上限です。
+
+Routing確認には、要求したspawn引数、子の`turn_context`に記録されたmodel/effort、`task_complete`というruntime/rollout証拠を使います。子エージェントの自己申告だけでは成功と判定しません。
 
 ## インストール
 
@@ -125,9 +124,9 @@ codex --enable plugins plugin add axiom@axiom-local --json
 
 ### 単体Plugin ZIPを使う場合
 
-`axiom-v0.1.5-plugin.zip`は、`.codex-plugin/plugin.json`、Core Skill、references、config、assetsなどを含む**Core-onlyの配布用Plugin package**です。Dashboard関連のSkill・runtime・binaryは含みません。ローカルMarketplace repositoryとして使う場合はsource archiveのほうが便利です。
+`axiom-v0.1.6-plugin.zip`は、`.codex-plugin/plugin.json`、Core Skill、references、config、assetsなどを含む**Core-onlyの配布用Plugin package**です。Dashboard関連のSkill・runtime・binaryは含みません。ローカルMarketplace repositoryとして使う場合はsource archiveのほうが便利です。
 
-`python3 tools/package_release.py --output dist`で同時に生成されるsource archiveは`axiom-codex-plugin-v0.1.5-source.zip`です。
+`python3 tools/package_release.py --output dist`で同時に生成されるsource archiveは`axiom-codex-plugin-v0.1.6-source.zip`です。
 
 ## 基本動作
 
@@ -172,7 +171,7 @@ wait_agent(timeout_ms = 3600000)
 
 ## Luna fleetと並列実行
 
-Axiom v0.1.5では、v0.1.2からの**安全な並列化を積極的なデフォルト**とする方針と、v0.1.4で明文化したalmost-free Luna economicsを維持しています。
+Axiom v0.1.6では、v0.1.2からの**安全な並列化を積極的なデフォルト**とする方針と、v0.1.4で明文化したalmost-free Luna economicsを維持しています。
 
 2つ以上の有用なbounded workが互いに独立しているなら、調整コスト・依存順序・write conflictのリスクが利益を上回らない限り、Luna MAXを逐次実行するより**同時にdirect spawnして並列実行**することを優先します。Luna usageそのものの節約はserial実行の理由にしません。
 
@@ -270,7 +269,7 @@ axiom-codex-plugin/
 └── tools/
 ```
 
-v0.1.5には`plugins/axiom/dashboard/`や`skills/axiom-dashboard/`は存在しません。
+v0.1.6には`plugins/axiom/dashboard/`や`skills/axiom-dashboard/`は存在しません。
 
 ## 検証
 
@@ -287,8 +286,8 @@ python3 tools/package_release.py --output dist
 
 これにより、Core-only Plugin packageとsource archiveを生成します。
 
-- `dist/axiom-v0.1.5-plugin.zip`
-- `dist/axiom-codex-plugin-v0.1.5-source.zip`
+- `dist/axiom-v0.1.6-plugin.zip`
+- `dist/axiom-codex-plugin-v0.1.6-source.zip`
 
 ## 設計資料
 

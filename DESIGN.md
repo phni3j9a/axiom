@@ -1,6 +1,6 @@
 # Axiom Design
 
-Version: 0.1.5
+Version: 0.1.6
 Target: Codex v0.147.x
 Status: Core-only guidance-first implementation
 
@@ -23,7 +23,7 @@ The Main Sol model remains the authority for:
 
 Bounded cognitive labor is externalized to Luna MAX. Independent review is externalized to a fresh Sol XHIGH only when the change is meaningful.
 
-Axiom v0.1.5 preserves the worker economics made explicit in v0.1.4: under the current Codex/model economics targeted by this version, ordinary Luna MAX worker usage is treated as **almost free** for orchestration decisions. This deliberately makes Main context preservation more important than minimizing Luna usage.
+Axiom v0.1.6 preserves the worker economics made explicit in v0.1.4: under the current Codex/model economics targeted by this version, ordinary Luna MAX worker usage is treated as **almost free** for orchestration decisions. This deliberately makes Main context preservation more important than minimizing Luna usage.
 
 > **Main context is expensive; Luna compute is almost free.**
 
@@ -50,7 +50,7 @@ Main Sol handles substantive ambiguity instead of delegating that ambiguity to a
 
 ## 5. Parallel Luna fleet policy
 
-Luna MAX is cheap enough that Axiom lowers the threshold for useful fan-out. The explicit v0.1.4 assumption remains unchanged in v0.1.5: ordinary Luna worker compute is treated as almost free, so Luna usage itself is not a meaningful reason to serialize or retain bounded work in Main.
+Luna MAX is cheap enough that Axiom lowers the threshold for useful fan-out. The explicit v0.1.4 assumption remains unchanged in v0.1.6: ordinary Luna worker compute is treated as almost free, so Luna usage itself is not a meaningful reason to serialize or retain bounded work in Main.
 
 If Main can identify two or more bounded tasks whose results do not depend on each other, parallel execution is the preferred default rather than serial spawn/wait cycles.
 

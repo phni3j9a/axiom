@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.6 — 2026-08-19
+
+- Removed the breaking `hide_spawn_agent_metadata = false` metadata visibility setting from current setup/config guidance.
+- Added a migration warning for v0.1.5 users to delete that setting because Codex CLI 0.147.0 returns HTTP 400 for the reserved `collaboration.spawn_agent` schema mismatch before the first model response.
+- Clarified that routing verification uses runtime/rollout evidence—the requested spawn args, child `turn_context` model/effort, and `task_complete`—rather than child self-report alone.
+- Added regression coverage for the schema/config change and rollout-based routing verification.
+
 ## 0.1.5 — 2026-08-19
 
 - Removed the optional Axiom Dashboard introduced in v0.1.3.
