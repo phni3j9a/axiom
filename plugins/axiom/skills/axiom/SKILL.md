@@ -17,7 +17,7 @@ This does not override sandbox, approval, security, or user constraints.
 
 ## Luna economics
 
-Under the current Codex/model economics preserved by Axiom v0.1.5, Luna MAX is so inexpensive that ordinary worker usage can be treated as **almost free** for orchestration decisions. This keeps the v0.1.4 economics principle unchanged.
+Under the current Codex/model economics preserved by Axiom v0.1.6, Luna MAX is so inexpensive that ordinary worker usage can be treated as **almost free** for orchestration decisions. This keeps the v0.1.4 economics principle unchanged.
 
 **Main context is expensive; Luna compute is almost free.** Protect Main Sol context aggressively when bounded work can be delegated cleanly.
 
@@ -63,6 +63,8 @@ Do not narrate this process unless it helps the user.
 - `service_tier`: omit unless the user explicitly requests a tier
 
 If explicit spawn model overrides are unavailable, do not silently create an inherited Main-Sol worker. Continue in Main or report the one-time v0.147 configuration requirement. If review is needed but a fresh Sol cannot be explicitly spawned, Main Sol performs the review itself rather than delegating review to Luna.
+
+Routing verification must use runtime/rollout evidence: the requested spawn args, the child `turn_context` model/effort, and `task_complete`. Never rely on a child's self-report alone.
 
 ## Parallel execution default
 

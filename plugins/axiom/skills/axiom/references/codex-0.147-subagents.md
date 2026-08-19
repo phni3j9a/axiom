@@ -15,10 +15,9 @@ wait_agent_enabled = true
 # Axiom prefers long event-driven waits instead of repeated 30-second wakeups.
 default_wait_timeout_ms = 3600000
 max_wait_timeout_ms = 3600000
-
-# Optional while validating routing:
-hide_spawn_agent_metadata = false
 ```
+
+Axiom v0.1.5 users must delete `hide_spawn_agent_metadata = false` from their existing configuration. On Codex CLI 0.147.0, leaving it in place causes an HTTP 400 reserved `collaboration.spawn_agent` schema mismatch before the first model response.
 
 Axiom must not edit the user's global config automatically.
 
@@ -88,6 +87,16 @@ If they are missing, do not silently spawn an unspecified worker that may inheri
 
 This preserves the intended cost and role separation.
 
+## Runtime routing verification
+
+Routing verification must use runtime/rollout evidence:
+
+- the requested `spawn_agent` args;
+- the child `turn_context` model/effort;
+- the `task_complete` event.
+
+Never rely on a child's self-report alone. A child saying that it is Luna or Sol is not routing evidence by itself.
+
 ## Waiting without polling churn
 
 For Axiom's long-running workers, prefer an event-driven wait near the v0.147 maximum rather than repeated short waits:
@@ -134,4 +143,4 @@ If Codex reports v0.147 but rejects `gpt-5.6-luna` as an unknown child model:
 codex --disable tui_app_server -m gpt-5.6-sol
 ```
 
-Do not claim routing succeeded based only on the child saying “I am Luna.” Use visible spawn metadata or runtime evidence when available.
+Do not claim routing succeeded based only on the child saying “I am Luna.” Use the requested spawn args, child `turn_context` model/effort, and `task_complete` runtime/rollout evidence.

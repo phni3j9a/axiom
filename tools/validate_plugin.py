@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+import tomllib
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -14,7 +15,23 @@ REMOVED_DASHBOARD_PATHS = (
     PLUGIN / "dashboard",
     PLUGIN / "skills" / "axiom-dashboard",
 )
-EXPECTED_VERSION = "0.1.5"
+CONFIG_EXAMPLE = PLUGIN / "config" / "codex-0.147.example.toml"
+HIDE_SPAWN_AGENT_METADATA_ASSIGNMENT = re.compile(
+    r'''(?mx)
+    ^[ \t]*
+    (?:(?:["']?features["']?)[ \t]*\.[ \t]*
+       (?:["']?multi_agent_v2["']?)[ \t]*\.[ \t]*)?
+    (?:["']?hide_spawn_agent_metadata["']?)[ \t]*=
+    '''
+)
+EXPECTED_CONFIG_VALUES = {
+    "enabled": True,
+    "expose_spawn_agent_model_overrides": True,
+    "wait_agent_enabled": True,
+    "default_wait_timeout_ms": 3_600_000,
+    "max_wait_timeout_ms": 3_600_000,
+}
+EXPECTED_VERSION = "0.1.6"
 FORBIDDEN_MANIFEST_TERMS = (
     "dashboard",
     "axiom-dashboard",
@@ -59,6 +76,7 @@ required_files = [
     CORE_SKILL / "references" / "review.md",
     CORE_SKILL / "references" / "context-management.md",
     CORE_SKILL / "references" / "git.md",
+    CONFIG_EXAMPLE,
 ]
 for path in required_files:
     check(path.is_file(), f"required file exists: {path.relative_to(ROOT)}")
@@ -181,6 +199,49 @@ def check_skill(skill: Path, name: str, implicit: bool) -> str:
 
 
 core_skill_text = check_skill(CORE_SKILL, "axiom", True)
+
+guidance_paths = sorted(
+    {
+        ROOT / "README.md",
+        ROOT / "DESIGN.md",
+        ROOT / "CHANGELOG.md",
+        *PLUGIN.glob("*.md"),
+        *PLUGIN.glob("config/*.toml"),
+        *CORE_SKILL.rglob("*.md"),
+    }
+)
+for path in guidance_paths:
+    check(
+        HIDE_SPAWN_AGENT_METADATA_ASSIGNMENT.search(read(path)) is None,
+        f"{path.relative_to(ROOT)} has no active hide_spawn_agent_metadata assignment",
+    )
+
+config_data: dict = {}
+if CONFIG_EXAMPLE.is_file():
+    config_text = read(CONFIG_EXAMPLE)
+    try:
+        config_data = tomllib.loads(config_text)
+    except tomllib.TOMLDecodeError as exc:
+        errors.append(f"{CONFIG_EXAMPLE.relative_to(ROOT)}: invalid TOML: {exc}")
+
+features = config_data.get("features", {})
+multi_agent_v2 = features.get("multi_agent_v2", {}) if isinstance(features, dict) else {}
+check(
+    isinstance(multi_agent_v2, dict),
+    "codex-0.147 config has a features.multi_agent_v2 table",
+)
+for key, expected in EXPECTED_CONFIG_VALUES.items():
+    actual = multi_agent_v2.get(key) if isinstance(multi_agent_v2, dict) else None
+    check(
+        type(actual) is type(expected) and actual == expected,
+        f"codex-0.147 config sets {key}={str(expected).lower()}",
+    )
+check(
+    isinstance(multi_agent_v2, dict)
+    and "hide_spawn_agent_metadata" not in multi_agent_v2,
+    "codex-0.147 config omits hide_spawn_agent_metadata",
+)
+
 core_combined = "\n".join(
     path.read_text(encoding="utf-8")
     for path in [
@@ -195,6 +256,10 @@ for required_text in (
     'reasoning_effort = "xhigh"',
     'fork_turns = "none"',
     "same reviewer agent",
+    "requested `spawn_agent` args",
+    "`turn_context` model/effort",
+    "`task_complete` event",
+    "Never rely on a child's self-report alone",
 ):
     check(required_text in core_combined, f"guidance contains {required_text}")
 

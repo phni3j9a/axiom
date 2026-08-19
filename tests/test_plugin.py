@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import tempfile
+import tomllib
 import unittest
 import zipfile
 from pathlib import Path
@@ -32,10 +34,66 @@ class AxiomPluginTests(unittest.TestCase):
             )
         )
         self.assertEqual(manifest["name"], "axiom")
-        self.assertEqual(manifest["version"], "0.1.5")
+        self.assertEqual(manifest["version"], "0.1.6")
         self.assertEqual(compat["name"], "axiom")
-        self.assertEqual(compat["version"], "0.1.5")
+        self.assertEqual(compat["version"], "0.1.6")
         self.assertEqual(marketplace["plugins"][0]["name"], "axiom")
+
+    def test_codex_0147_hotfix_config_and_docs(self) -> None:
+        unsafe_assignment = re.compile(
+            r'''(?mx)
+            ^[ \t]*
+            (?:(?:["']?features["']?)[ \t]*\.[ \t]*
+               (?:["']?multi_agent_v2["']?)[ \t]*\.[ \t]*)?
+            (?:["']?hide_spawn_agent_metadata["']?)[ \t]*=
+            '''
+        )
+        guidance_paths = sorted(
+            {
+                ROOT / "README.md",
+                ROOT / "DESIGN.md",
+                ROOT / "CHANGELOG.md",
+                *PLUGIN.glob("*.md"),
+                *PLUGIN.glob("config/*.toml"),
+                *CORE_SKILL.rglob("*.md"),
+            }
+        )
+        for path in guidance_paths:
+            text = path.read_text(encoding="utf-8")
+            self.assertIsNone(
+                unsafe_assignment.search(text),
+                f"unsafe assignment remains in {path.relative_to(ROOT)}",
+            )
+
+        for unsafe in (
+            "hide_spawn_agent_metadata = false",
+            '"hide_spawn_agent_metadata" = false',
+            "features.multi_agent_v2.hide_spawn_agent_metadata = false",
+            '"features"."multi_agent_v2"."hide_spawn_agent_metadata" = false',
+        ):
+            with self.subTest(unsafe=unsafe):
+                self.assertIsNotNone(unsafe_assignment.search(unsafe))
+        for safe in (
+            "# hide_spawn_agent_metadata = false",
+            "Delete `hide_spawn_agent_metadata = false` when upgrading.",
+        ):
+            with self.subTest(safe=safe):
+                self.assertIsNone(unsafe_assignment.search(safe))
+
+        config = tomllib.loads(
+            (PLUGIN / "config" / "codex-0.147.example.toml").read_text(
+                encoding="utf-8"
+            )
+        )
+        values = config["features"]["multi_agent_v2"]
+        self.assertIs(values["enabled"], True)
+        self.assertIs(values["expose_spawn_agent_model_overrides"], True)
+        self.assertIs(values["wait_agent_enabled"], True)
+        self.assertIs(type(values["default_wait_timeout_ms"]), int)
+        self.assertEqual(values["default_wait_timeout_ms"], 3_600_000)
+        self.assertIs(type(values["max_wait_timeout_ms"]), int)
+        self.assertEqual(values["max_wait_timeout_ms"], 3_600_000)
+        self.assertNotIn("hide_spawn_agent_metadata", values)
 
     def test_core_is_proactive(self) -> None:
         core = (CORE_SKILL / "agents" / "openai.yaml").read_text(encoding="utf-8")
@@ -77,6 +135,15 @@ class AxiomPluginTests(unittest.TestCase):
         self.assertIn('model = "gpt-5.6-sol"', text)
         self.assertIn('reasoning_effort = "xhigh"', text)
         self.assertIn('fork_turns = "none"', text)
+
+    def test_runtime_routing_evidence_is_required(self) -> None:
+        text = (
+            CORE_SKILL / "references" / "codex-0.147-subagents.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("requested `spawn_agent` args", text)
+        self.assertIn("`turn_context` model/effort", text)
+        self.assertIn("`task_complete` event", text)
+        self.assertIn("Never rely on a child's self-report alone", text)
 
     def test_review_continuity_without_numeric_caps(self) -> None:
         text = (CORE_SKILL / "references" / "review.md").read_text(encoding="utf-8")
@@ -146,8 +213,8 @@ class AxiomPluginTests(unittest.TestCase):
                 capture_output=True,
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            plugin_zip = Path(tmp) / "axiom-v0.1.5-plugin.zip"
-            source_zip = Path(tmp) / "axiom-codex-plugin-v0.1.5-source.zip"
+            plugin_zip = Path(tmp) / "axiom-v0.1.6-plugin.zip"
+            source_zip = Path(tmp) / "axiom-codex-plugin-v0.1.6-source.zip"
             self.assertTrue(plugin_zip.is_file())
             self.assertTrue(source_zip.is_file())
             with zipfile.ZipFile(plugin_zip) as archive:

@@ -14,6 +14,6 @@ wait_agent_enabled = true
 default_wait_timeout_ms = 3600000
 max_wait_timeout_ms = 3600000
 
-# Optional but useful while verifying that requested model/effort was used.
-# Set to true later if you prefer less spawn metadata.
-hide_spawn_agent_metadata = false
+# Migration from v0.1.5: remove `hide_spawn_agent_metadata = false`.
+# On Codex CLI 0.147.0, that value causes HTTP 400 before the first model
+# response because the reserved collaboration.spawn_agent schema mismatches.
