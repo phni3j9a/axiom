@@ -10,6 +10,8 @@ Mainの賢さを活かしながら、探索・実装・テスト・デバッグ�
 
 Axiom v0.1.5では、v0.1.4で明文化したCodex/model economicsの原則を維持し、通常のLuna MAX worker利用を**ほとんど無料（almost free）**としてorchestration判断します。Luna使用量を節約するためだけに有用なspawnを避けず、Main Solのcontext保護を優先します。
 
+v0.1.5は**Core-only構成**です。v0.1.3で追加されたoptional Dashboardは削除され、Rust/Axum backend、React/TypeScript frontend、Dashboard Skill、platform launcher、Dashboard用binary release処理は現在のPlugin packageには含まれません。Axiom Coreのdelegation、parallel Luna、review continuity、Git safety、direct-spawn policyはそのまま維持されています。
+
 ## Axiomの立ち位置
 
 Axiomは次を**行いません**。
@@ -22,6 +24,7 @@ Axiomは次を**行いません**。
 - 1 Task = 1 commitの強制
 - 常時作成されるstate/artifact
 - 無制限のレビュー反復
+- Dashboard、daemon、hookによる常時監視
 
 代わりに、Main Solが現在のタスクに必要なものだけを選びます。
 
@@ -95,6 +98,10 @@ enabled = true
 expose_spawn_agent_model_overrides = true
 wait_agent_enabled = true
 
+# 30秒ごとの不要なMain復帰を避け、長時間workerをevent-drivenで待つ。
+default_wait_timeout_ms = 3600000
+max_wait_timeout_ms = 3600000
+
 # routing確認時に便利。通常運用ではtrueへ戻しても構いません。
 hide_spawn_agent_metadata = false
 ```
@@ -102,6 +109,8 @@ hide_spawn_agent_metadata = false
 設定後はCodexを完全に再起動してください。
 
 Axiomはユーザー設定を自動変更しません。`spawn_agent`に`model`と`reasoning_effort`が見えない場合、親Solを黙って継承するworkerは作らず、Mainで継続するか一度だけ設定不足を報告します。
+
+Codex v0.147では`wait_agent`の既定waitが30秒で、最大は60分です。Axiomは`default_wait_timeout_ms = 3600000`と`max_wait_timeout_ms = 3600000`を推奨し、長時間のLuna MAX / Sol XHIGH実行中にMainが短周期で何度もtimeout復帰するのを避けます。これは60分間必ずsleepする設定ではなく、agent activityやsteering inputがあれば早く復帰するevent-driven waitの上限です。
 
 ## インストール
 
@@ -116,7 +125,9 @@ codex --enable plugins plugin add axiom@axiom-local --json
 
 ### 単体Plugin ZIPを使う場合
 
-`axiom-v0.1.5-plugin.zip`は、`.codex-plugin/plugin.json`と`skills/`を含む配布用Plugin packageです。ローカルMarketplace repositoryとして使う場合はsource archiveのほうが便利です。
+`axiom-v0.1.5-plugin.zip`は、`.codex-plugin/plugin.json`、Core Skill、references、config、assetsなどを含む**Core-onlyの配布用Plugin package**です。Dashboard関連のSkill・runtime・binaryは含みません。ローカルMarketplace repositoryとして使う場合はsource archiveのほうが便利です。
+
+`python3 tools/package_release.py --output dist`で同時に生成されるsource archiveは`axiom-codex-plugin-v0.1.5-source.zip`です。
 
 ## 基本動作
 
@@ -129,9 +140,11 @@ User request
 Main Sol XHIGH
    ├─ 意図・設計・境界を保持
    ├─ bounded workをLuna MAXへdirect spawn
+   ├─ independent workなら先にfan-out
+   ├─ long-running workはevent-driven wait
    ├─ actual diffとverificationを統合
    ├─ meaningful changeならfresh Sol XHIGH review
-   ├─ FindingをACCEPT / DEFER / REJECT
+   ├─ FindingをACCEPT / DEFER / REJECT / ESCALATE
    └─ accepted fixだけを反映して終了
 ```
 
@@ -148,6 +161,14 @@ spawn_agent(
   fork_turns = "none"
 )
 ```
+
+長時間workerを待つ場合は、v0.147で許可される範囲内で長いevent-driven waitを優先します。
+
+```text
+wait_agent(timeout_ms = 3600000)
+```
+
+複数の独立workerがある場合は、各workerをspawnしてからまとめて待ち、依存関係がないのに`spawn → wait → spawn`と直列化しません。
 
 ## Luna fleetと並列実行
 
@@ -237,6 +258,9 @@ axiom-codex-plugin/
 ├── plugins/axiom/
 │   ├── .codex-plugin/plugin.json
 │   ├── plugin.json
+│   ├── README.md
+│   ├── CHANGELOG.md
+│   ├── LICENSE
 │   ├── assets/
 │   ├── config/
 │   └── skills/
@@ -245,6 +269,8 @@ axiom-codex-plugin/
 ├── tests/
 └── tools/
 ```
+
+v0.1.5には`plugins/axiom/dashboard/`や`skills/axiom-dashboard/`は存在しません。
 
 ## 検証
 
@@ -259,7 +285,10 @@ python3 -m unittest discover -s tests -v
 python3 tools/package_release.py --output dist
 ```
 
-これにより、Core Plugin packageとsource archiveを生成します。
+これにより、Core-only Plugin packageとsource archiveを生成します。
+
+- `dist/axiom-v0.1.5-plugin.zip`
+- `dist/axiom-codex-plugin-v0.1.5-source.zip`
 
 ## 設計資料
 
