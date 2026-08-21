@@ -1,6 +1,6 @@
 # Axiom Design
 
-Version: 0.1.6
+Version: 0.1.7
 Target: Codex v0.147.x
 Status: Core-only guidance-first implementation
 
@@ -23,7 +23,7 @@ The Main Sol model remains the authority for:
 
 Bounded cognitive labor is externalized to Luna MAX. Independent review is externalized to a fresh Sol XHIGH only when the change is meaningful.
 
-Axiom v0.1.6 preserves the worker economics made explicit in v0.1.4: under the current Codex/model economics targeted by this version, ordinary Luna MAX worker usage is treated as **almost free** for orchestration decisions. This deliberately makes Main context preservation more important than minimizing Luna usage.
+Axiom v0.1.7 preserves the worker economics made explicit in v0.1.4: under the current Codex/model economics targeted by this version, ordinary Luna MAX worker usage is treated as **almost free** for orchestration decisions. This deliberately makes Main context preservation more important than minimizing Luna usage.
 
 > **Main context is expensive; Luna compute is almost free.**
 
@@ -38,7 +38,7 @@ This is a versioned assumption. If model economics change materially, the policy
 5. **Fresh context by default.** Prefer self-contained packets with `fork_turns: "none"`.
 6. **Prefer useful parallelism.** When multiple bounded tasks are independent, launch Luna MAX workers concurrently. Main chooses the natural fleet size; there is no fixed fan-out. Parallel writes require disjoint scopes and stable interfaces.
 7. **Verify the actual tree.** Worker claims never replace inspection, tests, or diff review.
-8. **Preserve review continuity.** Spawn a fresh Sol for the initial review, then reuse that same reviewer for re-review while Main owns every finding decision.
+8. **Preserve review continuity within a stable boundary.** Spawn a fresh Sol for the initial review, then reuse that same reviewer for re-review while user intent, acceptance, and substantive design remain stable. Main owns every finding and boundary decision.
 9. **Preserve user work.** Never discard, overwrite, or misattribute pre-existing changes.
 10. **Keep simple work simple.** Delegation and review are tools, not mandatory phases. Coordination/integration overhead can justify staying in Main; Luna token cost alone cannot.
 
@@ -50,7 +50,7 @@ Main Sol handles substantive ambiguity instead of delegating that ambiguity to a
 
 ## 5. Parallel Luna fleet policy
 
-Luna MAX is cheap enough that Axiom lowers the threshold for useful fan-out. The explicit v0.1.4 assumption remains unchanged in v0.1.6: ordinary Luna worker compute is treated as almost free, so Luna usage itself is not a meaningful reason to serialize or retain bounded work in Main.
+Luna MAX is cheap enough that Axiom lowers the threshold for useful fan-out. The explicit v0.1.4 assumption remains unchanged in v0.1.7: ordinary Luna worker compute is treated as almost free, so Luna usage itself is not a meaningful reason to serialize or retain bounded work in Main.
 
 If Main can identify two or more bounded tasks whose results do not depend on each other, parallel execution is the preferred default rather than serial spawn/wait cycles.
 
@@ -98,9 +98,17 @@ Review is risk-based; reviewer identity is fixed.
 - meaningful behavioral change: fresh Sol XHIGH review strongly preferred
 - security, auth, persistence, migration, concurrency, public API, broad refactor: fresh Sol XHIGH review expected
 
-The initial reviewer is fresh and independent. The same reviewer agent is then reused for re-review so finding IDs, prior evidence, and Main adjudications remain in context. Main decides which findings are accepted, deferred, rejected, or escalated and decides when review is complete. Axiom imposes no fixed finding count or review-round limit.
+The initial reviewer is fresh and independent. The same reviewer agent is then reused for re-review so finding IDs, prior evidence, and Main adjudications remain in context while the review boundary is materially stable. A material change to user intent, acceptance, non-goals, architecture, or risk policy is a judgment point: Main may re-adjudicate in place, reset the boundary explicitly, or begin a fresh review cycle. This is not an automatic workflow transition.
 
-## 9. Non-goals
+Reviewers provide evidence; they do not set user risk tolerance or product policy. Main preserves concrete correctness, safety, and requirement evidence while deciding which mitigations fit the user's accepted intent. Axiom imposes no fixed finding count or review-round limit.
+
+## 9. Evidence-aware operation
+
+Axiom favors monitoring that returns on meaningful activity for long-running agents and processes, but it does not prescribe a universal polling interval. Main may shorten cadence for safety, cancellation, liveness, or external-state risks. Similarly, overlapping Main/worker inspection is evaluated by whether it adds integration, verification, or independent challenge rather than prohibited as a duplicate lane.
+
+Optional rollout metrics and qualitative trace evals make these patterns visible. They provide evidence for Main and maintainers; they are not an orchestration gate or persistent runtime state.
+
+## 10. Non-goals
 
 Axiom is not:
 

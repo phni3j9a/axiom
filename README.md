@@ -8,9 +8,9 @@ Axiomは、Codexへ固定ワークフローを強制するPluginではありま�
 
 Mainの賢さを活かしながら、探索・実装・テスト・デバッグなどのbounded workをLuna MAXへ積極的に委譲し、独立した仕事が複数ある場合はLuna MAXを並列に走らせます。意味のある変更はfreshなSol XHIGHで独立レビューします。Mainのコンテキストを守り、レビューを収束させ、Git上のユーザー変更を安全に扱うための判断原則を、必要な開発タスクで自動的に適用します。
 
-Axiom v0.1.6では、v0.1.4で明文化したCodex/model economicsの原則を維持し、通常のLuna MAX worker利用を**ほとんど無料（almost free）**としてorchestration判断します。Luna使用量を節約するためだけに有用なspawnを避けず、Main Solのcontext保護を優先します。
+Axiom v0.1.7では、v0.1.4で明文化したCodex/model economicsの原則を維持し、通常のLuna MAX worker利用を**ほとんど無料（almost free）**としてorchestration判断します。Luna使用量を節約するためだけに有用なspawnを避けず、Main Solのcontext保護を優先します。
 
-v0.1.6は**Core-only構成**です。v0.1.3で追加されたoptional Dashboardは削除され、Rust/Axum backend、React/TypeScript frontend、Dashboard Skill、platform launcher、Dashboard用binary release処理は現在のPlugin packageには含まれません。Axiom Coreのdelegation、parallel Luna、review continuity、Git safety、direct-spawn policyはそのまま維持されています。
+v0.1.7は**Core-only構成**です。v0.1.3で追加されたoptional Dashboardは削除され、Rust/Axum backend、React/TypeScript frontend、Dashboard Skill、platform launcher、Dashboard用binary release処理は現在のPlugin packageには含まれません。Axiom Coreのdelegation、parallel Luna、review continuity、Git safety、direct-spawn policyはそのまま維持されています。任意のrollout auditはJSONLを読み取ってmetricsを返すだけで、常駐監視や実行制御を行いません。
 
 ## Axiomの立ち位置
 
@@ -70,7 +70,7 @@ $axiom:axiom
 
 ## Luna MAXの経済性（v0.1.4から継続）
 
-Axiom v0.1.6では、現在のCodex/model economicsを明示的な前提として、ordinary engineering workにおけるLuna MAX worker computeを**almost free**として扱います。
+Axiom v0.1.7では、現在のCodex/model economicsを明示的な前提として、ordinary engineering workにおけるLuna MAX worker computeを**almost free**として扱います。
 
 そのためMainは、Luna tokenやmodel usageの節約だけを理由に、有用なbounded delegationをMain側へ抱え込みません。spawnすることでMain contextを守れる、noisyな探索を隔離できる、独立仮説を調査できる、または有用な並列進行ができる場合はLunaを積極利用します。
 
@@ -82,7 +82,7 @@ Axiom v0.1.6では、現在のCodex/model economicsを明示的な前提とし�
 - integration / verification burden
 - Main judgmentを必要とするambiguity
 
-つまり、**Luna使用量ではなくcoordinationとintegrationがfan-outの制約**です。この前提は永久不変の料金主張ではなくv0.1.4で明文化され、v0.1.6でも維持している設計仕様なので、model economicsが大きく変わった場合はAxiom側を更新します。
+つまり、**Luna使用量ではなくcoordinationとintegrationがfan-outの制約**です。この前提は永久不変の料金主張ではなくv0.1.4で明文化され、v0.1.7でも維持している設計仕様なので、model economicsが大きく変わった場合はAxiom側を更新します。
 
 ## v0.147の一度だけの設定
 
@@ -109,7 +109,7 @@ Axiomはユーザー設定を自動変更しません。`spawn_agent`に`model`�
 
 Codex v0.147では`wait_agent`の既定waitが30秒で、最大は60分です。Axiomは`default_wait_timeout_ms = 3600000`と`max_wait_timeout_ms = 3600000`を推奨し、長時間のLuna MAX / Sol XHIGH実行中にMainが短周期で何度もtimeout復帰するのを避けます。これは60分間必ずsleepする設定ではなく、agent activityやsteering inputがあれば早く復帰するevent-driven waitの上限です。
 
-Routing確認には、要求したspawn引数、子の`turn_context`に記録されたmodel/effort、`task_complete`というruntime/rollout証拠を使います。子エージェントの自己申告だけでは成功と判定しません。
+Routing確認には、要求したspawn引数、子の`turn_context`に記録されたmodel/effort、対応する子turnの`task_complete`というruntime/rollout証拠を使います。`task_complete`は1つの子turnが返った証拠であり、再利用可能なagent sessionの終了やMainによる成果物受理を意味しません。子エージェントの自己申告だけでは成功と判定しません。
 
 ## インストール
 
@@ -124,9 +124,9 @@ codex --enable plugins plugin add axiom@axiom-local --json
 
 ### 単体Plugin ZIPを使う場合
 
-`axiom-v0.1.6-plugin.zip`は、`.codex-plugin/plugin.json`、Core Skill、references、config、assetsなどを含む**Core-onlyの配布用Plugin package**です。Dashboard関連のSkill・runtime・binaryは含みません。ローカルMarketplace repositoryとして使う場合はsource archiveのほうが便利です。
+`axiom-v0.1.7-plugin.zip`は、`.codex-plugin/plugin.json`、Core Skill、references、config、assets、任意のread-only rollout audit scriptなどを含む**Core-onlyの配布用Plugin package**です。Dashboard関連のSkill・runtime・binaryは含みません。ローカルMarketplace repositoryとして使う場合はsource archiveのほうが便利です。
 
-`python3 tools/package_release.py --output dist`で同時に生成されるsource archiveは`axiom-codex-plugin-v0.1.6-source.zip`です。
+`python3 tools/package_release.py --output dist`で同時に生成されるsource archiveは`axiom-codex-plugin-v0.1.7-source.zip`です。
 
 ## 基本動作
 
@@ -171,7 +171,7 @@ wait_agent(timeout_ms = 3600000)
 
 ## Luna fleetと並列実行
 
-Axiom v0.1.6では、v0.1.2からの**安全な並列化を積極的なデフォルト**とする方針と、v0.1.4で明文化したalmost-free Luna economicsを維持しています。
+Axiom v0.1.7では、v0.1.2からの**安全な並列化を積極的なデフォルト**とする方針と、v0.1.4で明文化したalmost-free Luna economicsを維持しています。
 
 2つ以上の有用なbounded workが互いに独立しているなら、調整コスト・依存順序・write conflictのリスクが利益を上回らない限り、Luna MAXを逐次実行するより**同時にdirect spawnして並列実行**することを優先します。Luna usageそのものの節約はserial実行の理由にしません。
 
@@ -213,7 +213,9 @@ spawn_agent(
 
 最初のレビューはfreshなSol XHIGHをdirect spawnします。LunaをReviewerには使いません。
 
-その後の再レビューでは、新しいReviewerを立て直さず、**同じReviewer agentを継続利用**します。MainはReviewerをreview cycleが終わるまで保持し、修正後のcandidate、検証結果、Findingごとの裁定を同じagentへfollow-upします。
+その後の再レビューでは、ユーザー意図・acceptance・non-goal・substantive designというreview boundaryがmaterialに安定している間、**同じReviewer agentを継続利用**します。MainはReviewerをreview cycleが終わるまで保持し、修正後のcandidate、検証結果、Findingごとの裁定を同じagentへfollow-upします。
+
+ユーザーの方針やrisk toleranceがmaterialに変わった場合は自動的なresetを強制せず、Mainが旧Findingを再裁定し、同じcontextで境界をresetするか、fresh review cycleを開始するかを判断します。Reviewerは独立した証拠を提供しますが、ユーザーのrisk toleranceやproduct policyを決めません。Mainは具体的なcorrectness・safety・requirement evidenceを隠さず、採用するmitigationをユーザー意図に照らして裁定します。
 
 ```text
 Initial fresh Sol review
@@ -264,12 +266,13 @@ axiom-codex-plugin/
 │   ├── config/
 │   └── skills/
 │       └── axiom/                 # proactive engineering guidance
+│           └── scripts/           # optional read-only rollout metrics
 ├── docs/
 ├── tests/
 └── tools/
 ```
 
-v0.1.6には`plugins/axiom/dashboard/`や`skills/axiom-dashboard/`は存在しません。
+v0.1.7には`plugins/axiom/dashboard/`や`skills/axiom-dashboard/`は存在しません。
 
 ## 検証
 
@@ -277,6 +280,15 @@ v0.1.6には`plugins/axiom/dashboard/`や`skills/axiom-dashboard/`は存在し�
 python3 tools/validate_plugin.py
 python3 -m unittest discover -s tests -v
 ```
+
+任意のrollout metrics確認:
+
+```bash
+python3 plugins/axiom/skills/axiom/scripts/audit_rollout.py \
+  ~/.codex/sessions/YYYY/MM/DD/rollout-....jsonl
+```
+
+この出力は診断材料であり、agentの実行可否やrelease可否を自動判定しません。
 
 配布物の生成:
 
@@ -286,13 +298,14 @@ python3 tools/package_release.py --output dist
 
 これにより、Core-only Plugin packageとsource archiveを生成します。
 
-- `dist/axiom-v0.1.6-plugin.zip`
-- `dist/axiom-codex-plugin-v0.1.6-source.zip`
+- `dist/axiom-v0.1.7-plugin.zip`
+- `dist/axiom-codex-plugin-v0.1.7-source.zip`
 
 ## 設計資料
 
 - [`DESIGN.md`](DESIGN.md)
 - [`docs/TRIGGER_EVALS.md`](docs/TRIGGER_EVALS.md)
+- [`docs/TRACE_EVALS.md`](docs/TRACE_EVALS.md)
 - [`plugins/axiom/skills/axiom/references/delegation.md`](plugins/axiom/skills/axiom/references/delegation.md)
 - [`plugins/axiom/skills/axiom/references/review.md`](plugins/axiom/skills/axiom/references/review.md)
 - [`plugins/axiom/skills/axiom/references/context-management.md`](plugins/axiom/skills/axiom/references/context-management.md)

@@ -16,6 +16,8 @@ REMOVED_DASHBOARD_PATHS = (
     PLUGIN / "skills" / "axiom-dashboard",
 )
 CONFIG_EXAMPLE = PLUGIN / "config" / "codex-0.147.example.toml"
+TRACE_EVALS = ROOT / "docs" / "TRACE_EVALS.md"
+ROLLOUT_AUDIT = CORE_SKILL / "scripts" / "audit_rollout.py"
 HIDE_SPAWN_AGENT_METADATA_ASSIGNMENT = re.compile(
     r'''(?mx)
     ^[ \t]*
@@ -31,7 +33,7 @@ EXPECTED_CONFIG_VALUES = {
     "default_wait_timeout_ms": 3_600_000,
     "max_wait_timeout_ms": 3_600_000,
 }
-EXPECTED_VERSION = "0.1.6"
+EXPECTED_VERSION = "0.1.7"
 FORBIDDEN_MANIFEST_TERMS = (
     "dashboard",
     "axiom-dashboard",
@@ -77,6 +79,8 @@ required_files = [
     CORE_SKILL / "references" / "context-management.md",
     CORE_SKILL / "references" / "git.md",
     CONFIG_EXAMPLE,
+    TRACE_EVALS,
+    ROLLOUT_AUDIT,
 ]
 for path in required_files:
     check(path.is_file(), f"required file exists: {path.relative_to(ROOT)}")
@@ -260,8 +264,23 @@ for required_text in (
     "`turn_context` model/effort",
     "`task_complete` event",
     "Never rely on a child's self-report alone",
+    "not an automatic reset rule",
+    "does not set the user's risk tolerance",
+    "one child turn returned",
+    "Polling cadence remains task-specific",
+    "context-cost heuristic, not an ownership rule",
 ):
     check(required_text in core_combined, f"guidance contains {required_text}")
+
+trace_eval_text = read(TRACE_EVALS)
+check(
+    "diagnostic, not gates" in trace_eval_text,
+    "trace evals are advisory rather than orchestration gates",
+)
+check(
+    "no single count" in trace_eval_text,
+    "trace evals avoid fixed metric verdicts",
+)
 
 check(
     "Never substitute Luna as the reviewer" in core_skill_text,

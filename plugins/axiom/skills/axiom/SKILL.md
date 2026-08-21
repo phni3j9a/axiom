@@ -17,7 +17,7 @@ This does not override sandbox, approval, security, or user constraints.
 
 ## Luna economics
 
-Under the current Codex/model economics preserved by Axiom v0.1.6, Luna MAX is so inexpensive that ordinary worker usage can be treated as **almost free** for orchestration decisions. This keeps the v0.1.4 economics principle unchanged.
+Under the current Codex/model economics preserved by Axiom v0.1.7, Luna MAX is so inexpensive that ordinary worker usage can be treated as **almost free** for orchestration decisions. This keeps the v0.1.4 economics principle unchanged.
 
 **Main context is expensive; Luna compute is almost free.** Protect Main Sol context aggressively when bounded work can be delegated cleanly.
 
@@ -34,7 +34,7 @@ This is an explicit economics assumption of this Axiom version, not a timeless c
 5. **Fresh context by default.** Prefer a self-contained Task Packet and `fork_turns: "none"`. Share conversation turns only when the dialogue itself is indispensable input.
 6. **Prefer parallel Luna fleets for independent work.** When two or more useful bounded tasks are independent, launch Luna MAX workers concurrently unless coordination cost, dependency order, or write-conflict risk outweighs the benefit. Choose the natural fan-out from the task; never use a fixed agent count. Parallel writes require disjoint ownership and stable interfaces; otherwise serialize or isolate with worktrees.
 7. **Verify the actual tree.** Inspect the resulting diff and run relevant deterministic checks. Worker self-reports are evidence, not acceptance.
-8. **Keep review continuity.** Spawn a fresh Sol for the initial review, then reuse the same reviewer agent for re-review. Main adjudicates every finding and decides when the review is complete. There is no fixed finding count and no fixed review-round limit.
+8. **Keep review continuity within a stable boundary.** Spawn a fresh Sol for the initial review, then reuse the same reviewer agent for re-review while user intent, acceptance, and substantive design remain stable. Main adjudicates every finding, decides whether a material boundary change warrants a reset, and decides when review is complete. There is no fixed finding count and no fixed review-round limit.
 9. **Preserve user work.** Detect pre-existing changes, never discard or rewrite them, and do not attribute them to an Axiom worker.
 10. **Keep simple work simple.** A direct Main edit is correct when coordination and integration overhead would exceed the context or quality benefit. Luna's token cost alone is not a reason to stay in Main.
 
@@ -50,7 +50,7 @@ Do not narrate this process unless it helps the user.
 6. Integrate results in Main and inspect the actual changed tree.
 7. Run targeted verification, then broader verification when justified.
 8. For meaningful changes, request an initial fresh Sol XHIGH review and keep that reviewer available.
-9. Adjudicate findings, apply only accepted fixes, and send the updated candidate back to the same reviewer when re-review is useful.
+9. Adjudicate findings, apply only accepted fixes, and send the updated candidate back to the same reviewer when re-review is useful and the review boundary remains stable.
 10. Continue only while Main accepts unresolved material findings; then report the completed result, tests, and residual risks.
 
 ## Model policy
@@ -64,7 +64,7 @@ Do not narrate this process unless it helps the user.
 
 If explicit spawn model overrides are unavailable, do not silently create an inherited Main-Sol worker. Continue in Main or report the one-time v0.147 configuration requirement. If review is needed but a fresh Sol cannot be explicitly spawned, Main Sol performs the review itself rather than delegating review to Luna.
 
-Routing verification must use runtime/rollout evidence: the requested spawn args, the child `turn_context` model/effort, and `task_complete`. Never rely on a child's self-report alone.
+Routing verification must use runtime/rollout evidence: the requested spawn args, the child `turn_context` model/effort, and the corresponding child-turn `task_complete`. A completed child turn is not by itself an accepted result or a terminal agent session. Never rely on a child's self-report alone.
 
 ## Parallel execution default
 

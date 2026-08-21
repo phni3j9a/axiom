@@ -38,6 +38,14 @@ Do not fork full conversation history merely because it is available.
 
 `fork_turns: "none"` is the default when a concise handoff captures what matters. A positive turn count can be better when recent dialogue is compact and materially relevant. `"all"` can be appropriate when the broader conversation itself is important input; use it deliberately because it weakens context isolation.
 
+Delegation does not prohibit Main from inspecting the same area. Main should prefer overlap that adds integration judgment, targeted verification, or an independent challenge rather than recreating broad exploration that a worker already owns. This is a context-cost heuristic, not an ownership rule.
+
+## Evidence-aware waiting
+
+For long-running agents or processes, prefer waits and monitoring that return on meaningful activity. Avoid repeatedly waking Main when no new evidence is expected. The right cadence depends on the task and may be shortened for safety, cancellation, liveness, or external-state risks.
+
+User preferences about update cadence are part of the task context, subject to higher-level constraints. Internal monitoring and user-facing progress updates need not have the same cadence: a runner may enforce continuous safety checks while Main reports only meaningful state changes.
+
 ## Optional long-task anchor
 
 Do not create state for ordinary work.

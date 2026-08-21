@@ -14,6 +14,8 @@ Do not use Luna as reviewer. Do not install or depend on a custom reviewer agent
 
 The reviewer is **fresh at the start of the review cycle**. If fixes are made and re-review is useful, continue with the **same reviewer agent/session** so it retains the original findings, Main adjudication, and review boundary. Do not spawn a new reviewer merely because the candidate changed.
 
+Continuity assumes that user intent, acceptance criteria, non-goals, and substantive design remain materially stable. When one of those changes, Main decides whether the existing findings can be re-adjudicated within the current context, whether an explicit review-boundary reset is enough, or whether a fresh review cycle would restore useful independence. A material steer is a judgment point, not an automatic reset rule.
+
 ## When review adds value
 
 Use risk, uncertainty, and verification quality rather than file count.
@@ -73,6 +75,7 @@ OUTPUT
 - Explain concrete impact and a bounded remediation direction.
 - Omit style-only, preference-only, speculative, and low-value nit findings.
 - Do not redesign beyond the accepted intent unless the current design cannot satisfy it.
+- When it matters to Main's adjudication, distinguish demonstrated failures or requirement gaps from optional risk-reduction recommendations.
 ```
 
 ## Reviewer output
@@ -105,6 +108,8 @@ Do not require the reviewer to issue `SHIP`, `FIX_FIRST`, `RETHINK`, severity en
 
 Reviewer findings are proposals, not commands.
 
+The reviewer supplies independent evidence; it does not set the user's risk tolerance or product policy. Main should preserve concrete correctness, safety, and requirement evidence while adjudicating which mitigations fit the user's accepted intent. An explicit user non-goal or rejected hardening should not be reintroduced as a requirement without materially new evidence. When concrete evidence may materially conflict with accepted intent, Main makes the conflict and residual risk explicit, then decides within its authority whether to accept, defer, reject, replan, or escalate. The reviewer does not decide for Main.
+
 Main assigns each material finding as useful:
 
 - `ACCEPT` — valid and worth addressing in the current task;
@@ -119,6 +124,8 @@ Main also decides whether another review pass is useful. Reviewer output does no
 ## Finding Freeze and reviewer continuity
 
 The initial review establishes stable finding IDs and a review boundary; it does not establish a fixed number of findings or rounds.
+
+Finding Freeze applies inside that boundary. A material change to user intent, acceptance, non-goals, architecture, or risk policy may make earlier findings stale, newly optional, or newly relevant. Main re-adjudicates them and chooses the continuity strategy; it does not keep a prior finding binding merely because the same reviewer session still exists.
 
 After accepted fixes, send a follow-up to the **same reviewer agent/session** when Main wants re-review. Include Main's adjudication and the evidence needed to inspect the updated candidate.
 

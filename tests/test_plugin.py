@@ -34,9 +34,9 @@ class AxiomPluginTests(unittest.TestCase):
             )
         )
         self.assertEqual(manifest["name"], "axiom")
-        self.assertEqual(manifest["version"], "0.1.6")
+        self.assertEqual(manifest["version"], "0.1.7")
         self.assertEqual(compat["name"], "axiom")
-        self.assertEqual(compat["version"], "0.1.6")
+        self.assertEqual(compat["version"], "0.1.7")
         self.assertEqual(marketplace["plugins"][0]["name"], "axiom")
 
     def test_codex_0147_hotfix_config_and_docs(self) -> None:
@@ -148,10 +148,33 @@ class AxiomPluginTests(unittest.TestCase):
     def test_review_continuity_without_numeric_caps(self) -> None:
         text = (CORE_SKILL / "references" / "review.md").read_text(encoding="utf-8")
         self.assertIn("same reviewer agent", text.lower())
+        self.assertIn("not an automatic reset rule", text.lower())
+        self.assertIn("does not set the user's risk tolerance", text.lower())
+        self.assertIn("re-adjudicates", text.lower())
         self.assertIn("no fixed finding count", text.lower())
         self.assertIn("no fixed review-round limit", text.lower())
         self.assertNotIn("Maximum five findings", text)
         self.assertNotIn("Default maximum: two review rounds", text)
+
+    def test_lifecycle_and_waiting_guidance_preserves_main_judgment(self) -> None:
+        subagents = (
+            CORE_SKILL / "references" / "codex-0.147-subagents.md"
+        ).read_text(encoding="utf-8")
+        context = (
+            CORE_SKILL / "references" / "context-management.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("one child turn returned", subagents)
+        self.assertIn("does not imply that Main accepted the work", subagents)
+        self.assertIn("Polling cadence remains task-specific", subagents)
+        self.assertIn("context-cost heuristic, not an ownership rule", context)
+        self.assertIn("The right cadence depends on the task", context)
+
+        trace_evals = (ROOT / "docs" / "TRACE_EVALS.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("diagnostic, not gates", trace_evals)
+        self.assertIn("no single count", trace_evals)
+        self.assertIn("does not modify sessions", trace_evals)
 
     def test_proactive_parallel_luna_fleet(self) -> None:
         skill = (CORE_SKILL / "SKILL.md").read_text(encoding="utf-8")
@@ -213,8 +236,8 @@ class AxiomPluginTests(unittest.TestCase):
                 capture_output=True,
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            plugin_zip = Path(tmp) / "axiom-v0.1.6-plugin.zip"
-            source_zip = Path(tmp) / "axiom-codex-plugin-v0.1.6-source.zip"
+            plugin_zip = Path(tmp) / "axiom-v0.1.7-plugin.zip"
+            source_zip = Path(tmp) / "axiom-codex-plugin-v0.1.7-source.zip"
             self.assertTrue(plugin_zip.is_file())
             self.assertTrue(source_zip.is_file())
             with zipfile.ZipFile(plugin_zip) as archive:

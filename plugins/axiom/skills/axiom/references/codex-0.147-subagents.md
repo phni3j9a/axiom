@@ -93,9 +93,18 @@ Routing verification must use runtime/rollout evidence:
 
 - the requested `spawn_agent` args;
 - the child `turn_context` model/effort;
-- the `task_complete` event.
+- the corresponding child-turn `task_complete` event.
 
 Never rely on a child's self-report alone. A child saying that it is Luna or Sol is not routing evidence by itself.
+
+These signals have different meanings:
+
+- matching spawn args and child `turn_context` verify routing;
+- `task_complete` means that one child turn returned;
+- a returned turn does not imply that the reusable agent session is terminal;
+- a returned turn does not imply that Main accepted the work.
+
+Main accepts work from the actual diff, artifacts, scope, and verification evidence appropriate to the task. Follow-up can start another turn in the same agent session.
 
 ## Waiting without polling churn
 
@@ -111,11 +120,13 @@ The call can return before 60 minutes when agent activity arrives or the user st
 
 When several independent agents are running, spawn the useful set first and then wait; do not serialize them by waiting immediately after each spawn unless their work is actually dependent.
 
+Apply the same evidence-aware judgment to long-running shell sessions, tests, builds, benchmarks, and external processes. Prefer monitoring that returns on meaningful activity, and avoid repeatedly waking Main when no new evidence is expected. Polling cadence remains task-specific and can be shorter when safety, cancellation, liveness, or external-state risks justify it. A runner's own heartbeat, limits, and cleanup may be better primary monitoring than repeated Main-side inspection.
+
 ## Follow-up and continuity
 
 Use follow-up when it continues the same bounded task and retained worker context is useful. Start a fresh worker when independence or a clean context boundary is more valuable.
 
-For review, preserve the same Sol reviewer across re-review passes when available; do not reuse an implementation worker as the independent reviewer.
+For review, preserve the same Sol reviewer across re-review passes when available and the review boundary remains materially stable; do not reuse an implementation worker as the independent reviewer. When user intent, acceptance, non-goals, or substantive design changes, Main decides whether to re-adjudicate in place, reset the boundary explicitly, or begin a fresh review cycle.
 
 ## Reviewer read-only contract
 
