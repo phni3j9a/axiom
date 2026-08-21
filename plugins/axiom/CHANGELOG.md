@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.7 — 2026-08-22
+
+- Scoped same-reviewer continuity to materially stable user intent, acceptance, non-goals, and substantive design while leaving boundary-reset decisions with Main.
+- Clarified that reviewers provide independent evidence but do not set user risk tolerance or product policy, and that optional hardening should be distinguished from demonstrated failures and requirement gaps.
+- Clarified that `task_complete` is a per-turn return signal, not proof of a terminal agent session or Main acceptance.
+- Extended evidence-aware waiting guidance to shell sessions, tests, builds, benchmarks, and external processes without imposing a fixed polling interval.
+- Added a context-cost heuristic for overlapping Main/worker inspection without introducing an ownership prohibition.
+- Added qualitative rollout trace eval guidance and a read-only metrics script; trace signals inform judgment and do not gate agent behavior.
+
 ## 0.1.6 — 2026-08-19
 
 - Removed the breaking `hide_spawn_agent_metadata = false` metadata visibility setting from current setup/config guidance.
