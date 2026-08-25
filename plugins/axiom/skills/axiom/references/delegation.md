@@ -4,11 +4,11 @@
 
 Use delegation to protect Main context and gain useful parallelism, not to maximize agent count.
 
-Main retains architecture, intent, trade-offs, integration, and acceptance. Luna receives bounded work whose delegation benefit exceeds coordination and integration cost.
+Main retains architecture, intent, design direction and constraints, trade-offs, integration, and acceptance. Luna receives ordinary bounded work whose delegation benefit exceeds coordination and integration cost. Sol MAX receives bounded design-sensitive work when material interface judgment is part of the task.
 
 ## Economics assumption
 
-Under the Codex/model economics targeted by Axiom v0.1.7, Luna MAX worker usage is inexpensive enough to be treated as **almost free** for ordinary orchestration decisions. This is the unchanged economics principle introduced in v0.1.4.
+Under the Codex/model economics targeted by Axiom v0.1.8, Luna MAX worker usage is inexpensive enough to be treated as **almost free** for ordinary orchestration decisions. This is the unchanged economics principle introduced in v0.1.4.
 
 This means Main should not suppress useful delegation merely to conserve Luna tokens or model usage. When a bounded spawn protects Main context, absorbs noisy exploration, separates an independent investigation, or creates useful parallel progress, Luna usage cost should normally be treated as negligible.
 
@@ -48,6 +48,24 @@ Main may keep work local when:
 - the only reason to spawn is to satisfy a ritual.
 
 These are heuristics, not routing rules. Luna's token cost by itself is not a reason to stay in Main.
+
+## Design-sensitive work
+
+Direct-spawn a Sol MAX design worker when a bounded task must create, compare, or iteratively refine material:
+
+- visual hierarchy, layout, spacing, typography, color, or art direction;
+- interaction patterns, navigation, user flow, or responsive behavior;
+- information architecture or component composition that materially affects usability;
+- interface improvements expressed through open-ended goals such as “make this polished” or “make this easier to use”;
+- screenshot-driven visual implementation where design judgment and code iteration are inseparable.
+
+The routing test is whether important interface decisions remain unresolved, not whether the task touches frontend code. Do not route work to Sol merely because it edits CSS, HTML, JSX, TSX, templates, or UI components. Prefer Luna MAX when a finished design, explicit tokens, exact measurements, or otherwise settled behavior makes the remaining implementation mechanical and bounded.
+
+A design worker may implement its own design when handing it off would break the visual feedback loop or lose important judgment. Once the design is stable, repetitive expansion, non-visual state and data wiring, tests, and mechanical cleanup can be split into Luna tasks with clear ownership.
+
+For mixed work, Main may run a Sol MAX design lane alongside disjoint Luna MAX lanes for backend behavior, data flow, tests, or settled implementation. Account for shared component and stylesheet ownership before allowing parallel writes.
+
+The design worker is an implementation participant, not an independent reviewer. Never reuse it as the fresh Sol XHIGH reviewer for the integrated candidate.
 
 ## Scale the handoff to the task
 
@@ -123,10 +141,18 @@ Further subdelegation is not a goal by itself. Let the active agent use it only 
 
 ## Direct-spawn default
 
-For Codex v0.147, prefer:
+For ordinary bounded work on Codex v0.147, prefer:
 
 ```text
 model = "gpt-5.6-luna"
+reasoning_effort = "max"
+fork_turns = "none"
+```
+
+For bounded design-sensitive work, prefer:
+
+```text
+model = "gpt-5.6-sol"
 reasoning_effort = "max"
 fork_turns = "none"
 ```

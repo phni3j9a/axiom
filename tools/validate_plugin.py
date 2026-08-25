@@ -33,7 +33,7 @@ EXPECTED_CONFIG_VALUES = {
     "default_wait_timeout_ms": 3_600_000,
     "max_wait_timeout_ms": 3_600_000,
 }
-EXPECTED_VERSION = "0.1.7"
+EXPECTED_VERSION = "0.1.8"
 FORBIDDEN_MANIFEST_TERMS = (
     "dashboard",
     "axiom-dashboard",
@@ -285,6 +285,19 @@ check(
 check(
     "Never substitute Luna as the reviewer" in core_skill_text,
     "main skill forbids Luna reviewer",
+)
+check(
+    "Design worker: `gpt-5.6-sol` / `max`" in core_skill_text,
+    "main skill routes design-sensitive work to Sol MAX",
+)
+check(
+    "Do not route work to Sol merely because it touches frontend files"
+    in core_combined,
+    "frontend file ownership alone does not trigger Sol routing",
+)
+check(
+    "never reuse a design worker as the independent reviewer" in core_combined.lower(),
+    "design worker remains separate from independent reviewer",
 )
 check(
     "Custom agents: do not install or depend on them" in core_skill_text,

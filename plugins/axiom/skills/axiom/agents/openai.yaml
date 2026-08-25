@@ -1,6 +1,6 @@
 interface:
   display_name: "Axiom"
-  short_description: "Proactive Sol/Luna engineering guidance"
+  short_description: "Design-aware Sol/Luna engineering guidance"
   default_prompt: "Use $axiom:axiom to complete this software task with efficient delegation and independent review."
 
 policy:

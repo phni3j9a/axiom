@@ -46,6 +46,24 @@ Intent:
 
 Do not confuse `reasoning_effort: "max"` with `service_tier`. Omit `service_tier` unless the user explicitly requests one.
 
+## Sol MAX design worker
+
+Use a Sol MAX worker when the bounded task must create, compare, or iteratively refine material visual, interaction, or information-design decisions:
+
+```text
+spawn_agent(
+  task_name = "design_sensitive_interface_work",
+  message = "<bounded design handoff with intent, constraints, ownership, and acceptance>",
+  model = "gpt-5.6-sol",
+  reasoning_effort = "max",
+  fork_turns = "none"
+)
+```
+
+Do not route work to Sol merely because it touches frontend files. If the design decisions are already settled and the remaining change is mechanical implementation, use Luna MAX. A Sol design worker may implement the interface when design and code iteration are inseparable.
+
+A design worker is not an independent reviewer. If the integrated change warrants review, spawn a separate fresh Sol XHIGH reviewer.
+
 ## Sol XHIGH reviewer: fresh initial spawn, same-session re-review
 
 Prefer direct spawn:
@@ -83,7 +101,7 @@ Before relying on delegated model routing, confirm that the available `spawn_age
 - `model`
 - `reasoning_effort`
 
-If they are missing, do not silently spawn an unspecified worker that may inherit Main Sol. Continue in Main when practical or report the one-time v0.147 configuration requirement. Do not fall back to Terra merely because Luna routing is unavailable, and never fall back to Luna for independent review.
+If they are missing, do not silently spawn an unspecified worker that may inherit Main Sol. Continue in Main when practical or report the one-time v0.147 configuration requirement. Keep design-sensitive work in Main if it cannot be explicitly routed to Sol MAX. Do not fall back to Terra merely because Luna routing is unavailable, and never fall back to Luna for independent review.
 
 This preserves the intended cost and role separation.
 
@@ -126,7 +144,7 @@ Apply the same evidence-aware judgment to long-running shell sessions, tests, bu
 
 Use follow-up when it continues the same bounded task and retained worker context is useful. Start a fresh worker when independence or a clean context boundary is more valuable.
 
-For review, preserve the same Sol reviewer across re-review passes when available and the review boundary remains materially stable; do not reuse an implementation worker as the independent reviewer. When user intent, acceptance, non-goals, or substantive design changes, Main decides whether to re-adjudicate in place, reset the boundary explicitly, or begin a fresh review cycle.
+For review, preserve the same Sol reviewer across re-review passes when available and the review boundary remains materially stable; do not reuse a Luna implementation worker or Sol design worker as the independent reviewer. When user intent, acceptance, non-goals, or substantive design changes, Main decides whether to re-adjudicate in place, reset the boundary explicitly, or begin a fresh review cycle.
 
 ## Reviewer read-only contract
 

@@ -1,7 +1,7 @@
 {
   "name": "axiom",
-  "version": "0.1.7",
-  "description": "Guidance-first Codex engineering with almost-free proactive parallel Luna MAX workers, fresh Sol XHIGH review, context isolation, and safe Git coordination.",
+  "version": "0.1.8",
+  "description": "Guidance-first Codex engineering with Luna MAX workers, Sol MAX design routing, fresh Sol XHIGH review, context isolation, and safe Git coordination.",
   "author": {
     "name": "phni3j9a",
     "url": "https://github.com/phni3j9a"
@@ -14,6 +14,7 @@
     "context-isolation",
     "luna",
     "sol",
+    "design",
     "review",
     "git",
     "parallelism"
@@ -22,13 +23,14 @@
   "interface": {
     "displayName": "Axiom",
     "shortDescription": "Sol/Luna engineering guidance",
-    "longDescription": "Axiom is a guidance-first Codex plugin for non-trivial software engineering. Main Sol owns intent, architecture, decomposition, integration, review adjudication, and final acceptance. Luna MAX worker usage is treated as almost free, so useful bounded delegation and parallel fan-out are not suppressed merely to conserve model usage. Meaningful changes receive fresh direct-spawn Sol XHIGH review with same-reviewer continuity, while context isolation and safe Git coordination protect the main thread and existing user work.",
+    "longDescription": "Axiom is a guidance-first Codex plugin for non-trivial software engineering. Main Sol owns intent, architecture, design direction, integration, review adjudication, and final acceptance. Luna MAX handles ordinary bounded work, while Sol MAX handles bounded work with unresolved material visual, interaction, or information-design judgment. Meaningful changes receive a separate fresh Sol XHIGH review with same-reviewer continuity, while context isolation and safe Git coordination protect the main thread and existing user work.",
     "developerName": "phni3j9a",
     "category": "Developer Tools",
     "capabilities": [
       "Context-efficient delegation",
       "Parallel Luna MAX execution",
       "Luna MAX worker routing",
+      "Sol MAX design-sensitive routing",
       "Independent Sol review",
       "Review-loop convergence",
       "Safe Git coordination"

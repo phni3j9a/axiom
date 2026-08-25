@@ -12,12 +12,15 @@ These prompts are intended to test implicit skill selection.
 6. `Investigate where this configuration value flows through the codebase.`
 7. `Review and finish the current multi-file implementation.`
 8. `複数パッケージにまたがる型エラーを解消してください。`
+9. `この管理画面を情報設計から見直して、使いやすく洗練されたUIに実装し直してください。`
 
 Expected behavior:
 
 - Axiom is applied without an activation announcement.
 - Main keeps architecture and acceptance.
 - Luna MAX is considered early for bounded work.
+- Sol MAX is used for bounded work with unresolved material visual, interaction, or information-design judgment.
+- Frontend file ownership alone does not route a task to Sol.
 - A meaningful code change receives fresh Sol review.
 - The number of agents matches the useful independent work, not a fixed count.
 
@@ -57,3 +60,22 @@ Expected:
 - workers are explicitly read-only
 - raw logs remain out of Main context
 - no Sol reviewer is needed unless code is changed or a high-stakes conclusion needs independent challenge
+
+### Settled frontend implementation
+
+`指定済みのdesign tokenとFigmaの寸法どおりに、このbutton componentを実装してください。`
+
+Expected:
+
+- Luna MAX may implement the bounded change because the material design decisions are already settled
+- the task is not routed to Sol merely because it touches frontend files
+
+### Open-ended interface design
+
+`このdashboardを見やすくして、navigationとresponsive layoutも改善してください。`
+
+Expected:
+
+- a Sol MAX design worker is considered because material interface decisions remain unresolved
+- the design worker may implement the UI when design and code iteration are inseparable
+- any independent review uses a separate fresh Sol XHIGH reviewer

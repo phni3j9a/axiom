@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.8 — 2026-08-24
+
+- Added direct-spawn Sol MAX design workers for bounded tasks that require material visual, interaction, or information-design judgment.
+- Kept Luna MAX as the default for ordinary bounded work and for frontend implementation whose design decisions are already settled.
+- Defined unresolved interface judgment—not frontend file ownership—as the design-routing boundary.
+- Allowed Design Sol to implement UI when design and code iteration are inseparable, with mixed Luna lanes for disjoint non-visual work.
+- Kept independent review on a separate fresh Sol XHIGH and explicitly prohibited reusing a Design Sol as the reviewer.
+- Added routing examples, trigger evals, validation, and regression coverage for the new role separation.
+
 ## 0.1.7 — 2026-08-22
 
 - Scoped same-reviewer continuity to materially stable user intent, acceptance, non-goals, and substantive design while leaving boundary-reset decisions with Main.

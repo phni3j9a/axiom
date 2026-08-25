@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "axiom",
-  "version": "0.1.7",
-  "description": "Guidance-first Codex engineering with almost-free proactive parallel Luna MAX workers, fresh Sol XHIGH review, context isolation, and safe Git coordination.",
+  "version": "0.1.8",
+  "description": "Guidance-first Codex engineering with Luna MAX workers, Sol MAX design routing, fresh Sol XHIGH review, context isolation, and safe Git coordination.",
   "author": {
     "name": "phni3j9a"
   },
@@ -14,6 +14,7 @@
     "context-isolation",
     "luna",
     "sol",
+    "design",
     "review",
     "git",
     "parallelism"

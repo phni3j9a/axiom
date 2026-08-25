@@ -34,9 +34,9 @@ class AxiomPluginTests(unittest.TestCase):
             )
         )
         self.assertEqual(manifest["name"], "axiom")
-        self.assertEqual(manifest["version"], "0.1.7")
+        self.assertEqual(manifest["version"], "0.1.8")
         self.assertEqual(compat["name"], "axiom")
-        self.assertEqual(compat["version"], "0.1.7")
+        self.assertEqual(compat["version"], "0.1.8")
         self.assertEqual(marketplace["plugins"][0]["name"], "axiom")
 
     def test_codex_0147_hotfix_config_and_docs(self) -> None:
@@ -135,6 +135,32 @@ class AxiomPluginTests(unittest.TestCase):
         self.assertIn('model = "gpt-5.6-sol"', text)
         self.assertIn('reasoning_effort = "xhigh"', text)
         self.assertIn('fork_turns = "none"', text)
+
+    def test_design_sensitive_work_uses_sol_max_without_stealing_review(self) -> None:
+        skill = (CORE_SKILL / "SKILL.md").read_text(encoding="utf-8")
+        delegation = (CORE_SKILL / "references" / "delegation.md").read_text(
+            encoding="utf-8"
+        )
+        subagents = (
+            CORE_SKILL / "references" / "codex-0.147-subagents.md"
+        ).read_text(encoding="utf-8")
+        combined = "\n".join((skill, delegation, subagents))
+
+        self.assertIn("Design worker: `gpt-5.6-sol` / `max`", skill)
+        self.assertIn("## Sol MAX design worker", subagents)
+        self.assertIn('task_name = "design_sensitive_interface_work"', subagents)
+        self.assertIn('model = "gpt-5.6-sol"', subagents)
+        self.assertIn('reasoning_effort = "max"', subagents)
+        self.assertIn(
+            "Do not route work to Sol merely because it touches frontend files",
+            combined,
+        )
+        self.assertIn(
+            "never reuse a design worker as the independent reviewer",
+            combined.lower(),
+        )
+        self.assertIn("## Sol XHIGH reviewer", subagents)
+        self.assertIn('reasoning_effort = "xhigh"', subagents)
 
     def test_runtime_routing_evidence_is_required(self) -> None:
         text = (
@@ -236,8 +262,8 @@ class AxiomPluginTests(unittest.TestCase):
                 capture_output=True,
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            plugin_zip = Path(tmp) / "axiom-v0.1.7-plugin.zip"
-            source_zip = Path(tmp) / "axiom-codex-plugin-v0.1.7-source.zip"
+            plugin_zip = Path(tmp) / "axiom-v0.1.8-plugin.zip"
+            source_zip = Path(tmp) / "axiom-codex-plugin-v0.1.8-source.zip"
             self.assertTrue(plugin_zip.is_file())
             self.assertTrue(source_zip.is_file())
             with zipfile.ZipFile(plugin_zip) as archive:

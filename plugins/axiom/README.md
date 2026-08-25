@@ -1,14 +1,16 @@
-# Axiom v0.1.7
+# Axiom v0.1.8
 
 Axiom is a guidance-first Codex plugin for non-trivial software engineering.
 
-> Sol thinks. Luna works. Sol reviews.
+> Sol thinks and designs. Luna executes. Sol reviews.
 >
 > **Main context is expensive; Luna compute is almost free.**
 
-- Main Sol owns intent, architecture, integration, and acceptance.
-- Axiom v0.1.7 preserves the v0.1.4 economics principle that ordinary Luna MAX worker usage is treated as almost free for orchestration decisions.
+- Main Sol owns intent, architecture, design direction and constraints, integration, and acceptance.
+- Axiom v0.1.8 preserves the v0.1.4 economics principle that ordinary Luna MAX worker usage is treated as almost free for orchestration decisions.
 - Direct-spawn Luna MAX performs bounded exploration and implementation; useful spawns should not be suppressed merely to conserve Luna usage.
+- Direct-spawn Sol MAX performs bounded work that requires material visual, interaction, or information-design judgment; frontend files alone do not trigger this route.
+- A Sol MAX design worker may implement its design when the feedback loop is inseparable, but it is never reused as the independent reviewer.
 - Independent useful bounded work fans out to parallel Luna MAX workers; there is no fixed fleet size, and coordination/integration cost—not Luna token cost—limits fan-out.
 - Fresh direct-spawn Sol XHIGH performs meaningful independent review.
 - The initial Sol reviewer is reused for re-review while the review boundary remains materially stable; Main adjudicates every finding and any boundary reset.
