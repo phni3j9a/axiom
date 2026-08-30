@@ -34,9 +34,9 @@ class AxiomPluginTests(unittest.TestCase):
             )
         )
         self.assertEqual(manifest["name"], "axiom")
-        self.assertEqual(manifest["version"], "0.1.9")
+        self.assertEqual(manifest["version"], "0.1.8")
         self.assertEqual(compat["name"], "axiom")
-        self.assertEqual(compat["version"], "0.1.9")
+        self.assertEqual(compat["version"], "0.1.8")
         self.assertEqual(marketplace["plugins"][0]["name"], "axiom")
 
     def test_codex_0147_hotfix_config_and_docs(self) -> None:
@@ -287,8 +287,8 @@ class AxiomPluginTests(unittest.TestCase):
                 capture_output=True,
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            plugin_zip = Path(tmp) / "axiom-v0.1.9-plugin.zip"
-            source_zip = Path(tmp) / "axiom-codex-plugin-v0.1.9-source.zip"
+            plugin_zip = Path(tmp) / "axiom-v0.1.8-plugin.zip"
+            source_zip = Path(tmp) / "axiom-codex-plugin-v0.1.8-source.zip"
             self.assertTrue(plugin_zip.is_file())
             self.assertTrue(source_zip.is_file())
             with zipfile.ZipFile(plugin_zip) as archive:
