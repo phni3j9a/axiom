@@ -33,7 +33,7 @@ Inspect whether material findings were tied to independent current evidence rath
 
 ### Complexity ratchet
 
-Inspect a bounded change across initial review, accepted fixes, and re-review. Look for follow-on findings whose only basis is machinery introduced by the previous fix—for example retry state leading to persistence, persistence leading to migration, or a compatibility shim leading to another compatibility obligation. Such chains need independent current evidence; the existence of the new mechanism is not enough. Re-review should remain centered on accepted findings, defects directly introduced or revealed by their fixes, and requirements already inside the review boundary.
+Inspect a bounded change across initial review, accepted fixes, and re-review. Look for follow-on findings whose only basis is machinery introduced by the previous fix—for example retry state leading to persistence, persistence leading to migration, or a compatibility shim leading to another compatibility obligation. Such chains need independent current evidence; the existence of the new mechanism is not enough. At the same time, Finding Freeze must not hide a concrete material correctness, security, data-integrity, trust-boundary, or compatibility defect that new independent evidence reveals during re-review, even when the initial review missed it and the accepted fix did not cause it. The distinction is concrete evidenced defect versus speculative follow-on hardening, not old finding versus new finding.
 
 ### Subtractive review
 
