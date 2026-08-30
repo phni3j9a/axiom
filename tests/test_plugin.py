@@ -182,6 +182,31 @@ class AxiomPluginTests(unittest.TestCase):
         self.assertNotIn("Maximum five findings", text)
         self.assertNotIn("Default maximum: two review rounds", text)
 
+    def test_review_resists_complexity_ratchets(self) -> None:
+        skill = (CORE_SKILL / "SKILL.md").read_text(encoding="utf-8").lower()
+        review = (
+            CORE_SKILL / "references" / "review.md"
+        ).read_text(encoding="utf-8").lower()
+        trace_evals = (ROOT / "docs" / "TRACE_EVALS.md").read_text(
+            encoding="utf-8"
+        ).lower()
+
+        self.assertIn("sol reviews evidence-boundedly", skill)
+        self.assertIn("unjustified complexity", skill)
+        self.assertIn("independent current evidence", skill)
+
+        self.assertIn("finding admissibility and complexity discipline", review)
+        self.assertIn("candidate-authored", review)
+        self.assertIn("prior reviewer suggestions also do not create requirements", review)
+        self.assertIn("optional hardening is not a material finding", review)
+        self.assertIn("prefer the smallest subtractive correction", review)
+        self.assertIn("candidate-created machinery does not create follow-on obligations", review)
+        self.assertIn("new material findings require", review)
+
+        self.assertIn("complexity ratchet", trace_evals)
+        self.assertIn("subtractive review", trace_evals)
+        self.assertIn("existence of the new mechanism is not enough", trace_evals)
+
     def test_lifecycle_and_waiting_guidance_preserves_main_judgment(self) -> None:
         subagents = (
             CORE_SKILL / "references" / "codex-0.147-subagents.md"

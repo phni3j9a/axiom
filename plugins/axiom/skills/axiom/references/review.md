@@ -44,6 +44,26 @@ Before initial review, Main should normally provide enough evidence for the revi
 
 This is context guidance, not a required ceremony. Main may omit fields that add no value.
 
+## Finding admissibility and complexity discipline
+
+A material finding needs an independent current basis. Before reporting a finding, the reviewer should be able to connect it to at least one of:
+
+- the accepted intent or acceptance criteria;
+- an existing supported behavior, contract, or compatibility obligation;
+- a concrete failure or regression demonstrated by the candidate;
+- a concrete security, data-integrity, or trust-boundary risk;
+- a verification gap that materially prevents judging one of the above.
+
+Do not turn hypothetical future needs, generic hardening, future-proofing, broader reuse, defense in depth, or preference for a more elaborate architecture into findings without such a basis.
+
+Candidate-authored code, tests, schemas, migrations, documentation, compatibility layers, state, or abstractions do not by themselves prove that the capability they introduce is required. Prior reviewer suggestions also do not create requirements. Trace the need back to independent current evidence rather than reasoning from the existence of newly added machinery.
+
+Unnecessary complexity is itself reviewable when an added mechanism lacks independent current justification **and** materially increases failure surface, state, migration burden, operational behavior, dependency surface, or maintenance cost. Examples include unjustified caches, retries, fallbacks, persistent state, migrations, abstraction layers, compatibility shims, schedulers, reconciliation loops, configuration, or dependencies. These mechanisms are not forbidden when the current task actually needs them.
+
+When a demonstrated problem can be corrected either by removing unjustified machinery or by adding another mechanism, prefer the smallest subtractive correction that still satisfies the current contract. Do not create work merely to make the candidate more generic, configurable, resilient to unspecified scenarios, or architecturally elaborate.
+
+Optional hardening is not a material finding. Preserve concrete safety and correctness evidence, but omit speculative risk-reduction suggestions from `FINDINGS` unless they satisfy the admissibility rule above.
+
 ## Initial Review Packet
 
 ```text
@@ -65,17 +85,19 @@ VERIFICATION EVIDENCE
 - <checks already run and notable gaps>
 
 FOCUS
-- Correctness, regressions, security/data integrity, requirement gaps,
-  compatibility, and missing verification with material impact.
+- Correctness, regressions, concrete security/data-integrity risks, requirement
+  gaps, compatibility, unjustified complexity, and missing verification with
+  material impact.
 
 OUTPUT
-- Report material findings only.
+- Report material findings only, each with independent current evidence.
 - Give each finding a stable ID.
 - Cite concrete file/line/symbol/behavior evidence.
 - Explain concrete impact and a bounded remediation direction.
-- Omit style-only, preference-only, speculative, and low-value nit findings.
+- Omit style-only, preference-only, speculative, optional-hardening, and low-value nit findings.
+- Do not treat candidate-created machinery or prior review suggestions as requirements by themselves.
+- Prefer removing unjustified machinery over adding machinery when both satisfy the current contract.
 - Do not redesign beyond the accepted intent unless the current design cannot satisfy it.
-- When it matters to Main's adjudication, distinguish demonstrated failures or requirement gaps from optional risk-reduction recommendations.
 ```
 
 ## Reviewer output
@@ -85,7 +107,7 @@ A useful output is:
 ```text
 FINDINGS:
 - AX-001 Short title
-  Evidence: exact file/line/behavior
+  Evidence: exact file/line/behavior and current basis
   Impact: concrete failure or risk
   Remediation direction: smallest useful correction
 
@@ -108,16 +130,16 @@ Do not require the reviewer to issue `SHIP`, `FIX_FIRST`, `RETHINK`, severity en
 
 Reviewer findings are proposals, not commands.
 
-The reviewer supplies independent evidence; it does not set the user's risk tolerance or product policy. Main should preserve concrete correctness, safety, and requirement evidence while adjudicating which mitigations fit the user's accepted intent. An explicit user non-goal or rejected hardening should not be reintroduced as a requirement without materially new evidence. When concrete evidence may materially conflict with accepted intent, Main makes the conflict and residual risk explicit, then decides within its authority whether to accept, defer, reject, replan, or escalate. The reviewer does not decide for Main.
+The reviewer supplies independent evidence; it does not set the user's risk tolerance or product policy. Main should preserve concrete correctness, safety, requirement, and unjustified-complexity evidence while adjudicating which mitigations fit the user's accepted intent. An explicit user non-goal or rejected hardening should not be reintroduced as a requirement without materially new independent evidence. When concrete evidence may materially conflict with accepted intent, Main makes the conflict and residual risk explicit, then decides within its authority whether to accept, defer, reject, replan, or escalate. The reviewer does not decide for Main.
 
 Main assigns each material finding as useful:
 
 - `ACCEPT` — valid and worth addressing in the current task;
 - `DEFER` — valid but intentionally outside current scope, with residual risk understood;
-- `REJECT` — unsupported, incorrect, preference-driven, or inconsistent with accepted intent;
+- `REJECT` — unsupported, incorrect, preference-driven, optional hardening, or inconsistent with accepted intent;
 - `ESCALATE` — resolving it requires user input or a substantive design/product decision.
 
-Do not forward reviewer output blindly to an implementer. Translate accepted findings into bounded fix requirements that preserve Main's intended design.
+Do not forward reviewer output blindly to an implementer. Translate accepted findings into bounded fix requirements that preserve Main's intended design and avoid unnecessary additive machinery.
 
 Main also decides whether another review pass is useful. Reviewer output does not force another pass by itself.
 
@@ -126,6 +148,8 @@ Main also decides whether another review pass is useful. Reviewer output does no
 The initial review establishes stable finding IDs and a review boundary; it does not establish a fixed number of findings or rounds.
 
 Finding Freeze applies inside that boundary. A material change to user intent, acceptance, non-goals, architecture, or risk policy may make earlier findings stale, newly optional, or newly relevant. Main re-adjudicates them and chooses the continuity strategy; it does not keep a prior finding binding merely because the same reviewer session still exists.
+
+Finding Freeze constrains re-litigation of already-adjudicated concerns; it does not suppress a newly evidenced concrete defect merely because the initial review missed it.
 
 After accepted fixes, send a follow-up to the **same reviewer agent/session** when Main wants re-review. Include Main's adjudication and the evidence needed to inspect the updated candidate.
 
@@ -139,10 +163,18 @@ Main adjudication:
 - AX-002: REJECT — <brief rationale>
 - AX-003: DEFER — <brief rationale>
 
-Check the accepted findings against the updated candidate and consider whether
-those fixes introduced or revealed any new material defect. Respect Main's
+Check the accepted findings against the updated candidate. A new finding is
+admissible when an accepted fix directly introduced/revealed a material defect;
+when new independent current evidence demonstrates a concrete material
+correctness, security, data-integrity, trust-boundary, or compatibility defect
+in the candidate, including one missed by the initial review; or when independent
+current evidence shows a violation of a requirement already inside the review
+boundary. A newly evidenced defect must identify concrete behavior, impact, or a
+real trust/compatibility boundary rather than a merely possible safeguard.
+Newly added machinery, its own schemas/docs/tests/state, or a prior reviewer
+suggestion do not by themselves create a new requirement. Respect Main's
 REJECT/DEFER decisions unless new concrete evidence materially changes them.
-Do not restart style/preference review or rediscover already-adjudicated points.
+Do not restart style/preference or optional-hardening review.
 ```
 
 Finding Freeze means:
@@ -151,10 +183,13 @@ Finding Freeze means:
 - Main's adjudication controls task scope;
 - re-review retains the original reviewer context instead of resetting it;
 - accepted fixes remain the center of attention;
-- genuinely new material defects may still be reported when supported by new evidence or caused/revealed by the fix;
+- new material findings require independent current evidence, and remain allowed for concrete material correctness, security, data-integrity, trust-boundary, or compatibility defects newly discovered in the candidate, including defects missed by the initial review;
+- defects directly introduced/revealed by an accepted fix and independently evidenced violations of in-boundary requirements also remain admissible;
+- candidate-created machinery does not create follow-on obligations merely by existing;
+- rejected or deferred concerns are not reopened without materially new independent evidence;
 - Main decides when further review has diminishing value and when the candidate is sufficiently resolved.
 
-There is no fixed finding count and no fixed review-round limit. Convergence comes from reviewer continuity, stable IDs, Main adjudication, and Main's judgment about remaining risk—not from numeric caps.
+There is no fixed finding count and no fixed review-round limit. Convergence comes from reviewer continuity, stable IDs, evidence-bounded findings, Main adjudication, and Main's judgment about remaining risk—not from numeric caps.
 
 If reviewer and Main remain in substantive disagreement, Main decides whether to accept the risk, replan, escalate to the user, or request more evidence. The reviewer is not an autonomous loop controller.
 

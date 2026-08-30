@@ -29,7 +29,15 @@ When the user changes acceptance, non-goals, substantive design, or risk toleran
 
 ### Reviewer authority
 
-Inspect whether reviewer output separated demonstrated failures or requirement gaps from optional risk-reduction recommendations when that distinction mattered. The reviewer supplies evidence; Main adjudicates it against the user's accepted intent. Concrete safety or correctness evidence must remain visible even when a mitigation is rejected.
+Inspect whether material findings were tied to independent current evidence rather than hypothetical hardening, candidate-created machinery, or a prior reviewer suggestion. The reviewer supplies evidence; Main adjudicates it against the user's accepted intent. Concrete safety, correctness, requirement, and unjustified-complexity evidence must remain visible even when a mitigation is rejected. Optional hardening should not enter `FINDINGS` merely because it could reduce an unspecified future risk.
+
+### Complexity ratchet
+
+Inspect a bounded change across initial review, accepted fixes, and re-review. Look for follow-on findings whose only basis is machinery introduced by the previous fix—for example retry state leading to persistence, persistence leading to migration, or a compatibility shim leading to another compatibility obligation. Such chains need independent current evidence; the existence of the new mechanism is not enough. At the same time, Finding Freeze must not hide a concrete material correctness, security, data-integrity, trust-boundary, or compatibility defect that new independent evidence reveals during re-review, even when the initial review missed it and the accepted fix did not cause it. The distinction is concrete evidenced defect versus speculative follow-on hardening, not old finding versus new finding.
+
+### Subtractive review
+
+When the candidate introduces state, abstraction, fallback, retry, migration, scheduling, reconciliation, configuration, or dependencies that are not justified by the current contract, inspect whether review considers removing that machinery instead of adding protection around it. The eval is qualitative: extra mechanisms may be correct when independently justified. The desired signal is that complexity is treated as a liability requiring evidence, not that fewer lines or files are automatically better.
 
 ### Lifecycle interpretation
 
