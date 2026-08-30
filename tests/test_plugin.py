@@ -34,9 +34,9 @@ class AxiomPluginTests(unittest.TestCase):
             )
         )
         self.assertEqual(manifest["name"], "axiom")
-        self.assertEqual(manifest["version"], "0.1.8")
+        self.assertEqual(manifest["version"], "0.1.9")
         self.assertEqual(compat["name"], "axiom")
-        self.assertEqual(compat["version"], "0.1.8")
+        self.assertEqual(compat["version"], "0.1.9")
         self.assertEqual(marketplace["plugins"][0]["name"], "axiom")
 
     def test_codex_0147_hotfix_config_and_docs(self) -> None:
@@ -182,6 +182,31 @@ class AxiomPluginTests(unittest.TestCase):
         self.assertNotIn("Maximum five findings", text)
         self.assertNotIn("Default maximum: two review rounds", text)
 
+    def test_review_resists_complexity_ratchets(self) -> None:
+        skill = (CORE_SKILL / "SKILL.md").read_text(encoding="utf-8").lower()
+        review = (
+            CORE_SKILL / "references" / "review.md"
+        ).read_text(encoding="utf-8").lower()
+        trace_evals = (ROOT / "docs" / "TRACE_EVALS.md").read_text(
+            encoding="utf-8"
+        ).lower()
+
+        self.assertIn("sol reviews evidence-boundedly", skill)
+        self.assertIn("unjustified complexity", skill)
+        self.assertIn("independent current evidence", skill)
+
+        self.assertIn("finding admissibility and complexity discipline", review)
+        self.assertIn("candidate-authored", review)
+        self.assertIn("prior reviewer suggestions also do not create requirements", review)
+        self.assertIn("optional hardening is not a material finding", review)
+        self.assertIn("prefer the smallest subtractive correction", review)
+        self.assertIn("candidate-created machinery does not create follow-on obligations", review)
+        self.assertIn("new material findings require", review)
+
+        self.assertIn("complexity ratchet", trace_evals)
+        self.assertIn("subtractive review", trace_evals)
+        self.assertIn("existence of the new mechanism is not enough", trace_evals)
+
     def test_lifecycle_and_waiting_guidance_preserves_main_judgment(self) -> None:
         subagents = (
             CORE_SKILL / "references" / "codex-0.147-subagents.md"
@@ -262,8 +287,8 @@ class AxiomPluginTests(unittest.TestCase):
                 capture_output=True,
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            plugin_zip = Path(tmp) / "axiom-v0.1.8-plugin.zip"
-            source_zip = Path(tmp) / "axiom-codex-plugin-v0.1.8-source.zip"
+            plugin_zip = Path(tmp) / "axiom-v0.1.9-plugin.zip"
+            source_zip = Path(tmp) / "axiom-codex-plugin-v0.1.9-source.zip"
             self.assertTrue(plugin_zip.is_file())
             self.assertTrue(source_zip.is_file())
             with zipfile.ZipFile(plugin_zip) as archive:
