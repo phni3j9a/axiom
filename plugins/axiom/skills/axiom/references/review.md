@@ -149,6 +149,8 @@ The initial review establishes stable finding IDs and a review boundary; it does
 
 Finding Freeze applies inside that boundary. A material change to user intent, acceptance, non-goals, architecture, or risk policy may make earlier findings stale, newly optional, or newly relevant. Main re-adjudicates them and chooses the continuity strategy; it does not keep a prior finding binding merely because the same reviewer session still exists.
 
+Finding Freeze constrains re-litigation of already-adjudicated concerns; it does not suppress a newly evidenced concrete defect merely because the initial review missed it.
+
 After accepted fixes, send a follow-up to the **same reviewer agent/session** when Main wants re-review. Include Main's adjudication and the evidence needed to inspect the updated candidate.
 
 Example:
@@ -162,13 +164,17 @@ Main adjudication:
 - AX-003: DEFER — <brief rationale>
 
 Check the accepted findings against the updated candidate. A new finding is
-admissible only when the accepted fix directly introduced/revealed a material
-defect, or when independent current evidence shows a violation of a requirement
-that was already inside the review boundary. Newly added machinery, its own
-schemas/docs/tests/state, or a prior reviewer suggestion do not by themselves
-create a new requirement. Respect Main's REJECT/DEFER decisions unless new
-concrete evidence materially changes them. Do not restart style/preference or
-optional-hardening review.
+admissible when an accepted fix directly introduced/revealed a material defect;
+when new independent current evidence demonstrates a concrete material
+correctness, security, data-integrity, trust-boundary, or compatibility defect
+in the candidate, including one missed by the initial review; or when independent
+current evidence shows a violation of a requirement already inside the review
+boundary. A newly evidenced defect must identify concrete behavior, impact, or a
+real trust/compatibility boundary rather than a merely possible safeguard.
+Newly added machinery, its own schemas/docs/tests/state, or a prior reviewer
+suggestion do not by themselves create a new requirement. Respect Main's
+REJECT/DEFER decisions unless new concrete evidence materially changes them.
+Do not restart style/preference or optional-hardening review.
 ```
 
 Finding Freeze means:
@@ -177,8 +183,10 @@ Finding Freeze means:
 - Main's adjudication controls task scope;
 - re-review retains the original reviewer context instead of resetting it;
 - accepted fixes remain the center of attention;
-- new material findings require either a defect directly introduced/revealed by an accepted fix or independent current evidence against an in-boundary requirement;
+- new material findings require independent current evidence, and remain allowed for concrete material correctness, security, data-integrity, trust-boundary, or compatibility defects newly discovered in the candidate, including defects missed by the initial review;
+- defects directly introduced/revealed by an accepted fix and independently evidenced violations of in-boundary requirements also remain admissible;
 - candidate-created machinery does not create follow-on obligations merely by existing;
+- rejected or deferred concerns are not reopened without materially new independent evidence;
 - Main decides when further review has diminishing value and when the candidate is sufficiently resolved.
 
 There is no fixed finding count and no fixed review-round limit. Convergence comes from reviewer continuity, stable IDs, evidence-bounded findings, Main adjudication, and Main's judgment about remaining risk—not from numeric caps.
