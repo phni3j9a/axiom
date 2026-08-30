@@ -17,7 +17,7 @@ This does not override sandbox, approval, security, or user constraints.
 
 ## Luna economics
 
-Under the current Codex/model economics preserved by Axiom v0.1.9, Luna MAX is so inexpensive that ordinary worker usage can be treated as **almost free** for orchestration decisions. This keeps the v0.1.4 economics principle unchanged.
+Under the current Codex/model economics preserved by Axiom v0.1.8, Luna MAX is so inexpensive that ordinary worker usage can be treated as **almost free** for orchestration decisions. This keeps the v0.1.4 economics principle unchanged.
 
 **Main context is expensive; Luna compute is almost free.** Protect Main Sol context aggressively when bounded work can be delegated cleanly.
 
