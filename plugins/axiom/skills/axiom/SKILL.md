@@ -1,6 +1,6 @@
 ---
 name: axiom
-description: Apply proactively to non-trivial software engineering work—feature implementation, bug fixes, refactoring, debugging, testing, codebase investigation, interface design, and code review—when delegation, context isolation, independent review, or Git coordination can improve delivery. Keep intent, architecture, design constraints, integration, and acceptance in the Main Sol agent; prefer direct-spawn Luna MAX for ordinary bounded work, Sol MAX for bounded design-sensitive work, and fresh direct-spawn Sol XHIGH for meaningful review. Skip only trivial edits or purely conversational requests.
+description: Apply proactively to non-trivial software engineering work—feature implementation, bug fixes, refactoring, debugging, testing, codebase investigation, interface design, and code review—when delegation, context isolation, independent review, or Git coordination can improve delivery. Keep intent, architecture, design constraints, integration, and acceptance in the Main agent (Sol or Astra); prefer direct-spawn Luna MAX for ordinary bounded work, Sol MAX for bounded design-sensitive work, and fresh direct-spawn Sol XHIGH for meaningful review. Skip only trivial edits or purely conversational requests.
 ---
 
 # Axiom
@@ -17,9 +17,9 @@ This does not override sandbox, approval, security, or user constraints.
 
 ## Luna economics
 
-Under the current Codex/model economics preserved by Axiom v0.1.8, Luna MAX is so inexpensive that ordinary worker usage can be treated as **almost free** for orchestration decisions. This keeps the v0.1.4 economics principle unchanged.
+Under the current Codex/model economics preserved by Axiom v0.1.9, Luna MAX is so inexpensive that ordinary worker usage can be treated as **almost free** for orchestration decisions. This keeps the v0.1.4 economics principle unchanged.
 
-**Main context is expensive; Luna compute is almost free.** Protect Main Sol context aggressively when bounded work can be delegated cleanly.
+**Main context is expensive; Luna compute is almost free.** Protect Main context aggressively when bounded work can be delegated cleanly.
 
 Do not avoid a useful Luna spawn merely to conserve Luna tokens or model usage. When delegation can protect Main context, isolate noisy work, investigate independently, or make useful parallel progress, prefer spawning Luna. The practical costs that should limit delegation are coordination, latency, overlapping work, dependency order, and integration complexity—not Luna MAX usage itself.
 
@@ -29,7 +29,7 @@ This is an explicit economics assumption of this Axiom version, not a timeless c
 
 1. **Main owns meaning.** Keep user intent, architecture, design constraints and direction, decomposition, integration, finding adjudication, and final acceptance in Main.
 2. **Delegate bounded work proactively.** Offload repository exploration, implementation, tests, debugging, log analysis, and mechanical refactors when they can be expressed with a clear objective, scope, constraints, and verification. Do not keep bounded work in Main merely to save Luna usage.
-3. **Luna first for ordinary work.** On Codex v0.147, directly spawn `gpt-5.6-luna` with `reasoning_effort: "max"` for ordinary delegated work. Do not select Terra merely because work is exploratory or read-heavy.
+3. **Luna first for ordinary work.** On Codex v0.147 or later (including v0.153), directly spawn `gpt-5.6-luna` with `reasoning_effort: "max"` for ordinary delegated work. Do not select Terra merely because work is exploratory or read-heavy.
 4. **Sol designs when judgment is material.** Directly spawn `gpt-5.6-sol` with `reasoning_effort: "max"` when a bounded task must create, compare, or iteratively refine material visual, interaction, or information-design decisions. Do not route work to Sol merely because it touches frontend files. When the relevant design decisions are already specified, prefer Luna MAX for the remaining bounded implementation.
 5. **Sol reviews evidence-boundedly.** When independent review is warranted, directly spawn a fresh `gpt-5.6-sol` with `reasoning_effort: "xhigh"`. Never substitute Luna as the reviewer, and never reuse a design worker as the independent reviewer. Review both material defects and unjustified complexity; additive review concerns require independent current evidence rather than hypothetical hardening or candidate-created machinery.
 6. **Fresh context by default.** Prefer a self-contained Task Packet and `fork_turns: "none"`. Share conversation turns only when the dialogue itself is indispensable input.
@@ -60,12 +60,14 @@ Do not narrate this process unless it helps the user.
 - Worker default: `gpt-5.6-luna` / `max`
 - Design worker: `gpt-5.6-sol` / `max`
 - Reviewer: `gpt-5.6-sol` / `xhigh`
-- Main: designed for `gpt-5.6-sol` / `xhigh`
+- Main: `gpt-5.6-sol` or `gpt-6-astra`; `xhigh` is recommended for Sol, while Astra follows the user's or session's reasoning-effort setting
 - Terra: not part of the default route
 - Custom agents: do not install or depend on them
 - `service_tier`: omit unless the user explicitly requests a tier
 
-If explicit spawn model overrides are unavailable, do not silently create an inherited Main-Sol worker. Continue in Main or report the one-time v0.147 configuration requirement. If design-sensitive work cannot be explicitly routed to Sol MAX, keep it in Main rather than silently assigning it to Luna. If review is needed but a fresh Sol cannot be explicitly spawned, Main Sol performs the review itself rather than delegating review to Luna.
+The recommended environment is Codex v0.147 or later, including v0.153, with Multi-Agent V2 and explicit spawn model/effort overrides. Configuration examples retain the v0.147 baseline; check the running tool surface on later releases.
+
+If explicit spawn model overrides are unavailable, do not silently create a worker that inherits the Main model. Continue in Main or report the missing model-override capability, using the v0.147 configuration example where applicable. If design-sensitive work cannot be explicitly routed to Sol MAX, keep it in Main rather than silently assigning it to Luna. If review is needed but a fresh Sol cannot be explicitly spawned, Main performs the review itself rather than delegating review to Luna.
 
 Routing verification must use runtime/rollout evidence: the requested spawn args, the child `turn_context` model/effort, and the corresponding child-turn `task_complete`. A completed child turn is not by itself an accepted result or a terminal agent session. Never rely on a child's self-report alone.
 
@@ -78,7 +80,7 @@ Treat safe parallelism as the default optimization, not an exceptional mode. Lun
 - Do not split work artificially just to increase agent count. One coherent task should remain one worker when extra boundaries add coordination cost.
 - Read-only investigations are the easiest parallel lane and should be fanned out proactively when they cover independent subsystems or hypotheses.
 - Parallel implementation is appropriate only with disjoint write scopes and stable interfaces. If writes overlap, serialize or use isolated worktrees.
-- Main Sol chooses the natural degree of parallelism from dependencies, ownership, useful work, latency, and integration cost. There is no fixed worker count; Axiom defines no fixed fleet size or concurrency target.
+- Main chooses the natural degree of parallelism from dependencies, ownership, useful work, latency, and integration cost. There is no fixed worker count; Axiom defines no fixed fleet size or concurrency target.
 
 ## Review threshold
 
@@ -91,7 +93,7 @@ Main verification may be enough for a clearly trivial, non-behavioral edit.
 ## Read the focused references
 
 - Before delegating: [delegation.md](references/delegation.md)
-- Before a v0.147 spawn or when routing fails: [codex-0.147-subagents.md](references/codex-0.147-subagents.md)
+- Before a direct spawn or when routing fails: [codex-0.147-subagents.md](references/codex-0.147-subagents.md)
 - Before independent review or a fix loop: [review.md](references/review.md)
 - When the task is long or compaction risk is material: [context-management.md](references/context-management.md)
 - Before parallel writes, commits, rebases, or final integration: [git.md](references/git.md)

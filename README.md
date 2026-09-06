@@ -2,15 +2,15 @@
 
 Axiomは、Codexへ固定ワークフローを強制するPluginではありません。
 
-> **Sol thinks and designs. Luna executes. Sol reviews.**
+> **Main thinks. Sol designs. Luna executes. Sol reviews.**
 >
 > **Main context is expensive; Luna compute is almost free.**
 
 Mainの賢さを活かしながら、通常の探索・実装・テスト・デバッグなどのbounded workをLuna MAXへ積極的に委譲し、未確定の重要なvisual・interaction・information designを含むbounded workはSol MAXへ委譲します。独立した仕事は安全な範囲で並列に走らせ、意味のある変更は実装担当とは別のfreshなSol XHIGHで独立レビューします。Mainのコンテキストを守り、レビューを収束させ、Git上のユーザー変更を安全に扱うための判断原則を、必要な開発タスクで自動的に適用します。
 
-Axiom v0.1.8では、v0.1.4で明文化したCodex/model economicsの原則を維持し、通常のLuna MAX worker利用を**ほとんど無料（almost free）**としてorchestration判断します。Luna使用量を節約するためだけに有用なspawnを避けず、Main Solのcontext保護を優先します。
+Axiom v0.1.9では、v0.1.4で明文化したCodex/model economicsの原則を維持し、通常のLuna MAX worker利用を**ほとんど無料（almost free）**としてorchestration判断します。Luna使用量を節約するためだけに有用なspawnを避けず、Mainのcontext保護を優先します。
 
-v0.1.8は**Core-only構成**です。v0.1.3で追加されたoptional Dashboardは削除され、Rust/Axum backend、React/TypeScript frontend、Dashboard Skill、platform launcher、Dashboard用binary release処理は現在のPlugin packageには含まれません。Axiom Coreのdelegation、design-sensitive routing、parallel Luna、review continuity、Git safety、direct-spawn policyはそのまま維持されています。任意のrollout auditはJSONLを読み取ってmetricsを返すだけで、常駐監視や実行制御を行いません。
+v0.1.9は**Core-only構成**です。v0.1.3で追加されたoptional Dashboardは削除され、Rust/Axum backend、React/TypeScript frontend、Dashboard Skill、platform launcher、Dashboard用binary release処理は現在のPlugin packageには含まれません。Axiom Coreのdelegation、design-sensitive routing、parallel Luna、review continuity、Git safety、direct-spawn policyはそのまま維持されています。任意のrollout auditはJSONLを読み取ってmetricsを返すだけで、常駐監視や実行制御を行いません。
 
 ## Axiomの立ち位置
 
@@ -26,17 +26,17 @@ Axiomは次を**行いません**。
 - 無制限のレビュー反復
 - Dashboard、daemon、hookによる常時監視
 
-代わりに、Main Solが現在のタスクに必要なものだけを選びます。
+代わりに、Main（SolまたはAstra）が現在のタスクに必要なものだけを選びます。
 
 | 役割 | 標準モデル | 責務 |
 |---|---|---|
-| Main | GPT-5.6 Sol / XHIGH | 意図、アーキテクチャ、デザイン制約・方向性、分割、統合、裁定、最終受理 |
+| Main | `gpt-5.6-sol` / `xhigh`（推奨）または `gpt-6-astra` | 意図、アーキテクチャ、デザイン制約・方向性、分割、統合、裁定、最終受理 |
 | Ordinary worker | GPT-5.6 Luna / MAX | 探索、通常実装、テスト、デバッグ、リファクタ |
 | Design worker | GPT-5.6 Sol / MAX | 未確定の重要なvisual・interaction・information designと不可分なUI実装 |
 | Reviewer | fresh GPT-5.6 Sol / XHIGH | 意味のある変更の独立レビュー |
 | Terra | 標準経路では不使用 | ユーザー指定または具体的な理由がある場合のみ |
 
-各workerとReviewerはいずれもCodex v0.147の`spawn_agent`から**direct spawn**します。custom agentは使いません。
+各workerとReviewerはいずれもCodex v0.147以上（v0.153を含む）の公開`spawn_agent`から**direct spawn**します。custom agentは使いません。
 
 ## 積極的な自動適用
 
@@ -63,16 +63,20 @@ $axiom:axiom
 
 ## 対象環境
 
-- Codex CLI: **v0.147.x**
-- Main model: **gpt-5.6-sol / xhigh** 推奨
+- Codex CLI: **v0.147以上（v0.153を含む）**
+- Main model: **gpt-5.6-sol / xhigh** 推奨、または **gpt-6-astra**
 - Ordinary worker: **gpt-5.6-luna / max**
 - Design worker: **gpt-5.6-sol / max**
 - Reviewer: **gpt-5.6-sol / xhigh**
 - Multi-Agent V2
 
+Mainは`gpt-5.6-sol`または`gpt-6-astra`を使えます。Solでは従来どおり`xhigh`を推奨し、Astraのreasoning effortは指定せず、ユーザー/セッション設定に従います。
+
+Codex v0.153.4では、Luna MAXの並列実行とfreshなSol XHIGH reviewerのdirect spawnおよびcompletionを、要求したspawn引数、子の`turn_context`のmodel/effort、対応する`task_complete`イベントで確認しました。これはその経路の確認であり、全機能や新版の設定既定値を実証するものではありません。
+
 ## Luna MAXの経済性（v0.1.4から継続）
 
-Axiom v0.1.8では、現在のCodex/model economicsを明示的な前提として、ordinary engineering workにおけるLuna MAX worker computeを**almost free**として扱います。
+Axiom v0.1.9では、現在のCodex/model economicsを明示的な前提として、ordinary engineering workにおけるLuna MAX worker computeを**almost free**として扱います。
 
 そのためMainは、Luna tokenやmodel usageの節約だけを理由に、有用なbounded delegationをMain側へ抱え込みません。spawnすることでMain contextを守れる、noisyな探索を隔離できる、独立仮説を調査できる、または有用な並列進行ができる場合はLunaを積極利用します。
 
@@ -84,13 +88,13 @@ Axiom v0.1.8では、現在のCodex/model economicsを明示的な前提とし�
 - integration / verification burden
 - Main judgmentを必要とするambiguity
 
-つまり、**Luna使用量ではなくcoordinationとintegrationがfan-outの制約**です。この前提は永久不変の料金主張ではなくv0.1.4で明文化され、v0.1.8でも維持している設計仕様なので、model economicsが大きく変わった場合はAxiom側を更新します。
+つまり、**Luna使用量ではなくcoordinationとintegrationがfan-outの制約**です。この前提は永久不変の料金主張ではなくv0.1.4で明文化され、v0.1.9でも維持している設計仕様なので、model economicsが大きく変わった場合はAxiom側を更新します。
 
-## v0.147の一度だけの設定
+## v0.147向けの一度だけの設定例
 
 `~/.codex/config.toml`へ、同梱の
 `plugins/axiom/config/codex-0.147.example.toml`
-を参考に設定してください。
+を参考に設定してください。以下はCodex v0.147向けの設定例です。v0.153など新版では、実行中の公開tool surfaceを確認してから、利用可能な設定を適用してください。
 
 ```toml
 [features.multi_agent_v2]
@@ -107,7 +111,7 @@ v0.1.5から更新する場合は、既存設定の`hide_spawn_agent_metadata = 
 
 設定後はCodexを完全に再起動してください。
 
-Axiomはユーザー設定を自動変更しません。`spawn_agent`に`model`と`reasoning_effort`が見えない場合、親Solを黙って継承するworkerは作らず、Mainで継続するか一度だけ設定不足を報告します。
+Axiomはユーザー設定を自動変更しません。`spawn_agent`に`model`と`reasoning_effort`が見えない場合、親モデル（SolまたはAstra）を黙って継承するworkerは作らず、Mainで継続するか一度だけ設定不足を報告します。
 
 Codex v0.147では`wait_agent`の既定waitが30秒で、最大は60分です。Axiomは`default_wait_timeout_ms = 3600000`と`max_wait_timeout_ms = 3600000`を推奨し、長時間のLuna MAX / Sol MAX / Sol XHIGH実行中にMainが短周期で何度もtimeout復帰するのを避けます。これは60分間必ずsleepする設定ではなく、agent activityやsteering inputがあれば早く復帰するevent-driven waitの上限です。
 
@@ -126,9 +130,9 @@ codex --enable plugins plugin add axiom@axiom-local --json
 
 ### 単体Plugin ZIPを使う場合
 
-`axiom-v0.1.8-plugin.zip`は、`.codex-plugin/plugin.json`、Core Skill、references、config、assets、任意のread-only rollout audit scriptなどを含む**Core-onlyの配布用Plugin package**です。Dashboard関連のSkill・runtime・binaryは含みません。ローカルMarketplace repositoryとして使う場合はsource archiveのほうが便利です。
+`axiom-v0.1.9-plugin.zip`は、`.codex-plugin/plugin.json`、Core Skill、references、config、assets、任意のread-only rollout audit scriptなどを含む**Core-onlyの配布用Plugin package**です。Dashboard関連のSkill・runtime・binaryは含みません。ローカルMarketplace repositoryとして使う場合はsource archiveのほうが便利です。
 
-`python3 tools/package_release.py --output dist`で同時に生成されるsource archiveは`axiom-codex-plugin-v0.1.8-source.zip`です。
+`python3 tools/package_release.py --output dist`で同時に生成されるsource archiveは`axiom-codex-plugin-v0.1.9-source.zip`です。
 
 ## 基本動作
 
@@ -138,7 +142,7 @@ codex --enable plugins plugin add axiom@axiom-local --json
 User request
    │
    ▼
-Main Sol XHIGH
+Main（SolまたはAstra）
    ├─ 意図・architecture・designの方向性と境界を保持
    ├─ ordinary bounded workをLuna MAXへdirect spawn
    ├─ design-sensitive bounded workをSol MAXへdirect spawn
@@ -200,12 +204,12 @@ Design Solはimplementation participantです。統合後に独立レビュー�
 
 ## Luna fleetと並列実行
 
-Axiom v0.1.8では、v0.1.2からの**安全な並列化を積極的なデフォルト**とする方針と、v0.1.4で明文化したalmost-free Luna economicsを維持しています。
+Axiom v0.1.9では、v0.1.2からの**安全な並列化を積極的なデフォルト**とする方針と、v0.1.4で明文化したalmost-free Luna economicsを維持しています。
 
 2つ以上の有用なbounded workが互いに独立しているなら、調整コスト・依存順序・write conflictのリスクが利益を上回らない限り、Luna MAXを逐次実行するより**同時にdirect spawnして並列実行**することを優先します。Luna usageそのものの節約はserial実行の理由にしません。
 
 ```text
-Main Sol XHIGH
+Main（SolまたはAstra）
    ├─ Luna MAX A ─ subsystem A investigation
    ├─ Luna MAX B ─ subsystem B investigation
    ├─ Luna MAX C ─ test-gap analysis
@@ -214,7 +218,7 @@ Main Sol XHIGH
              └─ Mainが統合・判断
 ```
 
-ただし、固定で3体・5体を起動するルールはありません。Main Solがtask graphから自然な並列度を決めます。
+ただし、固定で3体・5体を起動するルールはありません。Mainがtask graphから自然な並列度を決めます。
 
 - 独立したread-only調査は積極的にfan-out
 - 独立したwrite taskもownershipとinterfaceが分離できれば並列化
@@ -301,7 +305,7 @@ axiom-codex-plugin/
 └── tools/
 ```
 
-v0.1.8には`plugins/axiom/dashboard/`や`skills/axiom-dashboard/`は存在しません。
+v0.1.9には`plugins/axiom/dashboard/`や`skills/axiom-dashboard/`は存在しません。
 
 ## 検証
 
@@ -327,8 +331,8 @@ python3 tools/package_release.py --output dist
 
 これにより、Core-only Plugin packageとsource archiveを生成します。
 
-- `dist/axiom-v0.1.8-plugin.zip`
-- `dist/axiom-codex-plugin-v0.1.8-source.zip`
+- `dist/axiom-v0.1.9-plugin.zip`
+- `dist/axiom-codex-plugin-v0.1.9-source.zip`
 
 ## 設計資料
 

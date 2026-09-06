@@ -1,6 +1,6 @@
 {
   "name": "axiom",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Guidance-first Codex engineering with Luna MAX workers, Sol MAX design routing, fresh Sol XHIGH review, context isolation, and safe Git coordination.",
   "author": {
     "name": "phni3j9a",
@@ -23,7 +23,7 @@
   "interface": {
     "displayName": "Axiom",
     "shortDescription": "Sol/Luna engineering guidance",
-    "longDescription": "Axiom is a guidance-first Codex plugin for non-trivial software engineering. Main Sol owns intent, architecture, design direction, integration, review adjudication, and final acceptance. Luna MAX handles ordinary bounded work, while Sol MAX handles bounded work with unresolved material visual, interaction, or information-design judgment. Meaningful changes receive a separate fresh Sol XHIGH review with same-reviewer continuity, while context isolation and safe Git coordination protect the main thread and existing user work.",
+    "longDescription": "Axiom is a guidance-first Codex plugin for non-trivial software engineering. Main (Sol or Astra) owns intent, architecture, design direction, integration, review adjudication, and final acceptance. Luna MAX handles ordinary bounded work, while Sol MAX handles bounded work with unresolved material visual, interaction, or information-design judgment. Meaningful changes receive a separate fresh Sol XHIGH review with same-reviewer continuity, while context isolation and safe Git coordination protect the main thread and existing user work.",
     "developerName": "phni3j9a",
     "category": "Developer Tools",
     "capabilities": [

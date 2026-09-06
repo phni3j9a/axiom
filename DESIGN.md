@@ -1,7 +1,7 @@
 # Axiom Design
 
-Version: 0.1.8
-Target: Codex v0.147.x
+Version: 0.1.9
+Target: Codex v0.147 or later (including v0.153)
 Status: Core-only guidance-first implementation
 
 ## 1. Problem
@@ -12,7 +12,11 @@ Large software tasks can fill Main context with repository exploration, logs, te
 
 Axiom does not orchestrate the agent. Axiom teaches the agent how to orchestrate itself.
 
-The Main Sol model remains the authority for:
+> **Main thinks. Sol designs. Luna executes. Sol reviews.**
+
+The Main model may be `gpt-5.6-sol` or `gpt-6-astra`. `gpt-5.6-sol` with `xhigh` remains recommended; leave the reasoning effort for `gpt-6-astra` unspecified and follow the user's or session's setting.
+
+The Main model remains the authority for:
 
 - user intent
 - architecture and design direction
@@ -23,7 +27,7 @@ The Main Sol model remains the authority for:
 
 Ordinary bounded cognitive labor is externalized to Luna MAX. Bounded work that requires material visual, interaction, or information-design judgment is externalized to Sol MAX. Independent review is externalized to a separate fresh Sol XHIGH only when the change is meaningful.
 
-Axiom v0.1.8 preserves the worker economics made explicit in v0.1.4: under the current Codex/model economics targeted by this version, ordinary Luna MAX worker usage is treated as **almost free** for orchestration decisions. This deliberately makes Main context preservation more important than minimizing Luna usage.
+Axiom v0.1.9 preserves the worker economics made explicit in v0.1.4: under the current Codex/model economics targeted by this version, ordinary Luna MAX worker usage is treated as **almost free** for orchestration decisions. This deliberately makes Main context preservation more important than minimizing Luna usage.
 
 > **Main context is expensive; Luna compute is almost free.**
 
@@ -47,7 +51,7 @@ This is a versioned assumption. If model economics change materially, the policy
 
 Axiom does not map “exploration” to Terra. Luna MAX is the default bounded worker for exploration, implementation, tests, debugging, and mechanical refactors. Sol MAX is the deliberate exception for bounded design-sensitive work; another model is selected only for a concrete task-specific reason or an explicit user request.
 
-Main Sol handles substantive ambiguity instead of delegating that ambiguity to a permanent intermediate orchestrator.
+Main handles substantive ambiguity instead of delegating that ambiguity to a permanent intermediate orchestrator.
 
 ## 5. Design-sensitive routing
 
@@ -61,7 +65,7 @@ The Design Sol is an implementation participant. It is never reused as the fresh
 
 ## 6. Parallel Luna fleet policy
 
-Luna MAX is cheap enough that Axiom lowers the threshold for useful fan-out. The explicit v0.1.4 assumption remains unchanged in v0.1.8: ordinary Luna worker compute is treated as almost free, so Luna usage itself is not a meaningful reason to serialize or retain bounded work in Main.
+Luna MAX is cheap enough that Axiom lowers the threshold for useful fan-out. The explicit v0.1.4 assumption remains unchanged in v0.1.9: ordinary Luna worker compute is treated as almost free, so Luna usage itself is not a meaningful reason to serialize or retain bounded work in Main.
 
 If Main can identify two or more bounded tasks whose results do not depend on each other, parallel execution is the preferred default rather than serial spawn/wait cycles.
 
@@ -76,7 +80,7 @@ The policy is deliberately dependency-driven rather than numeric:
 
 The practical constraints are coordination, latency, dependency ordering, write conflicts, integration, and verification—not Luna token conservation.
 
-Main Sol owns the task graph and integration. Axiom does not introduce a permanent intermediary orchestrator.
+Main owns the task graph and integration. Axiom does not introduce a permanent intermediary orchestrator.
 
 ## 7. Why direct spawn only
 

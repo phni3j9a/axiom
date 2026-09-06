@@ -1,10 +1,12 @@
-# Codex v0.147 direct-spawn subagents
+# Codex v0.147 or later: direct-spawn subagents
 
-This reference is intentionally version-specific. Re-check it before adapting Axiom to another Codex release.
+Axiom targets Codex v0.147 or later, including v0.153. Main may use `gpt-5.6-sol` or `gpt-6-astra`. The configuration examples and v0.147-specific troubleshooting below retain the original baseline; check the running tool surface on later releases.
+
+On Codex v0.153.4, parallel Luna MAX workers and a fresh Sol XHIGH reviewer were verified using requested spawn args, child `turn_context` model/effort, and corresponding `task_complete` events. This verifies those routes, not every feature or configuration default on later releases.
 
 ## One-time configuration
 
-Merge this into `~/.codex/config.toml`, then fully restart Codex:
+For the v0.147 configuration baseline, merge this into `~/.codex/config.toml`, then fully restart Codex. On later releases, first check whether explicit model/effort overrides and waiting are already exposed; use these settings where applicable:
 
 ```toml
 [features.multi_agent_v2]
@@ -101,7 +103,7 @@ Before relying on delegated model routing, confirm that the available `spawn_age
 - `model`
 - `reasoning_effort`
 
-If they are missing, do not silently spawn an unspecified worker that may inherit Main Sol. Continue in Main when practical or report the one-time v0.147 configuration requirement. Keep design-sensitive work in Main if it cannot be explicitly routed to Sol MAX. Do not fall back to Terra merely because Luna routing is unavailable, and never fall back to Luna for independent review.
+If they are missing, do not silently spawn an unspecified worker that may inherit the Main model (Sol or Astra). Continue in Main when practical or report the missing model-override capability, using the v0.147 configuration example where applicable. Keep design-sensitive work in Main if it cannot be explicitly routed to Sol MAX. Do not fall back to Terra merely because Luna routing is unavailable, and never fall back to Luna for independent review.
 
 This preserves the intended cost and role separation.
 

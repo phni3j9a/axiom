@@ -33,7 +33,7 @@ EXPECTED_CONFIG_VALUES = {
     "default_wait_timeout_ms": 3_600_000,
     "max_wait_timeout_ms": 3_600_000,
 }
-EXPECTED_VERSION = "0.1.8"
+EXPECTED_VERSION = "0.1.9"
 FORBIDDEN_MANIFEST_TERMS = (
     "dashboard",
     "axiom-dashboard",

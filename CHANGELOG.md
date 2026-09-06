@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.9 — 2026-09-06
+
+- Expanded the recommended environment to Codex v0.147 or later, explicitly including v0.153, while keeping v0.147-specific configuration examples scoped to their baseline.
+- Added GPT-6 Astra alongside GPT-5.6 Sol as a Main model; Sol retains the XHIGH recommendation and Astra follows the user's or session's reasoning-effort setting.
+- Recorded runtime verification of parallel Luna MAX workers and a fresh Sol XHIGH reviewer on Codex v0.153.4 without claiming full compatibility coverage.
+- Hardened Sol review against complexity ratchets: findings require independent current evidence, unjustified machinery may be removed, and speculative hardening does not create new requirements.
+- Preserved same-reviewer continuity while allowing newly evidenced material defects during re-review, with regression coverage for that boundary.
+
 ## 0.1.8 — 2026-08-24
 
 - Added direct-spawn Sol MAX design workers for bounded tasks that require material visual, interaction, or information-design judgment.

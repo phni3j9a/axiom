@@ -8,7 +8,7 @@ Main retains architecture, intent, design direction and constraints, trade-offs,
 
 ## Economics assumption
 
-Under the Codex/model economics targeted by Axiom v0.1.8, Luna MAX worker usage is inexpensive enough to be treated as **almost free** for ordinary orchestration decisions. This is the unchanged economics principle introduced in v0.1.4.
+Under the Codex/model economics targeted by Axiom v0.1.9, Luna MAX worker usage is inexpensive enough to be treated as **almost free** for ordinary orchestration decisions. This is the unchanged economics principle introduced in v0.1.4.
 
 This means Main should not suppress useful delegation merely to conserve Luna tokens or model usage. When a bounded spawn protects Main context, absorbs noisy exploration, separates an independent investigation, or creates useful parallel progress, Luna usage cost should normally be treated as negligible.
 
@@ -141,7 +141,7 @@ Further subdelegation is not a goal by itself. Let the active agent use it only 
 
 ## Direct-spawn default
 
-For ordinary bounded work on Codex v0.147, prefer:
+For ordinary bounded work on Codex v0.147 or later (including v0.153), prefer:
 
 ```text
 model = "gpt-5.6-luna"
