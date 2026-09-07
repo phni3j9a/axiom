@@ -256,6 +256,7 @@ core_combined = "\n".join(
 for required_text in (
     "gpt-5.6-luna",
     'reasoning_effort = "max"',
+    "gpt-6-astra",
     "gpt-5.6-sol",
     'reasoning_effort = "xhigh"',
     'fork_turns = "none"',
@@ -287,13 +288,13 @@ check(
     "main skill forbids Luna reviewer",
 )
 check(
-    "Design worker: `gpt-5.6-sol` / `max`" in core_skill_text,
-    "main skill routes design-sensitive work to Sol MAX",
+    "Design worker: `gpt-6-astra` / `max`" in core_skill_text,
+    "main skill routes design-sensitive work to Astra MAX",
 )
 check(
-    "Do not route work to Sol merely because it touches frontend files"
+    "Do not route work to Astra merely because it touches frontend files"
     in core_combined,
-    "frontend file ownership alone does not trigger Sol routing",
+    "frontend file ownership alone does not trigger Astra routing",
 )
 check(
     "never reuse a design worker as the independent reviewer" in core_combined.lower(),

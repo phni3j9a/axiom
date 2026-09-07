@@ -19,8 +19,8 @@ Expected behavior:
 - Axiom is applied without an activation announcement.
 - Main keeps architecture and acceptance.
 - Luna MAX is considered early for bounded work.
-- Sol MAX is used for bounded work with unresolved material visual, interaction, or information-design judgment.
-- Frontend file ownership alone does not route a task to Sol.
+- Astra MAX is used for bounded work with unresolved material visual, interaction, or information-design judgment.
+- Frontend file ownership alone does not route a task to Astra.
 - A meaningful code change receives fresh Sol review.
 - The number of agents matches the useful independent work, not a fixed count.
 
@@ -68,7 +68,7 @@ Expected:
 Expected:
 
 - Luna MAX may implement the bounded change because the material design decisions are already settled
-- the task is not routed to Sol merely because it touches frontend files
+- the task is not routed to Astra merely because it touches frontend files
 
 ### Open-ended interface design
 
@@ -76,6 +76,6 @@ Expected:
 
 Expected:
 
-- a Sol MAX design worker is considered because material interface decisions remain unresolved
+- an Astra MAX design worker is considered because material interface decisions remain unresolved
 - the design worker may implement the UI when design and code iteration are inseparable
 - any independent review uses a separate fresh Sol XHIGH reviewer

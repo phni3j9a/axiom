@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "axiom",
   "version": "0.1.9",
-  "description": "Guidance-first Codex engineering with Luna MAX workers, Sol MAX design routing, fresh Sol XHIGH review, context isolation, and safe Git coordination.",
+  "description": "Guidance-first Codex engineering with Luna MAX workers, Astra MAX design routing, fresh Sol XHIGH review, context isolation, and safe Git coordination.",
   "author": {
     "name": "phni3j9a"
   },
@@ -13,6 +13,7 @@
     "delegation",
     "context-isolation",
     "luna",
+    "astra",
     "sol",
     "design",
     "review",
