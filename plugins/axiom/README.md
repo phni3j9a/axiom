@@ -2,16 +2,16 @@
 
 Axiom is a guidance-first Codex plugin for non-trivial software engineering.
 
-> Main thinks. Sol designs. Luna executes. Sol reviews.
+> Main thinks. Astra designs. Luna executes. Sol reviews.
 >
 > **Main context is expensive; Luna compute is almost free.**
 
 - Main (Sol or Astra) owns intent, architecture, design direction and constraints, integration, and acceptance.
-- The recommended environment is Codex v0.147 or later, including v0.153. Main may use `gpt-5.6-sol` with `xhigh` recommended, or `gpt-6-astra` with reasoning effort following the user's or session's setting.
+- The recommended environment is Codex v0.147 or later, including v0.153. Main may use `gpt-5.6-sol` with `xhigh` recommended, or `gpt-6-astra` with Main reasoning effort following the user's or session's setting; this is separate from the design worker's fixed MAX effort.
 - Axiom v0.1.9 preserves the v0.1.4 economics principle that ordinary Luna MAX worker usage is treated as almost free for orchestration decisions.
 - Direct-spawn Luna MAX performs bounded exploration and implementation; useful spawns should not be suppressed merely to conserve Luna usage.
-- Direct-spawn Sol MAX performs bounded work that requires material visual, interaction, or information-design judgment; frontend files alone do not trigger this route.
-- A Sol MAX design worker may implement its design when the feedback loop is inseparable, but it is never reused as the independent reviewer.
+- Direct-spawn Astra MAX performs bounded work that requires material visual, interaction, or information-design judgment; frontend files alone do not trigger this route.
+- An Astra MAX design worker may implement its design when the feedback loop is inseparable, but it is never reused as the independent reviewer.
 - Independent useful bounded work fans out to parallel Luna MAX workers; there is no fixed fleet size, and coordination/integration cost—not Luna token cost—limits fan-out.
 - Fresh direct-spawn Sol XHIGH performs meaningful independent review.
 - The initial Sol reviewer is reused for re-review while the review boundary remains materially stable; Main adjudicates every finding and any boundary reset.

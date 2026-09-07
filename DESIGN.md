@@ -12,9 +12,9 @@ Large software tasks can fill Main context with repository exploration, logs, te
 
 Axiom does not orchestrate the agent. Axiom teaches the agent how to orchestrate itself.
 
-> **Main thinks. Sol designs. Luna executes. Sol reviews.**
+> **Main thinks. Astra designs. Luna executes. Sol reviews.**
 
-The Main model may be `gpt-5.6-sol` or `gpt-6-astra`. `gpt-5.6-sol` with `xhigh` remains recommended; leave the reasoning effort for `gpt-6-astra` unspecified and follow the user's or session's setting.
+The Main model may be `gpt-5.6-sol` or `gpt-6-astra`. `gpt-5.6-sol` with `xhigh` remains recommended. For Main, leave the `gpt-6-astra` reasoning effort unspecified and follow the user's or session's setting; this Main setting is separate from the design worker's fixed `max` effort.
 
 The Main model remains the authority for:
 
@@ -25,7 +25,7 @@ The Main model remains the authority for:
 - review adjudication
 - final acceptance
 
-Ordinary bounded cognitive labor is externalized to Luna MAX. Bounded work that requires material visual, interaction, or information-design judgment is externalized to Sol MAX. Independent review is externalized to a separate fresh Sol XHIGH only when the change is meaningful.
+Ordinary bounded cognitive labor is externalized to Luna MAX. Bounded work that requires material visual, interaction, or information-design judgment is externalized to Astra MAX. Independent review is externalized to a separate fresh Sol XHIGH only when the change is meaningful.
 
 Axiom v0.1.9 preserves the worker economics made explicit in v0.1.4: under the current Codex/model economics targeted by this version, ordinary Luna MAX worker usage is treated as **almost free** for orchestration decisions. This deliberately makes Main context preservation more important than minimizing Luna usage.
 
@@ -38,7 +38,7 @@ This is a versioned assumption. If model economics change materially, the policy
 1. **Main owns meaning.** Do not delegate final architecture, product intent, or acceptance.
 2. **Delegate bounded work proactively.** Use workers for work that has a clear objective, scope, constraints, and verification; do not keep such work in Main merely to save Luna usage.
 3. **Luna first for ordinary work.** Use direct-spawn Luna MAX for ordinary delegated work, including exploration.
-4. **Sol designs when judgment is material.** Use direct-spawn Sol MAX for bounded work that must create, compare, or iteratively refine material visual, interaction, or information-design decisions. Frontend file ownership alone is not a routing signal.
+4. **Astra designs when judgment is material.** Use direct-spawn Astra MAX for bounded work that must create, compare, or iteratively refine material visual, interaction, or information-design decisions. Frontend file ownership alone is not a routing signal.
 5. **Sol reviews independently.** If independent review is warranted, use a fresh direct-spawn Sol XHIGH that did not implement the candidate.
 6. **Fresh context by default.** Prefer self-contained packets with `fork_turns: "none"`.
 7. **Prefer useful parallelism.** When multiple bounded tasks are independent, launch them concurrently. Main chooses the natural fleet size; there is no fixed fan-out. Parallel writes require disjoint scopes and stable interfaces.
@@ -49,19 +49,19 @@ This is a versioned assumption. If model economics change materially, the policy
 
 ## 4. Why no Terra default
 
-Axiom does not map “exploration” to Terra. Luna MAX is the default bounded worker for exploration, implementation, tests, debugging, and mechanical refactors. Sol MAX is the deliberate exception for bounded design-sensitive work; another model is selected only for a concrete task-specific reason or an explicit user request.
+Axiom does not map “exploration” to Terra. Luna MAX is the default bounded worker for exploration, implementation, tests, debugging, and mechanical refactors. Astra MAX is the deliberate exception for bounded design-sensitive work; another model is selected only for a concrete task-specific reason or an explicit user request.
 
 Main handles substantive ambiguity instead of delegating that ambiguity to a permanent intermediate orchestrator.
 
 ## 5. Design-sensitive routing
 
-The decision boundary is unresolved interface judgment, not frontend technology. Sol MAX is used when a bounded task must materially choose or iteratively refine visual hierarchy, layout, typography, color, interaction, navigation, responsive behavior, information architecture, or usability-affecting component composition.
+The decision boundary is unresolved interface judgment, not frontend technology. Astra MAX is used when a bounded task must materially choose or iteratively refine visual hierarchy, layout, typography, color, interaction, navigation, responsive behavior, information architecture, or usability-affecting component composition.
 
 If a finished design, explicit tokens and dimensions, or settled behavior makes the remaining change mechanical, Luna MAX remains the preferred worker even when the task edits CSS, HTML, JSX, TSX, templates, or UI components.
 
-A Sol MAX design worker may implement its design when separating design from code would damage the feedback loop. Once the design stabilizes, Main may split repetitive expansion, non-visual wiring, tests, and cleanup to Luna. Mixed tasks may run a Design Sol lane beside disjoint Luna lanes when ownership is safe.
+An Astra MAX design worker may implement its design when separating design from code would damage the feedback loop. Once the design stabilizes, Main may split repetitive expansion, non-visual wiring, tests, and cleanup to Luna. Mixed tasks may run an Astra design lane beside disjoint Luna lanes when ownership is safe.
 
-The Design Sol is an implementation participant. It is never reused as the fresh independent Sol XHIGH reviewer.
+The Design Astra is an implementation participant. It is never reused as the fresh independent Sol XHIGH reviewer.
 
 ## 6. Parallel Luna fleet policy
 
@@ -113,7 +113,7 @@ Review is risk-based; reviewer identity is fixed.
 - meaningful behavioral change: fresh Sol XHIGH review strongly preferred
 - security, auth, persistence, migration, concurrency, public API, broad refactor: fresh Sol XHIGH review expected
 
-The initial reviewer is fresh and independent from Luna implementation workers and Sol design workers. The same reviewer agent is then reused for re-review so finding IDs, prior evidence, and Main adjudications remain in context while the review boundary is materially stable. A material change to user intent, acceptance, non-goals, architecture, or risk policy is a judgment point: Main may re-adjudicate in place, reset the boundary explicitly, or begin a fresh review cycle. This is not an automatic workflow transition.
+The initial reviewer is fresh and independent from Luna implementation workers and Astra design workers. The same reviewer agent is then reused for re-review so finding IDs, prior evidence, and Main adjudications remain in context while the review boundary is materially stable. A material change to user intent, acceptance, non-goals, architecture, or risk policy is a judgment point: Main may re-adjudicate in place, reset the boundary explicitly, or begin a fresh review cycle. This is not an automatic workflow transition.
 
 Reviewers provide evidence; they do not set user risk tolerance or product policy. Main preserves concrete correctness, safety, and requirement evidence while deciding which mitigations fit the user's accepted intent. Axiom imposes no fixed finding count or review-round limit.
 

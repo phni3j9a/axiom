@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Routed design-sensitive bounded work to GPT-6 Astra / MAX while retaining Luna MAX for ordinary work, fresh Sol XHIGH for review, and Main's user/session-controlled Astra effort.
+
 ## 0.1.9 — 2026-09-06
 
 - Expanded the recommended environment to Codex v0.147 or later, explicitly including v0.153, while keeping v0.147-specific configuration examples scoped to their baseline.

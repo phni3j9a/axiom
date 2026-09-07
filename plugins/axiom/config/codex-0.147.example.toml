@@ -2,7 +2,8 @@
 # This configuration example retains the v0.147 baseline; on later releases,
 # check the running tool surface and use these settings where applicable.
 # Main model: gpt-5.6-sol (xhigh recommended) or gpt-6-astra
-# (reasoning effort follows the user's or session's setting).
+# (Main reasoning effort follows the user's or session's setting).
+# Design-sensitive workers use gpt-6-astra with reasoning_effort = "max".
 #
 # Merge this section into ~/.codex/config.toml, then fully restart Codex.
 # Axiom does not modify user configuration automatically.
@@ -14,7 +15,7 @@ wait_agent_enabled = true
 
 # v0.147 defaults wait_agent to 30 seconds and allows up to 60 minutes.
 # Axiom uses the full 60-minute event-driven wait window to avoid repeated
-# timeout/wakeup cycles while Luna MAX or Sol XHIGH is still working.
+# timeout/wakeup cycles while Luna MAX, Astra MAX, or Sol XHIGH is still working.
 default_wait_timeout_ms = 3600000
 max_wait_timeout_ms = 3600000
 

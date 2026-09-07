@@ -132,11 +132,12 @@ class AxiomPluginTests(unittest.TestCase):
         )
         self.assertIn('model = "gpt-5.6-luna"', text)
         self.assertIn('reasoning_effort = "max"', text)
+        self.assertIn('model = "gpt-6-astra"', text)
         self.assertIn('model = "gpt-5.6-sol"', text)
         self.assertIn('reasoning_effort = "xhigh"', text)
         self.assertIn('fork_turns = "none"', text)
 
-    def test_design_sensitive_work_uses_sol_max_without_stealing_review(self) -> None:
+    def test_design_sensitive_work_uses_astra_max_without_stealing_review(self) -> None:
         skill = (CORE_SKILL / "SKILL.md").read_text(encoding="utf-8")
         delegation = (CORE_SKILL / "references" / "delegation.md").read_text(
             encoding="utf-8"
@@ -146,13 +147,18 @@ class AxiomPluginTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         combined = "\n".join((skill, delegation, subagents))
 
-        self.assertIn("Design worker: `gpt-5.6-sol` / `max`", skill)
-        self.assertIn("## Sol MAX design worker", subagents)
+        self.assertIn("Design worker: `gpt-6-astra` / `max`", skill)
+        self.assertIn("## Astra MAX design worker", subagents)
         self.assertIn('task_name = "design_sensitive_interface_work"', subagents)
-        self.assertIn('model = "gpt-5.6-sol"', subagents)
-        self.assertIn('reasoning_effort = "max"', subagents)
+        design_section = subagents.split("## Astra MAX design worker", 1)[1].split(
+            "## Sol XHIGH reviewer", 1
+        )[0]
+        reviewer_section = subagents.split("## Sol XHIGH reviewer", 1)[1]
+        self.assertIn('model = "gpt-6-astra"', design_section)
+        self.assertIn('reasoning_effort = "max"', design_section)
+        self.assertNotIn('model = "gpt-5.6-sol"', design_section)
         self.assertIn(
-            "Do not route work to Sol merely because it touches frontend files",
+            "Do not route work to Astra merely because it touches frontend files",
             combined,
         )
         self.assertIn(
@@ -160,7 +166,9 @@ class AxiomPluginTests(unittest.TestCase):
             combined.lower(),
         )
         self.assertIn("## Sol XHIGH reviewer", subagents)
-        self.assertIn('reasoning_effort = "xhigh"', subagents)
+        self.assertIn('model = "gpt-5.6-sol"', reviewer_section)
+        self.assertIn('reasoning_effort = "xhigh"', reviewer_section)
+        self.assertNotIn('model = "gpt-6-astra"', reviewer_section)
 
     def test_runtime_routing_evidence_is_required(self) -> None:
         text = (

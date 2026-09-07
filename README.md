@@ -2,11 +2,11 @@
 
 Axiomは、Codexへ固定ワークフローを強制するPluginではありません。
 
-> **Main thinks. Sol designs. Luna executes. Sol reviews.**
+> **Main thinks. Astra designs. Luna executes. Sol reviews.**
 >
 > **Main context is expensive; Luna compute is almost free.**
 
-Mainの賢さを活かしながら、通常の探索・実装・テスト・デバッグなどのbounded workをLuna MAXへ積極的に委譲し、未確定の重要なvisual・interaction・information designを含むbounded workはSol MAXへ委譲します。独立した仕事は安全な範囲で並列に走らせ、意味のある変更は実装担当とは別のfreshなSol XHIGHで独立レビューします。Mainのコンテキストを守り、レビューを収束させ、Git上のユーザー変更を安全に扱うための判断原則を、必要な開発タスクで自動的に適用します。
+Mainの賢さを活かしながら、通常の探索・実装・テスト・デバッグなどのbounded workをLuna MAXへ積極的に委譲し、未確定の重要なvisual・interaction・information designを含むbounded workはAstra MAXへ委譲します。独立した仕事は安全な範囲で並列に走らせ、意味のある変更は実装担当とは別のfreshなSol XHIGHで独立レビューします。Mainのコンテキストを守り、レビューを収束させ、Git上のユーザー変更を安全に扱うための判断原則を、必要な開発タスクで自動的に適用します。
 
 Axiom v0.1.9では、v0.1.4で明文化したCodex/model economicsの原則を維持し、通常のLuna MAX worker利用を**ほとんど無料（almost free）**としてorchestration判断します。Luna使用量を節約するためだけに有用なspawnを避けず、Mainのcontext保護を優先します。
 
@@ -32,7 +32,7 @@ Axiomは次を**行いません**。
 |---|---|---|
 | Main | `gpt-5.6-sol` / `xhigh`（推奨）または `gpt-6-astra` | 意図、アーキテクチャ、デザイン制約・方向性、分割、統合、裁定、最終受理 |
 | Ordinary worker | GPT-5.6 Luna / MAX | 探索、通常実装、テスト、デバッグ、リファクタ |
-| Design worker | GPT-5.6 Sol / MAX | 未確定の重要なvisual・interaction・information designと不可分なUI実装 |
+| Design worker | GPT-6 Astra / MAX | 未確定の重要なvisual・interaction・information designと不可分なUI実装 |
 | Reviewer | fresh GPT-5.6 Sol / XHIGH | 意味のある変更の独立レビュー |
 | Terra | 標準経路では不使用 | ユーザー指定または具体的な理由がある場合のみ |
 
@@ -66,11 +66,11 @@ $axiom:axiom
 - Codex CLI: **v0.147以上（v0.153を含む）**
 - Main model: **gpt-5.6-sol / xhigh** 推奨、または **gpt-6-astra**
 - Ordinary worker: **gpt-5.6-luna / max**
-- Design worker: **gpt-5.6-sol / max**
+- Design worker: **gpt-6-astra / max**
 - Reviewer: **gpt-5.6-sol / xhigh**
 - Multi-Agent V2
 
-Mainは`gpt-5.6-sol`または`gpt-6-astra`を使えます。Solでは従来どおり`xhigh`を推奨し、Astraのreasoning effortは指定せず、ユーザー/セッション設定に従います。
+Mainは`gpt-5.6-sol`または`gpt-6-astra`を使えます。Solでは従来どおり`xhigh`を推奨します。MainとしてのAstraのreasoning effortは指定せず、ユーザー/セッション設定に従います。このMain設定は、設計担当Astraを`max`で起動する指定とは別です。
 
 Codex v0.153.4では、Luna MAXの並列実行とfreshなSol XHIGH reviewerのdirect spawnおよびcompletionを、要求したspawn引数、子の`turn_context`のmodel/effort、対応する`task_complete`イベントで確認しました。これはその経路の確認であり、全機能や新版の設定既定値を実証するものではありません。
 
@@ -113,7 +113,7 @@ v0.1.5から更新する場合は、既存設定の`hide_spawn_agent_metadata = 
 
 Axiomはユーザー設定を自動変更しません。`spawn_agent`に`model`と`reasoning_effort`が見えない場合、親モデル（SolまたはAstra）を黙って継承するworkerは作らず、Mainで継続するか一度だけ設定不足を報告します。
 
-Codex v0.147では`wait_agent`の既定waitが30秒で、最大は60分です。Axiomは`default_wait_timeout_ms = 3600000`と`max_wait_timeout_ms = 3600000`を推奨し、長時間のLuna MAX / Sol MAX / Sol XHIGH実行中にMainが短周期で何度もtimeout復帰するのを避けます。これは60分間必ずsleepする設定ではなく、agent activityやsteering inputがあれば早く復帰するevent-driven waitの上限です。
+Codex v0.147では`wait_agent`の既定waitが30秒で、最大は60分です。Axiomは`default_wait_timeout_ms = 3600000`と`max_wait_timeout_ms = 3600000`を推奨し、長時間のLuna MAX / Astra MAX / Sol XHIGH実行中にMainが短周期で何度もtimeout復帰するのを避けます。これは60分間必ずsleepする設定ではなく、agent activityやsteering inputがあれば早く復帰するevent-driven waitの上限です。
 
 Routing確認には、要求したspawn引数、子の`turn_context`に記録されたmodel/effort、対応する子turnの`task_complete`というruntime/rollout証拠を使います。`task_complete`は1つの子turnが返った証拠であり、再利用可能なagent sessionの終了やMainによる成果物受理を意味しません。子エージェントの自己申告だけでは成功と判定しません。
 
@@ -145,7 +145,7 @@ User request
 Main（SolまたはAstra）
    ├─ 意図・architecture・designの方向性と境界を保持
    ├─ ordinary bounded workをLuna MAXへdirect spawn
-   ├─ design-sensitive bounded workをSol MAXへdirect spawn
+   ├─ design-sensitive bounded workをAstra MAXへdirect spawn
    ├─ independent workなら先にfan-out
    ├─ long-running workはevent-driven wait
    ├─ actual diffとverificationを統合
@@ -176,15 +176,15 @@ wait_agent(timeout_ms = 3600000)
 
 複数の独立workerがある場合は、各workerをspawnしてからまとめて待ち、依存関係がないのに`spawn → wait → spawn`と直列化しません。
 
-### Sol MAX design worker
+### Astra MAX design worker
 
-未確定の重要なvisual・interaction・information designを作成、比較、反復改善するbounded workはSol MAXへ委譲します。
+未確定の重要なvisual・interaction・information designを作成、比較、反復改善するbounded workはAstra MAXへ委譲します。
 
 ```text
 spawn_agent(
   task_name = "design_sensitive_interface_work",
   message = "<intent、制約、ownership、acceptanceを含むdesign Task Packet>",
-  model = "gpt-5.6-sol",
+  model = "gpt-6-astra",
   reasoning_effort = "max",
   fork_turns = "none"
 )
@@ -198,9 +198,9 @@ spawn_agent(
 - 「polishedにして」「使いやすくして」のようなopen-endedな改善
 - screenshotを見ながらdesignとcodeを往復するUI実装
 
-完成済みdesign、明示されたtokenや寸法、確定済み挙動をそのまま実装する作業は、frontendであってもLuna MAXを優先します。designと実装が不可分ならDesign SolがUIコードまで担当でき、design安定後の反復展開、非視覚的なdata/state wiring、test、mechanical cleanupはLunaへ分割できます。
+完成済みdesign、明示されたtokenや寸法、確定済み挙動をそのまま実装する作業は、frontendであってもLuna MAXを優先します。designと実装が不可分ならDesign AstraがUIコードまで担当でき、design安定後の反復展開、非視覚的なdata/state wiring、test、mechanical cleanupはLunaへ分割できます。
 
-Design Solはimplementation participantです。統合後に独立レビューが必要なら、そのDesign Solを再利用せず、別のfresh Sol XHIGH Reviewerを起動します。
+Design Astraはimplementation participantです。統合後に独立レビューが必要なら、そのDesign Astraを再利用せず、別のfresh Sol XHIGH Reviewerを起動します。
 
 ## Luna fleetと並列実行
 
