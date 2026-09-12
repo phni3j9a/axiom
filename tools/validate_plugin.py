@@ -202,7 +202,7 @@ def check_skill(skill: Path, name: str, implicit: bool) -> str:
     return skill_text
 
 
-core_skill_text = check_skill(CORE_SKILL, "axiom", True)
+core_skill_text = check_skill(CORE_SKILL, "axiom", False)
 
 guidance_paths = sorted(
     {

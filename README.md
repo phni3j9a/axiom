@@ -6,7 +6,7 @@ Axiomは、Codexへ固定ワークフローを強制するPluginではありま�
 >
 > **Main context is expensive; Luna compute is almost free.**
 
-Mainの賢さを活かしながら、通常の探索・実装・テスト・デバッグなどのbounded workをLuna MAXへ積極的に委譲し、未確定の重要なvisual・interaction・information designを含むbounded workはAstra MAXへ委譲します。独立した仕事は安全な範囲で並列に走らせ、意味のある変更は実装担当とは別のfreshなSol XHIGHで独立レビューします。Mainのコンテキストを守り、レビューを収束させ、Git上のユーザー変更を安全に扱うための判断原則を、必要な開発タスクで自動的に適用します。
+Mainの賢さを活かしながら、通常の探索・実装・テスト・デバッグなどのbounded workをLuna MAXへ積極的に委譲し、未確定の重要なvisual・interaction・information designを含むbounded workはAstra MAXへ委譲します。独立した仕事は安全な範囲で並列に走らせ、意味のある変更は実装担当とは別のfreshなSol XHIGHで独立レビューします。Mainのコンテキストを守り、レビューを収束させ、Git上のユーザー変更を安全に扱うための判断原則を、ユーザーがAxiomを明示呼び出しした開発タスクに適用します。
 
 Axiom v0.1.9では、v0.1.4で明文化したCodex/model economicsの原則を維持し、通常のLuna MAX worker利用を**ほとんど無料（almost free）**としてorchestration判断します。Luna使用量を節約するためだけに有用なspawnを避けず、Mainのcontext保護を優先します。
 
@@ -38,20 +38,20 @@ Axiomは次を**行いません**。
 
 各workerとReviewerはいずれもCodex v0.147以上（v0.153を含む）の公開`spawn_agent`から**direct spawn**します。custom agentは使いません。
 
-## 積極的な自動適用
+## 明示呼び出し
 
 `skills/axiom/agents/openai.yaml`では次を明示しています。
 
 ```yaml
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false
 ```
 
-そのため、feature実装、bug fix、refactor、debug、test、コードベース調査、code reviewなど、非自明なsoftware engineering requestではAxiomが暗黙選択されることを狙っています。
+スキルの`description`は機能を説明し、呼び出し方はこのpolicyで制御します。通常の開発依頼では自動選択されません。
 
-一方、単純な説明、1行だけの明白な修正、typo修正などでは、subagentやreviewを無理に追加しません。Axiomは「積極利用」と「儀式化しない」を両立させます。
+呼び出された作業内では、必要な委譲やレビューを積極的に行います。単純な説明、1行だけの明白な修正、typo修正などでは、subagentやreviewを無理に追加しません。
 
-明示利用も可能です。
+利用する作業で次のように指定します。
 
 ```text
 $axiom:axiom
@@ -59,7 +59,7 @@ $axiom:axiom
 認証処理を追加してください。
 ```
 
-通常は明示呼び出し不要です。
+明示呼び出しした作業とその続きに適用します。同じ作業の追加指示では、毎回指定し直す必要はありません。
 
 ## 対象環境
 
@@ -298,7 +298,7 @@ axiom-codex-plugin/
 │   ├── assets/
 │   ├── config/
 │   └── skills/
-│       └── axiom/                 # proactive engineering guidance
+│       └── axiom/                 # explicitly invoked engineering guidance
 │           └── scripts/           # optional read-only rollout metrics
 ├── docs/
 ├── tests/
