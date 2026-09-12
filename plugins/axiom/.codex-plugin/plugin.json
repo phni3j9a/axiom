@@ -1,7 +1,7 @@
 {
   "name": "axiom",
   "version": "0.1.9",
-  "description": "Guidance-first Codex engineering with Luna MAX Fast workers, Sol MAX design routing, fresh Sol XHIGH review, context isolation, and safe Git coordination.",
+  "description": "Codex engineering with Astra XHIGH planning and advice, Luna MAX Fast workers, Sol MAX design, independent Sol review, and context isolation.",
   "author": {
     "name": "phni3j9a",
     "url": "https://github.com/phni3j9a"
@@ -17,16 +17,20 @@
     "design",
     "review",
     "git",
-    "parallelism"
+    "parallelism",
+    "astra",
+    "advisor",
+    "planning"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Axiom",
-    "shortDescription": "Sol/Luna guidance",
-    "longDescription": "Axiom is a guidance-first Codex plugin for non-trivial software engineering. Main (Sol XHIGH) owns intent, architecture, design direction, integration, review adjudication, and final acceptance. Luna MAX Fast handles ordinary bounded work, while Sol MAX handles bounded work with unresolved material visual, interaction, or information-design judgment. Meaningful changes receive a separate fresh Sol XHIGH review with same-reviewer continuity, while context isolation and safe Git coordination protect the main thread and existing user work.",
+    "shortDescription": "Astra/Sol/Luna guidance",
+    "longDescription": "Axiom is a guidance-first Codex plugin for non-trivial software engineering. Main (Sol XHIGH) owns intent, architecture, design direction, integration, review adjudication, and final acceptance. Luna MAX Fast handles ordinary bounded work, while Sol MAX handles bounded work with unresolved material visual, interaction, or information-design judgment. Meaningful changes receive a separate fresh Sol XHIGH review with same-reviewer continuity, while context isolation and safe Git coordination protect the main thread and existing user work. Astra XHIGH drafts difficult plans and advises on consequential decisions using selected dialogue and evidence; Main retains adoption and acceptance.",
     "developerName": "phni3j9a",
     "category": "Developer Tools",
     "capabilities": [
+      "Astra XHIGH planning and advice",
       "Context-efficient delegation",
       "Parallel Luna MAX Fast execution",
       "Luna MAX Fast worker routing",

@@ -305,6 +305,10 @@ class AxiomPluginTests(unittest.TestCase):
                 names = set(archive.namelist())
                 self.assertIn("axiom/.codex-plugin/plugin.json", names)
                 self.assertIn("axiom/skills/axiom/SKILL.md", names)
+                advisor_path = "axiom/skills/axiom/references/advisor.md"
+                self.assertIn(advisor_path, names)
+                self.assertEqual(archive.read(advisor_path),
+                                 (CORE_SKILL / "references" / "advisor.md").read_bytes())
                 lowered = {name.lower() for name in names}
                 self.assertFalse(any("dashboard" in name for name in lowered))
                 self.assertFalse(

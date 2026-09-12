@@ -36,6 +36,8 @@ A handoff can be very small or richly structured. Include the context that mater
 
 Do not fork full conversation history merely because it is available.
 
+For Astra consultations, use the more focused [advisor packet](advisor.md): selected user/Main dialogue, the current decision, and primary evidence with source references. Do not fork Main history for the Advisor; keep internal reasoning and raw execution transcripts out while preserving decision-relevant observations. There is no automatic conversation extraction in this version. Same-question follow-ups carry new evidence and Main's decisions rather than another full transcript.
+
 `fork_turns: "none"` is the default when a concise handoff captures what matters. A positive turn count can be better when recent dialogue is compact and materially relevant. `"all"` can be appropriate when the broader conversation itself is important input; use it deliberately because it weakens context isolation.
 
 Delegation does not prohibit Main from inspecting the same area. Main should prefer overlap that adds integration judgment, targeted verification, or an independent challenge rather than recreating broad exploration that a worker already owns. This is a context-cost heuristic, not an ownership rule.

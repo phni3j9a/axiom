@@ -12,7 +12,7 @@ Large software tasks can fill Main context with repository exploration, logs, te
 
 Axiom does not orchestrate the agent. Axiom teaches the agent how to orchestrate itself.
 
-> **Main thinks. Sol designs. Luna executes. Sol reviews.**
+> **Main decides. Astra advises. Sol designs. Luna executes. Sol reviews.**
 
 Main uses `gpt-5.6-sol` / `xhigh`. Ordinary workers use Luna MAX Fast; design uses a separate Sol MAX, and independent review uses fresh Sol XHIGH. The plugin does not switch the active Main model or rewrite global defaults. Fast is requested only for ordinary workers and must be supported by the exposed tool surface or confirmed by runtime evidence. If it is unavailable, report that limit while retaining Luna MAX; see the direct-spawn reference for the capability check.
 
@@ -32,6 +32,23 @@ Axiom v0.1.9 preserves the worker economics made explicit in v0.1.4: under the c
 > **Main context is expensive; Luna compute is almost free.**
 
 This is a versioned assumption. If model economics change materially, the policy should be updated rather than treated as timeless.
+
+### Astra advisory support
+
+Astra (`gpt-6-astra` / `xhigh`) provides on-demand plan drafts and advice after
+initial orientation. Main retains final architecture and plan adoption; drafting
+can be delegated without transferring that authority. The Advisor receives selected
+user/Main dialogue, current agreements, a specific decision, and primary evidence,
+not a fork of Main's reasoning and tool history. It can read relevant files or ask
+Main for missing facts, but does not implement or manage workers.
+
+Reuse the Advisor for the same question with new evidence and Main decisions. It
+is not an independent Reviewer. Simple tasks have no consultation requirement,
+fixed call quota, or new phase ledger. The role adds no service-tier override,
+conversation exporter, custom agent installation, or separate API runtime.
+Luna's almost-free assumption does not apply to Astra. See the packaged
+[advisor policy](plugins/axiom/skills/axiom/references/advisor.md) and
+[evaluation procedure](docs/ADVISOR_EVALS.md).
 
 ## 3. Core axioms
 

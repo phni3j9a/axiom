@@ -25,6 +25,24 @@ Axiom must not edit the user's global config automatically.
 
 In Codex v0.147, the built-in Multi-Agent V2 wait defaults are 30,000 ms and the hard maximum is 3,600,000 ms. Setting the default to 60 minutes prevents omitted `timeout_ms` calls from repeatedly waking Main every 30 seconds. A `wait_agent` call returns early when agent activity or new steering input arrives, so 60 minutes is an upper bound rather than a forced sleep duration.
 
+## Astra XHIGH advisor
+
+Read [advisor.md](advisor.md) and construct the selected-dialogue/evidence packet before spawning:
+
+```text
+spawn_agent(
+  task_name = "astra_advisor",
+  message = "Read <absolute skill path>/references/advisor.md. Act only as Advisor: inspect relevant files read-only, do not edit the project, and do not spawn agents. <self-contained consultation packet and return request>",
+  model = "gpt-6-astra",
+  reasoning_effort = "xhigh",
+  fork_turns = "none"
+)
+```
+
+Use the same model and effort for plan drafting and advice. Add no service-tier override. Retain the returned agent handle; use `followup_task` when the Advisor is idle to send additional evidence or a related question to that same session. Use the exposed event-aware waiting mechanism while it runs. Do not turn a short reply into Main acceptance or reuse the Advisor as the independent Reviewer.
+
+If explicit Astra XHIGH routing is unavailable, report it and continue useful work in Main instead of silently inheriting a model. Requested arguments alone do not prove actual routing. The earlier v0.153.4 worker/reviewer verification does not verify this new Advisor route.
+
 ## Luna MAX Fast worker
 
 Check Fast availability below before direct spawn. This example contains model/effort arguments; add the tier only when exposed:
@@ -46,7 +64,7 @@ Intent:
 - `fork_turns: "none"` preserves a clean context boundary when the handoff is sufficient;
 - `message` contains the context the task actually needs.
 
-Fast is separate from `reasoning_effort: "max"`. For ordinary workers, add `service_tier = "priority"` if the running `spawn_agent` schema exposes it. Codex config uses `service_tier = "fast"`, which maps to the request value `priority` ([official configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference)). Do not add a tier override for Main, design, or review.
+Fast is separate from `reasoning_effort: "max"`. For ordinary workers, add `service_tier = "priority"` if the running `spawn_agent` schema exposes it. Codex config uses `service_tier = "fast"`, which maps to the request value `priority` ([official configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference)). Do not add a tier override for Main, advisor, design, or review.
 
 If `spawn_agent` has no tier field, do not invent one. An inherited Fast tier is acceptable only when confirmed by runtime evidence. If Fast cannot be selected or established, report the limitation once and retain the Luna MAX model/effort assignment; do not claim Fast is verified. The v0.153.4 model/effort verification above did not verify Fast.
 
@@ -95,6 +113,8 @@ Multi-Agent V2 accepts:
 - a positive integer string such as `"3"` — most recent turns.
 
 Choose the smallest context that reliably preserves the task. A recent-turn fork can be better than rewriting subtle dialogue into a packet; full history can be appropriate when the larger conversation materially informs the task. Use context isolation deliberately rather than mechanically.
+
+The Advisor specifically uses `"none"` with selected dialogue and evidence; the general fork options above are not a conversation-only filter. Check model-override compatibility with the running tool surface; a full-history fork may not permit model/effort overrides.
 
 Do not pass `fork_context` to Multi-Agent V2. Use `fork_turns`.
 

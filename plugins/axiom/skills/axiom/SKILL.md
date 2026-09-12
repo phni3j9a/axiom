@@ -1,6 +1,6 @@
 ---
 name: axiom
-description: Software engineering guidance combining Sol XHIGH architecture and integration, Luna MAX Fast implementation, Sol MAX design, and Sol XHIGH independent review through direct Codex subagents.
+description: Software engineering guidance combining Sol XHIGH integration, Astra XHIGH planning and advice, Luna MAX Fast implementation, Sol MAX design, and independent Sol review through direct Codex subagents.
 ---
 
 # Axiom
@@ -38,6 +38,7 @@ This is an explicit economics assumption of this Axiom version, not a timeless c
 9. **Keep review continuity within a stable boundary.** Spawn a fresh Sol for the initial review, then reuse the same reviewer agent for re-review while user intent, acceptance, and substantive design remain stable. Main adjudicates every finding, decides whether a material boundary change warrants a reset, and decides when review is complete. There is no fixed finding count and no fixed review-round limit.
 10. **Preserve user work.** Detect pre-existing changes, never discard or rewrite them, and do not attribute them to an Axiom worker.
 11. **Keep simple work simple.** A direct Main edit is correct when coordination and integration overhead would exceed the context or quality benefit. Luna's token cost alone is not a reason to stay in Main.
+12. **Astra advises on consequential decisions.** Use `gpt-6-astra` / `xhigh` for difficult plan drafts, consequential trade-offs, non-converging failures, or an explicit user request. Orient before consulting and give selected user/Main dialogue plus primary evidence, without forking Main's history. Astra may request missing facts; Main adopts or rejects proposals and retains final authority. Keep the Advisor separate from the independent Reviewer. Read [advisor.md](references/advisor.md) when considering or receiving a consultation.
 
 ## Default decision process
 
@@ -46,6 +47,7 @@ Do not narrate this process unless it helps the user.
 1. Clarify the goal and acceptance boundary from available context.
 2. Inspect repository instructions and current Git state.
 3. Decide which judgment must remain in Main.
+   When stronger advice is useful, ask Astra XHIGH to draft the difficult plan or examine the decision after gathering the relevant facts. Main owns adoption; an ordinary plan update does not require consultation.
 4. Identify whether any bounded task requires material visual, interaction, or information-design judgment; route that task to Sol MAX and ordinary bounded work to Luna MAX.
 5. Split genuinely bounded work whenever doing so protects Main context or creates useful independent progress; do not optimize for minimizing Luna usage.
 6. When multiple useful bounded tasks are independent, spawn them before waiting on any one of them; otherwise delegate work that benefits from isolation.
@@ -61,9 +63,10 @@ Do not narrate this process unless it helps the user.
 - Design worker: `gpt-5.6-sol` / `max`
 - Reviewer: `gpt-5.6-sol` / `xhigh`
 - Main: `gpt-5.6-sol` / `xhigh`
+- Advisor: `gpt-6-astra` / `xhigh` for both plan drafting and consultation
 - Terra: not part of the default route
 - Custom agents: do not install or depend on them
-- `service_tier`: request Fast for ordinary workers only; do not add a tier override for Main, design, or review
+- `service_tier`: request Fast for ordinary workers only; do not add a tier override for Main, advisor, design, or review
 
 Main is selected when starting the session; this skill cannot switch the active Main model. Use Sol XHIGH for a new Axiom Main session without changing unrelated global defaults.
 
@@ -74,6 +77,8 @@ The recommended environment is Codex v0.147 or later, including v0.153, with Mul
 If explicit spawn model overrides are unavailable, do not silently create a worker that inherits the Main model. Continue in Main or report the missing model-override capability, using the v0.147 configuration example where applicable. If design-sensitive work cannot be explicitly routed to Sol MAX, keep it in Main rather than silently assigning it to Luna. If review is needed but a fresh Sol cannot be explicitly spawned, Main performs the review itself rather than delegating review to Luna.
 
 Routing verification must use runtime/rollout evidence: the requested spawn args, the child `turn_context` model/effort, and the corresponding child-turn `task_complete`. A completed child turn is not by itself an accepted result or a terminal agent session. Never rely on a child's self-report alone.
+
+If Astra XHIGH cannot be explicitly selected or the consultation fails, disclose the limitation and continue useful work in Main. Do not silently substitute a different advisor model or effort. The Advisor's advisory/no-project-edit contract is behavioral, not a separate sandbox; send it explicitly with the assignment and advisor reference.
 
 ## Parallel execution default
 
@@ -97,6 +102,7 @@ Main verification may be enough for a clearly trivial, non-behavioral edit.
 ## Read the focused references
 
 - Before delegating: [delegation.md](references/delegation.md)
+- Before an Astra plan or decision consultation: [advisor.md](references/advisor.md)
 - Before a direct spawn or when routing fails: [codex-0.147-subagents.md](references/codex-0.147-subagents.md)
 - Before independent review or a fix loop: [review.md](references/review.md)
 - When the task is long or compaction risk is material: [context-management.md](references/context-management.md)
