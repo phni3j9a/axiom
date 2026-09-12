@@ -4,7 +4,7 @@
 
 Use delegation to protect Main context and gain useful parallelism, not to maximize agent count.
 
-Main retains architecture, intent, design direction and constraints, trade-offs, integration, and acceptance. Luna receives ordinary bounded work whose delegation benefit exceeds coordination and integration cost. Astra MAX receives bounded design-sensitive work when material interface judgment is part of the task.
+Main retains architecture, intent, design direction and constraints, trade-offs, integration, and acceptance. Luna receives ordinary bounded work whose delegation benefit exceeds coordination and integration cost. Sol MAX receives bounded design-sensitive work when material interface judgment is part of the task.
 
 ## Economics assumption
 
@@ -51,7 +51,7 @@ These are heuristics, not routing rules. Luna's token cost by itself is not a re
 
 ## Design-sensitive work
 
-Direct-spawn an Astra MAX design worker when a bounded task must create, compare, or iteratively refine material:
+Direct-spawn a Sol MAX design worker when a bounded task must create, compare, or iteratively refine material:
 
 - visual hierarchy, layout, spacing, typography, color, or art direction;
 - interaction patterns, navigation, user flow, or responsive behavior;
@@ -59,11 +59,11 @@ Direct-spawn an Astra MAX design worker when a bounded task must create, compare
 - interface improvements expressed through open-ended goals such as “make this polished” or “make this easier to use”;
 - screenshot-driven visual implementation where design judgment and code iteration are inseparable.
 
-The routing test is whether important interface decisions remain unresolved, not whether the task touches frontend code. Do not route work to Astra merely because it edits CSS, HTML, JSX, TSX, templates, or UI components. Prefer Luna MAX when a finished design, explicit tokens, exact measurements, or otherwise settled behavior makes the remaining implementation mechanical and bounded.
+The routing test is whether important interface decisions remain unresolved, not whether the task touches frontend code. Do not route work to Sol merely because it edits CSS, HTML, JSX, TSX, templates, or UI components. Prefer Luna MAX when a finished design, explicit tokens, exact measurements, or otherwise settled behavior makes the remaining implementation mechanical and bounded.
 
 A design worker may implement its own design when handing it off would break the visual feedback loop or lose important judgment. Once the design is stable, repetitive expansion, non-visual state and data wiring, tests, and mechanical cleanup can be split into Luna tasks with clear ownership.
 
-For mixed work, Main may run an Astra MAX design lane alongside disjoint Luna MAX lanes for backend behavior, data flow, tests, or settled implementation. Account for shared component and stylesheet ownership before allowing parallel writes.
+For mixed work, Main may run a Sol MAX design lane alongside disjoint Luna MAX lanes for backend behavior, data flow, tests, or settled implementation. Account for shared component and stylesheet ownership before allowing parallel writes.
 
 The design worker is an implementation participant, not an independent reviewer. Never reuse it as the fresh Sol XHIGH reviewer for the integrated candidate.
 
@@ -141,7 +141,7 @@ Further subdelegation is not a goal by itself. Let the active agent use it only 
 
 ## Direct-spawn default
 
-For ordinary bounded work on Codex v0.147 or later (including v0.153), prefer:
+For ordinary bounded work on Codex v0.147 or later (including v0.153), use Luna MAX Fast. Check the running tool's tier capability as described in the direct-spawn reference before using these model/effort arguments:
 
 ```text
 model = "gpt-5.6-luna"
@@ -149,10 +149,12 @@ reasoning_effort = "max"
 fork_turns = "none"
 ```
 
+When exposed, add `service_tier = "priority"` for the ordinary worker only; otherwise require verified inherited Fast or report the limitation while retaining Luna MAX. Do not send unsupported arguments.
+
 For bounded design-sensitive work, prefer:
 
 ```text
-model = "gpt-6-astra"
+model = "gpt-5.6-sol"
 reasoning_effort = "max"
 fork_turns = "none"
 ```
