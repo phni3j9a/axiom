@@ -1,6 +1,6 @@
 # Codex v0.147 or later: direct-spawn subagents
 
-Axiom targets Codex v0.147 or later, including v0.153. Main may use `gpt-5.6-sol` or `gpt-6-astra`; for Main, Astra's reasoning effort follows the user's or session's setting. The design worker route below explicitly uses MAX. The configuration examples and v0.147-specific troubleshooting below retain the original baseline; check the running tool surface on later releases.
+Axiom targets Codex v0.147 or later, including v0.153. Main uses `gpt-5.6-sol` / `xhigh`; start it with `codex -m gpt-5.6-sol -c 'model_reasoning_effort="xhigh"'`. Ordinary workers use Luna MAX Fast. Design uses a separate Sol MAX; review uses fresh Sol XHIGH. The configuration examples and v0.147-specific troubleshooting below retain the original baseline; check the running tool surface on later releases.
 
 On Codex v0.153.4, parallel Luna MAX workers and a fresh Sol XHIGH reviewer were verified using requested spawn args, child `turn_context` model/effort, and corresponding `task_complete` events. This verifies those routes, not every feature or configuration default on later releases.
 
@@ -25,9 +25,9 @@ Axiom must not edit the user's global config automatically.
 
 In Codex v0.147, the built-in Multi-Agent V2 wait defaults are 30,000 ms and the hard maximum is 3,600,000 ms. Setting the default to 60 minutes prevents omitted `timeout_ms` calls from repeatedly waking Main every 30 seconds. A `wait_agent` call returns early when agent activity or new steering input arrives, so 60 minutes is an upper bound rather than a forced sleep duration.
 
-## Luna MAX worker
+## Luna MAX Fast worker
 
-Prefer direct spawn:
+Check Fast availability below before direct spawn. This example contains model/effort arguments; add the tier only when exposed:
 
 ```text
 spawn_agent(
@@ -46,23 +46,25 @@ Intent:
 - `fork_turns: "none"` preserves a clean context boundary when the handoff is sufficient;
 - `message` contains the context the task actually needs.
 
-Do not confuse `reasoning_effort: "max"` with `service_tier`. Omit `service_tier` unless the user explicitly requests one.
+Fast is separate from `reasoning_effort: "max"`. For ordinary workers, add `service_tier = "priority"` if the running `spawn_agent` schema exposes it. Codex config uses `service_tier = "fast"`, which maps to the request value `priority` ([official configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference)). Do not add a tier override for Main, design, or review.
 
-## Astra MAX design worker
+If `spawn_agent` has no tier field, do not invent one. An inherited Fast tier is acceptable only when confirmed by runtime evidence. If Fast cannot be selected or established, report the limitation once and retain the Luna MAX model/effort assignment; do not claim Fast is verified. The v0.153.4 model/effort verification above did not verify Fast.
 
-Use an Astra MAX worker when the bounded task must create, compare, or iteratively refine material visual, interaction, or information-design decisions:
+## Sol MAX design worker
+
+Use a Sol MAX worker when the bounded task must create, compare, or iteratively refine material visual, interaction, or information-design decisions:
 
 ```text
 spawn_agent(
   task_name = "design_sensitive_interface_work",
   message = "<bounded design handoff with intent, constraints, ownership, and acceptance>",
-  model = "gpt-6-astra",
+  model = "gpt-5.6-sol",
   reasoning_effort = "max",
   fork_turns = "none"
 )
 ```
 
-Do not route work to Astra merely because it touches frontend files. If the design decisions are already settled and the remaining change is mechanical implementation, use Luna MAX. An Astra design worker may implement the interface when design and code iteration are inseparable.
+Do not route work to Sol merely because it touches frontend files. If the design decisions are already settled and the remaining change is mechanical implementation, use Luna MAX. A Sol design worker may implement the interface when design and code iteration are inseparable.
 
 A design worker is not an independent reviewer. If the integrated change warrants review, spawn a separate fresh Sol XHIGH reviewer.
 
@@ -103,7 +105,7 @@ Before relying on delegated model routing, confirm that the available `spawn_age
 - `model`
 - `reasoning_effort`
 
-If they are missing, do not silently spawn an unspecified worker that may inherit the Main model (Sol or Astra). Continue in Main when practical or report the missing model-override capability, using the v0.147 configuration example where applicable. Keep design-sensitive work in Main if it cannot be explicitly routed to Astra MAX. Do not fall back to Terra merely because Luna routing is unavailable, and never fall back to Luna for independent review.
+If they are missing, do not silently spawn an unspecified worker that may inherit the Main model (Sol). Continue in Main when practical or report the missing model-override capability, using the v0.147 configuration example where applicable. Keep design-sensitive work in Main if it cannot be explicitly routed to Sol MAX. Do not fall back to Terra merely because Luna routing is unavailable, and never fall back to Luna for independent review.
 
 This preserves the intended cost and role separation.
 
@@ -113,9 +115,10 @@ Routing verification must use runtime/rollout evidence:
 
 - the requested `spawn_agent` args;
 - the child `turn_context` model/effort;
+- effective service-tier evidence for Fast workers, when exposed (requested tier alone is not proof);
 - the corresponding child-turn `task_complete` event.
 
-Never rely on a child's self-report alone. A child saying that it is Luna, Astra, or Sol is not routing evidence by itself.
+Never rely on a child's self-report alone. A child saying that it is Luna or Sol is not routing evidence by itself.
 
 These signals have different meanings:
 
@@ -146,7 +149,7 @@ Apply the same evidence-aware judgment to long-running shell sessions, tests, bu
 
 Use follow-up when it continues the same bounded task and retained worker context is useful. Start a fresh worker when independence or a clean context boundary is more valuable.
 
-For review, preserve the same Sol reviewer across re-review passes when available and the review boundary remains materially stable; do not reuse a Luna implementation worker or Astra design worker as the independent reviewer. When user intent, acceptance, non-goals, or substantive design changes, Main decides whether to re-adjudicate in place, reset the boundary explicitly, or begin a fresh review cycle.
+For review, preserve the same Sol reviewer across re-review passes when available and the review boundary remains materially stable; do not reuse a Luna implementation worker or Sol design worker as the independent reviewer. When user intent, acceptance, non-goals, or substantive design changes, Main decides whether to re-adjudicate in place, reset the boundary explicitly, or begin a fresh review cycle.
 
 ## Reviewer read-only contract
 

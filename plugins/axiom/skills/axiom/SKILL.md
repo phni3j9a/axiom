@@ -1,6 +1,6 @@
 ---
 name: axiom
-description: Software engineering guidance combining Main-owned architecture and integration, Luna MAX implementation, Astra MAX design, and Sol XHIGH independent review through direct Codex subagents.
+description: Software engineering guidance combining Sol XHIGH architecture and integration, Luna MAX Fast implementation, Sol MAX design, and Sol XHIGH independent review through direct Codex subagents.
 ---
 
 # Axiom
@@ -29,8 +29,8 @@ This is an explicit economics assumption of this Axiom version, not a timeless c
 
 1. **Main owns meaning.** Keep user intent, architecture, design constraints and direction, decomposition, integration, finding adjudication, and final acceptance in Main.
 2. **Delegate bounded work proactively.** Offload repository exploration, implementation, tests, debugging, log analysis, and mechanical refactors when they can be expressed with a clear objective, scope, constraints, and verification. Do not keep bounded work in Main merely to save Luna usage.
-3. **Luna first for ordinary work.** On Codex v0.147 or later (including v0.153), directly spawn `gpt-5.6-luna` with `reasoning_effort: "max"` for ordinary delegated work. Do not select Terra merely because work is exploratory or read-heavy.
-4. **Astra designs when judgment is material.** Directly spawn `gpt-6-astra` with `reasoning_effort: "max"` when a bounded task must create, compare, or iteratively refine material visual, interaction, or information-design decisions. Do not route work to Astra merely because it touches frontend files. When the relevant design decisions are already specified, prefer Luna MAX for the remaining bounded implementation.
+3. **Luna first for ordinary work.** On Codex v0.147 or later (including v0.153), directly spawn `gpt-5.6-luna` with `reasoning_effort: "max"` and Fast service tier for ordinary delegated work. Follow the capability check in Model policy before spawning. Do not select Terra merely because work is exploratory or read-heavy.
+4. **Sol designs when judgment is material.** Directly spawn `gpt-5.6-sol` with `reasoning_effort: "max"` when a bounded task must create, compare, or iteratively refine material visual, interaction, or information-design decisions. Do not route work to Sol merely because it touches frontend files. When the relevant design decisions are already specified, prefer Luna MAX for the remaining bounded implementation.
 5. **Sol reviews evidence-boundedly.** When independent review is warranted, directly spawn a fresh `gpt-5.6-sol` with `reasoning_effort: "xhigh"`. Never substitute Luna as the reviewer, and never reuse a design worker as the independent reviewer. Review both material defects and unjustified complexity; additive review concerns require independent current evidence rather than hypothetical hardening or candidate-created machinery.
 6. **Fresh context by default.** Prefer a self-contained Task Packet and `fork_turns: "none"`. Share conversation turns only when the dialogue itself is indispensable input.
 7. **Prefer parallel Luna fleets for independent work.** When two or more useful bounded tasks are independent, launch Luna MAX workers concurrently unless coordination cost, dependency order, or write-conflict risk outweighs the benefit. Choose the natural fan-out from the task; never use a fixed agent count. Parallel writes require disjoint ownership and stable interfaces; otherwise serialize or isolate with worktrees.
@@ -46,7 +46,7 @@ Do not narrate this process unless it helps the user.
 1. Clarify the goal and acceptance boundary from available context.
 2. Inspect repository instructions and current Git state.
 3. Decide which judgment must remain in Main.
-4. Identify whether any bounded task requires material visual, interaction, or information-design judgment; route that task to Astra MAX and ordinary bounded work to Luna MAX.
+4. Identify whether any bounded task requires material visual, interaction, or information-design judgment; route that task to Sol MAX and ordinary bounded work to Luna MAX.
 5. Split genuinely bounded work whenever doing so protects Main context or creates useful independent progress; do not optimize for minimizing Luna usage.
 6. When multiple useful bounded tasks are independent, spawn them before waiting on any one of them; otherwise delegate work that benefits from isolation.
 7. Integrate results in Main and inspect the actual changed tree.
@@ -57,17 +57,21 @@ Do not narrate this process unless it helps the user.
 
 ## Model policy
 
-- Worker default: `gpt-5.6-luna` / `max`
-- Design worker: `gpt-6-astra` / `max`
+- Worker default: `gpt-5.6-luna` / `max` / Fast
+- Design worker: `gpt-5.6-sol` / `max`
 - Reviewer: `gpt-5.6-sol` / `xhigh`
-- Main: `gpt-5.6-sol` or `gpt-6-astra`; `xhigh` is recommended for Sol, while Main's Astra follows the user's or session's reasoning-effort setting independently from the design worker's fixed MAX effort
+- Main: `gpt-5.6-sol` / `xhigh`
 - Terra: not part of the default route
 - Custom agents: do not install or depend on them
-- `service_tier`: omit unless the user explicitly requests a tier
+- `service_tier`: request Fast for ordinary workers only; do not add a tier override for Main, design, or review
+
+Main is selected when starting the session; this skill cannot switch the active Main model. Use Sol XHIGH for a new Axiom Main session without changing unrelated global defaults.
+
+For workers, request `service_tier = "priority"` only if the running `spawn_agent` schema exposes it (Codex config calls this `fast`). If that field is absent, use an inherited Fast tier only when runtime evidence confirms it. If Fast cannot be selected or established, report the limitation once and retain the Luna MAX model/effort assignment; do not send unsupported arguments or claim Fast is active. See [codex-0.147-subagents.md](references/codex-0.147-subagents.md).
 
 The recommended environment is Codex v0.147 or later, including v0.153, with Multi-Agent V2 and explicit spawn model/effort overrides. Configuration examples retain the v0.147 baseline; check the running tool surface on later releases.
 
-If explicit spawn model overrides are unavailable, do not silently create a worker that inherits the Main model. Continue in Main or report the missing model-override capability, using the v0.147 configuration example where applicable. If design-sensitive work cannot be explicitly routed to Astra MAX, keep it in Main rather than silently assigning it to Luna. If review is needed but a fresh Sol cannot be explicitly spawned, Main performs the review itself rather than delegating review to Luna.
+If explicit spawn model overrides are unavailable, do not silently create a worker that inherits the Main model. Continue in Main or report the missing model-override capability, using the v0.147 configuration example where applicable. If design-sensitive work cannot be explicitly routed to Sol MAX, keep it in Main rather than silently assigning it to Luna. If review is needed but a fresh Sol cannot be explicitly spawned, Main performs the review itself rather than delegating review to Luna.
 
 Routing verification must use runtime/rollout evidence: the requested spawn args, the child `turn_context` model/effort, and the corresponding child-turn `task_complete`. A completed child turn is not by itself an accepted result or a terminal agent session. Never rely on a child's self-report alone.
 

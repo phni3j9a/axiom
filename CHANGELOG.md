@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Set Main to Sol XHIGH, ordinary workers to Luna MAX Fast, design to Sol MAX, and independent review to fresh Sol XHIGH.
+- Request Fast only where the runtime exposes a tier override or inherited Fast is verified; report unavailable routing without sending unsupported arguments.
+
+### Earlier routing change (superseded)
+
 - Routed design-sensitive bounded work to GPT-6 Astra / MAX while retaining Luna MAX for ordinary work, fresh Sol XHIGH for review, and Main's user/session-controlled Astra effort.
 
 ## 0.1.9 — 2026-09-06
