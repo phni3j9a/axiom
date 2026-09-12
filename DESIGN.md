@@ -99,11 +99,11 @@ Trade-off:
 - a direct-spawn reviewer inherits the runtime environment and cannot be hard-pinned to a dedicated read-only sandbox by Axiom
 - read-only review is therefore enforced by instructions and checked by Main
 
-## 8. Automatic use
+## 8. Explicit invocation
 
-Axiom has one broad but focused skill. Its description covers non-trivial software engineering tasks, while `allow_implicit_invocation: true` explicitly permits automatic selection.
+Axiom has one focused skill. Its description explains the engineering capability, while `allow_implicit_invocation: false` disables automatic selection. Users invoke it with `$axiom:axiom` for a task; the guidance continues to apply to follow-up work on that task.
 
-It must not announce an “Axiom mode,” require route labels, or pause for activation. The user should experience normal Codex behavior with better delegation and review decisions.
+After invocation, it must not announce an “Axiom mode,” require route labels, or pause for repeated activation. The user should experience normal Codex behavior with better delegation and review decisions.
 
 ## 9. Review policy
 

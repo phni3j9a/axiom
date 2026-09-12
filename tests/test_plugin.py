@@ -95,9 +95,9 @@ class AxiomPluginTests(unittest.TestCase):
         self.assertEqual(values["max_wait_timeout_ms"], 3_600_000)
         self.assertNotIn("hide_spawn_agent_metadata", values)
 
-    def test_core_is_proactive(self) -> None:
+    def test_core_requires_explicit_invocation(self) -> None:
         core = (CORE_SKILL / "agents" / "openai.yaml").read_text(encoding="utf-8")
-        self.assertIn("allow_implicit_invocation: true", core)
+        self.assertIn("allow_implicit_invocation: false", core)
 
     def test_removed_runtime_is_absent(self) -> None:
         self.assertFalse((PLUGIN / "dashboard").exists())

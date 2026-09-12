@@ -1,13 +1,13 @@
 ---
 name: axiom
-description: Apply proactively to non-trivial software engineering work—feature implementation, bug fixes, refactoring, debugging, testing, codebase investigation, interface design, and code review—when delegation, context isolation, independent review, or Git coordination can improve delivery. Keep intent, architecture, design constraints, integration, and acceptance in the Main agent (Sol or Astra); prefer direct-spawn Luna MAX for ordinary bounded work, Astra MAX for bounded design-sensitive work, and fresh direct-spawn Sol XHIGH for meaningful review. Skip only trivial edits or purely conversational requests.
+description: Software engineering guidance combining Main-owned architecture and integration, Luna MAX implementation, Astra MAX design, and Sol XHIGH independent review through direct Codex subagents.
 ---
 
 # Axiom
 
-Use these principles quietly as part of normal software engineering. Axiom is guidance, not a workflow.
+Apply these principles to the task for which the user explicitly invoked Axiom, including follow-up work on that task. Axiom is guidance, not a workflow.
 
-Do not announce an Axiom mode, classify the request into a named route, create mandatory phases, or require activation. Do not add ceremony that does not improve the current task.
+Do not announce an Axiom mode, classify the request into a named route, or create mandatory phases. Do not add ceremony that does not improve the current task.
 
 ## Delegation authorization
 

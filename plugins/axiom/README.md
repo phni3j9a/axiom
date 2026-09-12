@@ -19,7 +19,7 @@ Axiom is a guidance-first Codex plugin for non-trivial software engineering.
 - `task_complete` is treated as a child-turn return signal, not Main acceptance or terminal agent state.
 - Evidence-aware wait and optional rollout metrics inform Main without imposing fixed cadence or workflow gates.
 - No fixed workflow, no Terra default, and no custom agent installation.
-- `allow_implicit_invocation: true` makes the core Axiom skill available proactively.
+- `allow_implicit_invocation: false` reserves Axiom for explicit invocation with `$axiom:axiom`; its delegation and review guidance applies throughout that task and its follow-up work.
 
 See the repository root `README.md` for installation and configuration.
 
