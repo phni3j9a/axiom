@@ -44,7 +44,7 @@ Delegation does not prohibit Main from inspecting the same area. Main should pre
 
 ## Evidence-aware waiting
 
-For long-running agents or processes, prefer waits and monitoring that return on meaningful activity. Avoid repeatedly waking Main when no new evidence is expected. The right cadence depends on the task and may be shortened for safety, cancellation, liveness, or external-state risks.
+For processes that need repeated status checks, follow the [monitoring delegation policy](../SKILL.md#long-running-monitoring). Main continues useful independent work or uses the existing agent wait for the report, without repeatedly checking the process or worker progress.
 
 User preferences about update cadence are part of the task context, subject to higher-level constraints. Internal monitoring and user-facing progress updates need not have the same cadence: a runner may enforce continuous safety checks while Main reports only meaningful state changes.
 

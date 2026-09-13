@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Delegate repeated monitoring of long-running processes to Luna through completion, reuse the responsible worker, and keep Main on existing report waits without unchanged-status updates.
+
 - Add Astra XHIGH as an on-demand advisor for difficult plan drafting and consequential decisions, with selected dialogue/evidence, missing-fact requests, and same-question continuity.
 - Preserve Main adoption and acceptance, independent Sol review, and existing worker routing; document actual-routing and quality/cost validation separately.
 

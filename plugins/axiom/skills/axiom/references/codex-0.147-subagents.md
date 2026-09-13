@@ -163,7 +163,7 @@ The call can return before 60 minutes when agent activity arrives or the user st
 
 When several independent agents are running, spawn the useful set first and then wait; do not serialize them by waiting immediately after each spawn unless their work is actually dependent.
 
-Apply the same evidence-aware judgment to long-running shell sessions, tests, builds, benchmarks, and external processes. Prefer monitoring that returns on meaningful activity, and avoid repeatedly waking Main when no new evidence is expected. Polling cadence remains task-specific and can be shorter when safety, cancellation, liveness, or external-state risks justify it. A runner's own heartbeat, limits, and cleanup may be better primary monitoring than repeated Main-side inspection.
+For long-running shell sessions, CI/CD, tests, builds, benchmarks, and external processes that need repeated status checks, follow the [monitoring delegation policy](../SKILL.md#long-running-monitoring). Keep completion monitoring with the existing Luna responsible for the process when available. Main uses the existing agent wait for the report and does not repeatedly inspect the process or the worker's progress.
 
 ## Follow-up and continuity
 

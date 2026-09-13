@@ -40,6 +40,12 @@ This is an explicit economics assumption of this Axiom version, not a timeless c
 11. **Keep simple work simple.** A direct Main edit is correct when coordination and integration overhead would exceed the context or quality benefit. Luna's token cost alone is not a reason to stay in Main.
 12. **Astra advises on consequential decisions.** Use `gpt-6-astra` / `xhigh` for difficult plan drafts, consequential trade-offs, non-converging failures, or an explicit user request. Orient before consulting and give selected user/Main dialogue plus primary evidence, without forking Main's history. Astra may request missing facts; Main adopts or rejects proposals and retains final authority. Keep the Advisor separate from the independent Reviewer. Read [advisor.md](references/advisor.md) when considering or receiving a consultation.
 
+## Long-running monitoring
+
+- Delegate repeated status checks for CI/CD, GitHub Actions, builds, tests, and similar long-running processes to a Luna worker through completion. Monitoring alone is a useful assignment; keep it with the existing Luna responsible for that process when available.
+- Main does not repeatedly check the delegated process or the worker's progress. Continue useful independent work or use the existing event-aware waiting mechanism for the report.
+- The Luna worker reports completion, failure, inability to monitor, or a need for Main's judgment, with concise evidence. Do not send Main periodic unchanged-status reports.
+
 ## Default decision process
 
 Do not narrate this process unless it helps the user.
