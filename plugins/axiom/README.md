@@ -21,6 +21,7 @@ Axiom is a guidance-first Codex plugin for non-trivial software engineering.
 - Reviewers provide evidence but do not set user risk tolerance or product policy.
 - `task_complete` is treated as a child-turn return signal, not Main acceptance or terminal agent state.
 - Evidence-aware wait and optional rollout metrics inform Main without imposing fixed cadence or workflow gates.
+- Repeated status checks for long-running processes go to a Luna worker through completion, reusing the responsible Luna when available. Main waits for concise completion, failure, monitoring-blocker, or decision-needed reports instead of repeatedly checking progress; unchanged-status reports are unnecessary.
 - No fixed workflow, no Terra default, and no custom agent installation.
 - `allow_implicit_invocation: false` reserves Axiom for explicit invocation with `$axiom:axiom`; its delegation and review guidance applies throughout that task and its follow-up work.
 

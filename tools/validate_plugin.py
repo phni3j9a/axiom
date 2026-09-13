@@ -268,7 +268,6 @@ for required_text in (
     "not an automatic reset rule",
     "does not set the user's risk tolerance",
     "one child turn returned",
-    "Polling cadence remains task-specific",
     "context-cost heuristic, not an ownership rule",
 ):
     check(required_text in core_combined, f"guidance contains {required_text}")

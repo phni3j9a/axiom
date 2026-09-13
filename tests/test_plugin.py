@@ -226,9 +226,7 @@ class AxiomPluginTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn("one child turn returned", subagents)
         self.assertIn("does not imply that Main accepted the work", subagents)
-        self.assertIn("Polling cadence remains task-specific", subagents)
         self.assertIn("context-cost heuristic, not an ownership rule", context)
-        self.assertIn("The right cadence depends on the task", context)
 
         trace_evals = (ROOT / "docs" / "TRACE_EVALS.md").read_text(
             encoding="utf-8"

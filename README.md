@@ -32,7 +32,7 @@ Axiomは次を**行いません**。
 |---|---|---|
 | Main | `gpt-5.6-sol` / `xhigh` | 意図、アーキテクチャ、デザイン制約・方向性、分割、統合、裁定、最終受理 |
 | Advisor | GPT-6 Astra / XHIGH | 難しいPlanの起草、設計比較、行き詰まりの分析。採否はMainが判断 |
-| Ordinary worker | GPT-5.6 Luna / MAX / Fast | 探索、通常実装、テスト、デバッグ、リファクタ |
+| Ordinary worker | GPT-5.6 Luna / MAX / Fast | 探索、通常実装、テスト、デバッグ、リファクタ、長時間処理の監視 |
 | Design worker | GPT-5.6 Sol / MAX | 未確定の重要なvisual・interaction・information designと不可分なUI実装 |
 | Reviewer | fresh GPT-5.6 Sol / XHIGH | 意味のある変更の独立レビュー |
 | Terra | 標準経路では不使用 | ユーザー指定または具体的な理由がある場合のみ |
@@ -209,6 +209,14 @@ wait_agent(timeout_ms = 3600000)
 ```
 
 複数の独立workerがある場合は、各workerをspawnしてからまとめて待ち、依存関係がないのに`spawn → wait → spawn`と直列化しません。
+
+### 長時間処理の監視
+
+CI/CD、GitHub Actions、ビルド、テストなどで反復的な状態確認が必要な場合は、
+Luna workerに完了確認まで委任します。監視だけでも委任でき、既存の担当Lunaがいれば同じ担当に任せます。
+Mainは委任後の状態確認を繰り返さず、他の作業を進めるか、既存の待機機能で報告を待ちます。
+Lunaは完了・失敗・監視不能・Mainの判断が必要になったときに、結果と証拠を簡潔に報告します。
+変化のない状況の定期報告は不要です。
 
 ### Sol MAX design worker
 

@@ -33,6 +33,7 @@ A Luna MAX worker often helps when:
 - a change has a useful ownership boundary;
 - an implementation, test, or investigation can make progress without inventing unresolved architecture;
 - repetitive or mechanical work would consume substantial Main context;
+- a long-running process needs repeated status checks through completion, even when monitoring is the whole assignment;
 - independent investigations can run concurrently;
 - Main mainly needs evidence, a file map, or a concise recommendation rather than the raw search process.
 
@@ -136,6 +137,7 @@ Useful defaults for a worker:
 - avoid destructive Git/history operations;
 - surface substantive architecture or product ambiguity back to Main rather than silently redefining intent;
 - report verification actually performed, not verification merely intended;
+- for monitoring assignments, report completion, failure, inability to monitor, or a need for Main's judgment; include this return condition in the handoff and omit periodic unchanged-status reports to Main;
 - return concise evidence rather than raw transcripts.
 
 In a shared working tree, Main-owned commits are usually simpler. In an isolated worktree or clearly bounded branch, Main may deliberately delegate commit creation when it improves integration.
