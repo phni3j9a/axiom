@@ -12,6 +12,8 @@ When delegated independent review is useful, use:
 
 Do not use Luna as reviewer. Do not install or depend on a custom reviewer agent.
 
+Do not reuse an Astra planning/advisory participant as the independent Reviewer. Astra may advise Main on a material technical dispute, but Main still adjudicates the findings and chooses whether another review pass is useful.
+
 The reviewer is **fresh at the start of the review cycle**. If fixes are made and re-review is useful, continue with the **same reviewer agent/session** so it retains the original findings, Main adjudication, and review boundary. Do not spawn a new reviewer merely because the candidate changed.
 
 Continuity assumes that user intent, acceptance criteria, non-goals, and substantive design remain materially stable. When one of those changes, Main decides whether the existing findings can be re-adjudicated within the current context, whether an explicit review-boundary reset is enough, or whether a fresh review cycle would restore useful independence. A material steer is a judgment point, not an automatic reset rule.

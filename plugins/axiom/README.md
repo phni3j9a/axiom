@@ -2,7 +2,7 @@
 
 Axiom is a guidance-first Codex plugin for non-trivial software engineering.
 
-> Main thinks. Sol designs. Luna executes. Sol reviews.
+> Main decides. Astra advises. Sol designs. Luna executes. Sol reviews.
 >
 > **Main context is expensive; Luna compute is almost free.**
 
@@ -14,6 +14,8 @@ Axiom is a guidance-first Codex plugin for non-trivial software engineering.
 - Direct-spawn Sol MAX performs bounded work that requires material visual, interaction, or information-design judgment; frontend files alone do not trigger this route.
 - A Sol MAX design worker may implement its design when the feedback loop is inseparable, but it is never reused as the independent reviewer.
 - Independent useful bounded work fans out to parallel Luna MAX workers; there is no fixed fleet size, and coordination/integration cost—not Luna token cost—limits fan-out.
+- Astra XHIGH drafts difficult plans and advises on consequential decisions after orientation. Main selects relevant dialogue and primary evidence instead of forking its history; Astra can request missing facts. See [advisor guidance](skills/axiom/references/advisor.md).
+- Keep the same Advisor for same-question follow-ups; its no-project-edit contract is behavioral, and it is not reused as the independent Reviewer.
 - Fresh direct-spawn Sol XHIGH performs meaningful independent review.
 - The initial Sol reviewer is reused for re-review while the review boundary remains materially stable; Main adjudicates every finding and any boundary reset.
 - Reviewers provide evidence but do not set user risk tolerance or product policy.

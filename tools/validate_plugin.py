@@ -74,6 +74,7 @@ required_files = [
     CORE_SKILL / "SKILL.md",
     CORE_SKILL / "agents" / "openai.yaml",
     CORE_SKILL / "references" / "delegation.md",
+    CORE_SKILL / "references" / "advisor.md",
     CORE_SKILL / "references" / "codex-0.147-subagents.md",
     CORE_SKILL / "references" / "review.md",
     CORE_SKILL / "references" / "context-management.md",

@@ -6,6 +6,8 @@ Use delegation to protect Main context and gain useful parallelism, not to maxim
 
 Main retains architecture, intent, design direction and constraints, trade-offs, integration, and acceptance. Luna receives ordinary bounded work whose delegation benefit exceeds coordination and integration cost. Sol MAX receives bounded design-sensitive work when material interface judgment is part of the task.
 
+Astra XHIGH can draft difficult plans or advise Main on consequential decisions after orientation. Main retains adoption and assignment authority. Use [advisor.md](advisor.md) for the selected-dialogue/evidence packet, no-project-edit contract, and same-question follow-up policy. Astra's cost is not covered by the Luna economics assumption below.
+
 ## Economics assumption
 
 Under the Codex/model economics targeted by Axiom v0.1.9, Luna MAX worker usage is inexpensive enough to be treated as **almost free** for ordinary orchestration decisions. This is the unchanged economics principle introduced in v0.1.4.
@@ -42,12 +44,13 @@ Main may keep work local when:
 
 - the edit is obvious and local;
 - the request is primarily explanation rather than repository work;
-- architecture or product intent is still unresolved;
 - the worker would require continuous back-and-forth;
 - delegation would save little context or time while adding coordination/integration overhead;
 - the only reason to spawn is to satisfy a ritual.
 
 These are heuristics, not routing rules. Luna's token cost by itself is not a reason to stay in Main.
+
+Unresolved architecture can justify an Astra consultation rather than an implementation handoff. Missing user intent remains Main's responsibility; the Advisor cannot invent agreement or permission.
 
 ## Design-sensitive work
 

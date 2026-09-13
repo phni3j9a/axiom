@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add Astra XHIGH as an on-demand advisor for difficult plan drafting and consequential decisions, with selected dialogue/evidence, missing-fact requests, and same-question continuity.
+- Preserve Main adoption and acceptance, independent Sol review, and existing worker routing; document actual-routing and quality/cost validation separately.
+
 - Set Main to Sol XHIGH, ordinary workers to Luna MAX Fast, design to Sol MAX, and independent review to fresh Sol XHIGH.
 - Request Fast only where the runtime exposes a tier override or inherited Fast is verified; report unavailable routing without sending unsupported arguments.
 

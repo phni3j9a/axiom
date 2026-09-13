@@ -2,7 +2,7 @@
 
 Axiomは、Codexへ固定ワークフローを強制するPluginではありません。
 
-> **Main thinks. Sol designs. Luna executes. Sol reviews.**
+> **Main decides. Astra advises. Sol designs. Luna executes. Sol reviews.**
 >
 > **Main context is expensive; Luna compute is almost free.**
 
@@ -31,12 +31,40 @@ Axiomは次を**行いません**。
 | 役割 | 標準モデル | 責務 |
 |---|---|---|
 | Main | `gpt-5.6-sol` / `xhigh` | 意図、アーキテクチャ、デザイン制約・方向性、分割、統合、裁定、最終受理 |
+| Advisor | GPT-6 Astra / XHIGH | 難しいPlanの起草、設計比較、行き詰まりの分析。採否はMainが判断 |
 | Ordinary worker | GPT-5.6 Luna / MAX / Fast | 探索、通常実装、テスト、デバッグ、リファクタ |
 | Design worker | GPT-5.6 Sol / MAX | 未確定の重要なvisual・interaction・information designと不可分なUI実装 |
 | Reviewer | fresh GPT-5.6 Sol / XHIGH | 意味のある変更の独立レビュー |
 | Terra | 標準経路では不使用 | ユーザー指定または具体的な理由がある場合のみ |
 
-各workerとReviewerはいずれもCodex v0.147以上（v0.153を含む）の公開`spawn_agent`から**direct spawn**します。custom agentは使いません。
+Advisor・各worker・ReviewerはいずれもCodex v0.147以上（v0.153を含む）の公開`spawn_agent`から**direct spawn**します。custom agentは使いません。
+
+## Astra Advisor
+
+難しいPlanは、MainまたはLunaが現状を調べた後、Astra XHIGHに起草を依頼できます。
+設計案の比較、失敗が収束しないデバッグ、前提が変わった計画、重要な技術的争点にも使います。
+Mainが計画・助言の採否を決め、Workerへの分担と最終受理を担当します。
+単純な編集や通常のPlan更新では相談を強制しません。
+
+Mainは重要なユーザー発言と関連会話、現在の合意・制約、相談論点、必要なコードや
+失敗結果の抜粋を選んで渡します。Mainの仮説と一次証拠を区別し、全履歴はforkしません。
+会話の自動抽出機能はありません。Astraは関連ファイルを読み取り、不足情報をMainへ
+要求できますが、プロジェクトの編集・計画の実行は行いません。この制約は役割指示です。
+
+同じ論点の追加相談は同じAdvisorへ新しい証拠とMainの判断を送ります。
+Advisorを独立Reviewerとして再利用せず、既存のSolレビューを維持します。
+モデル・effortは計画作成と相談の両方で `gpt-6-astra / xhigh` 固定です。
+利用できない場合は制約を報告してMainで可能な作業を続け、別モデルへ黙って置換しません。
+
+```text
+$axiom:axiom
+認証方式の移行について現状を調べ、難しい設計判断はAstraに相談して計画を作ってください。
+```
+
+詳しい[相談方針](plugins/axiom/skills/axiom/references/advisor.md)と
+[起動例](plugins/axiom/skills/axiom/references/codex-0.147-subagents.md#astra-xhigh-advisor)を参照してください。
+従来のworker/reviewerの実機確認はAdvisorの実証にはなりません。
+品質・消費量は[Advisor評価手順](docs/ADVISOR_EVALS.md)で比較します。
 
 ## 明示呼び出し
 
@@ -65,6 +93,7 @@ $axiom:axiom
 
 - Codex CLI: **v0.147以上（v0.153を含む）**
 - Main model: **gpt-5.6-sol / xhigh**
+- Advisor: **gpt-6-astra / xhigh**（計画作成・相談ともに固定）
 - Ordinary worker: **gpt-5.6-luna / max / Fast**
 - Design worker: **gpt-5.6-sol / max**
 - Reviewer: **gpt-5.6-sol / xhigh**
@@ -144,6 +173,7 @@ User request
    ▼
 Main（Sol XHIGH）
    ├─ 意図・architecture・designの方向性と境界を保持
+   ├─ 難しいPlan・判断はAstra XHIGHへ相談し、Mainが採否を判断
    ├─ ordinary bounded workをLuna MAXへdirect spawn
    ├─ design-sensitive bounded workをSol MAXへdirect spawn
    ├─ independent workなら先にfan-out
@@ -342,6 +372,8 @@ python3 tools/package_release.py --output dist
 - [`DESIGN.md`](DESIGN.md)
 - [`docs/TRIGGER_EVALS.md`](docs/TRIGGER_EVALS.md)
 - [`docs/TRACE_EVALS.md`](docs/TRACE_EVALS.md)
+- [`docs/ADVISOR_EVALS.md`](docs/ADVISOR_EVALS.md)
+- [`plugins/axiom/skills/axiom/references/advisor.md`](plugins/axiom/skills/axiom/references/advisor.md)
 - [`plugins/axiom/skills/axiom/references/delegation.md`](plugins/axiom/skills/axiom/references/delegation.md)
 - [`plugins/axiom/skills/axiom/references/review.md`](plugins/axiom/skills/axiom/references/review.md)
 - [`plugins/axiom/skills/axiom/references/context-management.md`](plugins/axiom/skills/axiom/references/context-management.md)
